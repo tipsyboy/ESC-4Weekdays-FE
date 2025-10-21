@@ -1,9 +1,22 @@
-import ProductRegisterPage from '@/views/product/ProductRegisterPage.vue'
+import ProductList from '@/views/product/ProductList.vue'
+import ProductRegister from '@/views/product/ProductRegister.vue'
+import ProductDetail from '@/views/product/ProductDetail.vue'
 
 export default [
   {
+    path: '/product',
+    name: 'ProductList',
+    component: ProductList,
+  },
+  {
     path: '/product/register',
     name: 'ProductRegister',
-    component: ProductRegisterPage,
+    component: ProductRegister,
+  },
+  {
+    path: '/product/:id',
+    name: 'ProductDetail',
+    component: ProductDetail,
+    props: true, // id를 route param으로 전달받음
   },
 ]
