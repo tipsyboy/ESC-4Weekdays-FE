@@ -75,6 +75,7 @@ const munus = [
   { label: '리포트', icon: 'bar_chart', route: '/3' },
   { label: '상품 관리', icon: 'Shop', route: '/product' },
   { label: '외부 업체(Vendor)', icon: 'handshake', route: '/vendor' },
+  { label: '가맹점(Franchise)', icon: 'handshake', route: '/franchise' },
   { label: '직원 관리', icon: 'assignment_ind', route: '/employee' },
   { label: '작업 관리', icon: 'task', route: '/task/list' },
   { label: '모달 테스트', icon: 'frame_bug', route: '/modaltest' },
