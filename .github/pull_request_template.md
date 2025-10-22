@@ -1,4 +1,4 @@
-# 🧩 Issue Number
+# 🧩 Issue
 
 ## 📝 요약
 > PR의 목적이나 변경 내용을 간단히 요약
