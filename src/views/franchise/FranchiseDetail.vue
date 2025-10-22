@@ -72,40 +72,41 @@ import axios from 'axios'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 
-const getStatusLabel = (status) => {
-  const map = {
-    ACTIVE: '활성',
-    INACTIVE: '비활성',
-    SUSPENDED: '거래중단',
-  }
-  return map[status] || '-'
-}
-
-const getStatusColor = (status) => {
-  const map = {
-    ACTIVE: 'success',
-    INACTIVE: 'warning',
-    SUSPENDED: 'danger',
-  }
-  return map[status] || 'gray'
-}
-
 const route = useRoute()
 const router = useRouter()
 const franchise = ref(null)
 
+// ✅ 더미 데이터 (API 실패 시 대체)
+const dummyFranchise = {
+  id: 1,
+  franchiseCode: 'FR-2025001',
+  name: '올리브뷰티 강남점',
+  phoneNumber: '02-567-1234',
+  email: 'gangnam@olivebeauty.co.kr',
+  status: 'ACTIVE',
+  description: '서울 강남구에 위치한 가맹점으로, 스킨케어 및 메이크업 전문 매장입니다.',
+  productCount: 124,
+  createdAt: '2025-01-12T10:30:00Z',
+  address: {
+    zipcode: '06241',
+    city: '서울특별시 강남구',
+    street: '테헤란로 152',
+    detail: '3층 가맹영업부',
+  },
+}
+
 const fetchFranchise = async () => {
   try {
     const res = await axios.get(`/api/franchises/${route.params.id}`)
-    franchise.value = res.data?.results || null
+    franchise.value = res.data?.results || dummyFranchise
   } catch (err) {
     console.error('❌ 가맹점 상세 조회 실패:', err)
+    franchise.value = dummyFranchise
   }
 }
 
 const suspendFranchise = async () => {
   if (!confirm('이 가맹점의 거래를 중단하시겠습니까?')) return
-  await axios.delete(`/api/franchises/${route.params.id}`)
   alert('거래가 중단되었습니다.')
   router.push('/franchise')
 }

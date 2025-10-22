@@ -14,7 +14,7 @@ const franchiseRoutes = [
         component: FranchiseCreate,
     },
     {
-        path: '/franchise/detail',
+        path: '/franchise/:id',
         name: 'franchiseDetail',
         component: FranchiseDetail,
     },
