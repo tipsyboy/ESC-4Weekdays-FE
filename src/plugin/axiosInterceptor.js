@@ -3,6 +3,7 @@ import axios from 'axios'
 axios.defaults.withCredentials = true
 
 const api = axios.create({
+  // baseURL: 'http://localhost:8080',
   baseURL: '',
   timeout: 5000,
 })
@@ -10,6 +11,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // console.log('요청 보내기 전 실행')
+    console.log("요청 URL:", config.baseURL + config.url); // 테스트용
     return config
   },
   (error) => {

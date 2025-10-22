@@ -40,7 +40,7 @@
 
       <!-- 상태 -->
       <template #cell-status="{ row }">
-        <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)" />
+        <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)"/>
       </template>
 
       <!-- 주소 -->
@@ -57,8 +57,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import axios from 'axios'
+import {computed, onMounted, ref} from 'vue'
+import franchiseApi from "@/api/franchise/index.js";
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
@@ -99,24 +99,22 @@ const query = ref('')
 
 // ✅ 테이블 컬럼 정의
 const columns = [
-  { key: 'franchiseCode', label: '가맹점 코드', width: '12%' },
-  { key: 'name', label: '가맹점명' },
-  { key: 'phoneNumber', label: '연락처' },
-  { key: 'email', label: '이메일' },
-  { key: 'address', label: '주소' }, // street만 표시
-  { key: 'status', label: '상태', align: 'center' },
-  { key: 'createdAt', label: '등록일' },
+  {key: 'franchiseCode', label: '가맹점 코드', width: '12%'},
+  {key: 'name', label: '가맹점명'},
+  {key: 'phoneNumber', label: '연락처'},
+  {key: 'email', label: '이메일'},
+  {key: 'address', label: '주소'}, // street만 표시
+  {key: 'status', label: '상태', align: 'center'},
+  {key: 'createdAt', label: '등록일'},
 ]
 
-// ✅ axios로 franchise 목록 불러오기
+// import 사용해서 불러오는 방식! 기억을 상기시켜 보시기 바람니다!
 const fetchFranchises = async () => {
   try {
-    const res = await axios.get('/api/franchises/list', { params: { page: 0, size: 20 } })
-    // results.content 배열에서 데이터 추출
-    franchises.value = res.data?.results?.content || []
-  } catch (err) {
-    console.error('❌ 가맹점 목록 조회 실패:', err)
-    franchises.value = [] // 실패 시 빈 리스트
+    const res = await franchiseApi.franchiseReadAll(0, 10);
+    franchises.value = res.results.content || []
+  } catch (e) {
+    console.error("가맹점 목록 조회 실패:", e)
   }
 }
 

@@ -121,6 +121,7 @@ import {useRoute, useRouter} from 'vue-router'
 import axios from 'axios'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
+import franchiseApi from "@/api/franchise/index.js";
 
 const route = useRoute()
 const router = useRouter()
@@ -166,7 +167,7 @@ const fetchFranchise = async () => {
 // ✅ PATCH 수정 요청
 const updateFranchise = async () => {
   try {
-    const res = await axios.patch(`/api/franchises/${route.params.id}`, form.value)
+    const res = await franchiseApi.franchiseUpdate(form.value)
     if (res.data?.success) {
       alert('가맹점 정보가 수정되었습니다.')
       router.push({ name: 'franchiseDetail', params: { id: route.params.id } })
@@ -178,6 +179,8 @@ const updateFranchise = async () => {
     alert('수정 실패: ' + (err.response?.data?.message || '서버 오류'))
   }
 }
+
+// TODO 수정 되기 시작하면 테스트 해보고 수정하기 그냥 config 내가 수정할까?
 
 // ✅ 취소 버튼
 const cancelEdit = () => {
