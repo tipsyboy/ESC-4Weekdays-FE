@@ -179,13 +179,14 @@ const createFranchise = async () => {
 
   try {
     const res = await franchiseApi.franchiseCreate(form.value)
-    if (res.data?.success) {
+    console.log(res.success)
+    if (res.success) {
       alert('가맹점이 등록되었습니다.')
-      router.push({name: 'franchiseDetail', params: {id: res.data.results}})
+      router.push({name: 'franchiseDetail', params: {id: res.results}})
       // or
       // router.push({ name: 'FranchiseList'})
     } else {
-      alert('등록 실패: ' + (res.data?.message || '알 수 없는 오류'))
+      alert('등록 실패: ' + (res.message || '알 수 없는 오류'))
     }
   } catch (err) {
     console.error('❌ 등록 실패:', err)

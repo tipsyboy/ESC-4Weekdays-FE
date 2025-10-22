@@ -180,6 +180,8 @@ const updateFranchise = async () => {
   }
 }
 
+// TODO 수정 되기 시작하면 테스트 해보고 수정하기 그냥 config 내가 수정할까?
+
 // ✅ 취소 버튼
 const cancelEdit = () => {
   if (confirm('수정을 취소하시겠습니까? 변경사항은 저장되지 않습니다.')) {

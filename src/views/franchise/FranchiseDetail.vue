@@ -12,15 +12,15 @@
         </div>
 
         <div class="flex gap-2">
-          <ButtonComp color="secondary" icon="arrow_back" @click="$router.back()">
+          <ButtonComp color="secondary" icon="arrow_back" @click="$router.push({ name: 'franchiseList' })">
             뒤로가기
           </ButtonComp>
           <ButtonComp color="primary" icon="edit" @click="editFranchise">
             수정
           </ButtonComp>
-<!--          <ButtonComp color="danger" icon="block" @click="suspendFranchise">-->
-<!--            거래 중단-->
-<!--          </ButtonComp>-->
+          <!--          <ButtonComp color="danger" icon="block" @click="suspendFranchise">-->
+          <!--            거래 중단-->
+          <!--          </ButtonComp>-->
         </div>
       </div>
     </template>
@@ -41,7 +41,8 @@
           <div><span class="text-gray-500 text-sm block">이메일</span> {{ franchise.email || '-' }}</div>
           <div class="col-span-1 md:col-span-2">
             <span class="text-gray-500 text-sm block">설명</span> {{ franchise.description || '-' }}
-          </div> <br>
+          </div>
+          <br>
           <div><span class="text-gray-500 text-sm block">등록일</span> {{ formatDate(franchise.createdAt) }}</div>
           <div><span class="text-gray-500 text-sm block">최근 수정일</span> {{ formatDate(franchise.updatedAt) }}</div>
         </div>
@@ -99,7 +100,7 @@ const getFranchises = async () => {
 
 // ✅ 수정 이동 (name 기반)
 const editFranchise = () => {
-  router.push({ name: 'franchiseUpdate', params: { id: route.params.id } })
+  router.push({name: 'franchiseUpdate', params: {id: route.params.id}})
 }
 
 // ✅ 날짜 포맷
