@@ -14,7 +14,7 @@ const purchaseOrderRoutes = [
     component: PurchaseOrderCreate,
   },
   {
-    path: '/purchase/detail',
+    path: '/purchase/:id',
     name: 'purchaseOrderDetail',
     component: PurchaseOrderDetail,
   },
