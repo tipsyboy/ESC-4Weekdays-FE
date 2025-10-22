@@ -70,24 +70,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
+import {onMounted, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
+import franchiseApi from "@/api/franchise/index.js";
 
 const route = useRoute()
 const router = useRouter()
 const franchise = ref(null)
 
 // ✅ 가맹점 상세 조회
-const fetchFranchise = async () => {
+const getFranchises = async () => {
   try {
-    const res = await axios.get(`/api/franchises/${route.params.id}`)
-    franchise.value = res.data?.results || null
-  } catch (err) {
-    console.error('❌ 가맹점 상세 조회 실패:', err)
-    alert('가맹점 정보를 불러오는 중 오류가 발생했습니다.')
+    const res = await franchiseApi.franchiseRead(`${route.params.id}`)
+    franchise.value = (res.data?.results ?? res.results) || {}
+  } catch (e) {
+    console.error("가맹점 상세 조회 실패:", e)
   }
 }
 
@@ -115,5 +114,5 @@ const formatDate = (dateStr) => {
   })
 }
 
-onMounted(fetchFranchise)
+onMounted(getFranchises)
 </script>

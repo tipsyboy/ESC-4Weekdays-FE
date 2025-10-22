@@ -151,9 +151,9 @@
 <script setup>
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
-import axios from 'axios'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
+import franchiseApi from "@/api/franchise/index.js";
 
 const router = useRouter()
 
@@ -178,7 +178,7 @@ const createFranchise = async () => {
   }
 
   try {
-    const res = await axios.post('/api/franchises', form.value)
+    const res = await franchiseApi.franchiseCreate(form.value)
     if (res.data?.success) {
       alert('가맹점이 등록되었습니다.')
       router.push({name: 'franchiseDetail', params: {id: res.data.results}})
