@@ -31,7 +31,7 @@
       <!-- 가맹점코드 -->
       <template #cell-franchiseCode="{ row }">
         <RouterLink
-            :to="{name:'franchiseDetail', params:{id: row.id}}"
+            :to="{ name: 'franchiseDetail', params: { id: row.id } }"
             class="text-blue-600 dark:text-blue-400 hover:underline font-medium"
         >
           {{ row.franchiseCode }}
@@ -40,10 +40,15 @@
 
       <!-- 상태 -->
       <template #cell-status="{ row }">
-        <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)"/>
+        <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)" />
       </template>
 
-      <!-- 등록일 포맷 -->
+      <!-- 주소 -->
+      <template #cell-address="{ row }">
+        {{ row.address?.street || '-' }}
+      </template>
+
+      <!-- 등록일 -->
       <template #cell-createdAt="{ row }">
         {{ formatDate(row.createdAt) }}
       </template>
@@ -52,8 +57,7 @@
 </template>
 
 <script setup>
-import {ref, computed, onMounted} from 'vue'
-import {useRouter} from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
@@ -90,83 +94,29 @@ const formatDate = (dateStr) => {
   })
 }
 
-const router = useRouter()
 const franchises = ref([])
 const query = ref('')
 
-// ✅ 더미 데이터 (API 실패 시 대체)
-const dummyFranchises = [
-  {
-    id: 1,
-    franchiseCode: 'FR-2025001',
-    name: '올리브뷰티 강남점',
-    phoneNumber: '02-567-1234',
-    email: 'gangnam@olivebeauty.co.kr',
-    status: 'ACTIVE',
-    productCount: 124,
-    createdAt: '2025-01-12T10:30:00Z',
-  },
-  {
-    id: 2,
-    franchiseCode: 'FR-2025002',
-    name: '올리브뷰티 홍대점',
-    phoneNumber: '02-324-5678',
-    email: 'hongdae@olivebeauty.co.kr',
-    status: 'ACTIVE',
-    productCount: 98,
-    createdAt: '2025-02-03T14:20:00Z',
-  },
-  {
-    id: 3,
-    franchiseCode: 'FR-2025003',
-    name: '올리브뷰티 부산서면점',
-    phoneNumber: '051-802-3344',
-    email: 'busan@olivebeauty.co.kr',
-    status: 'INACTIVE',
-    productCount: 85,
-    createdAt: '2025-03-08T09:45:00Z',
-  },
-  {
-    id: 4,
-    franchiseCode: 'FR-2025004',
-    name: '올리브뷰티 대구중앙점',
-    phoneNumber: '053-422-7788',
-    email: 'daegu@olivebeauty.co.kr',
-    status: 'ACTIVE',
-    productCount: 110,
-    createdAt: '2025-03-25T16:10:00Z',
-  },
-  {
-    id: 5,
-    franchiseCode: 'FR-2025005',
-    name: '올리브뷰티 광주상무점',
-    phoneNumber: '062-381-5599',
-    email: 'gwangju@olivebeauty.co.kr',
-    status: 'SUSPENDED',
-    productCount: 60,
-    createdAt: '2025-04-15T13:00:00Z',
-  },
-]
-
-// 테이블 컬럼 정의
+// ✅ 테이블 컬럼 정의
 const columns = [
-  {key: 'franchiseCode', label: '가맹점 코드', width: '10%'},
-  {key: 'name', label: '가맹점명'},
-  {key: 'phoneNumber', label: '연락처'},
-  {key: 'email', label: '이메일'},
-  {key: 'status', label: '상태', align: 'center'},
-  {key: 'productCount', label: '상품 수', align: 'center'},
-  {key: 'createdAt', label: '등록일'},
+  { key: 'franchiseCode', label: '가맹점 코드', width: '12%' },
+  { key: 'name', label: '가맹점명' },
+  { key: 'phoneNumber', label: '연락처' },
+  { key: 'email', label: '이메일' },
+  { key: 'address', label: '주소' }, // street만 표시
+  { key: 'status', label: '상태', align: 'center' },
+  { key: 'createdAt', label: '등록일' },
 ]
 
 // ✅ axios로 franchise 목록 불러오기
 const fetchFranchises = async () => {
   try {
-    const res = await axios.get('/api/franchises/list', {params: {page: 0, size: 20}})
-    franchises.value = res.data?.results?.content || dummyFranchises
+    const res = await axios.get('/api/franchises/list', { params: { page: 0, size: 20 } })
+    // results.content 배열에서 데이터 추출
+    franchises.value = res.data?.results?.content || []
   } catch (err) {
     console.error('❌ 가맹점 목록 조회 실패:', err)
-    franchises.value = dummyFranchises
+    franchises.value = [] // 실패 시 빈 리스트
   }
 }
 

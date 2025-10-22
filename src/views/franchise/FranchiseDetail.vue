@@ -18,9 +18,9 @@
           <ButtonComp color="primary" icon="edit" @click="editFranchise">
             수정
           </ButtonComp>
-          <ButtonComp color="danger" icon="block" @click="suspendFranchise">
-            거래 중단
-          </ButtonComp>
+<!--          <ButtonComp color="danger" icon="block" @click="suspendFranchise">-->
+<!--            거래 중단-->
+<!--          </ButtonComp>-->
         </div>
       </div>
     </template>
@@ -34,14 +34,16 @@
         <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-white">기본 정보</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+          <div><span class="text-gray-500 text-sm block">가맹점 코드</span> {{ franchise.franchiseCode }}</div>
+          <div><span class="text-gray-500 text-sm block">가맹점명</span> {{ franchise.name }}</div>
           <div><span class="text-gray-500 text-sm block">상태</span> {{ franchise.status }}</div>
           <div><span class="text-gray-500 text-sm block">연락처</span> {{ franchise.phoneNumber || '-' }}</div>
           <div><span class="text-gray-500 text-sm block">이메일</span> {{ franchise.email || '-' }}</div>
           <div class="col-span-1 md:col-span-2">
             <span class="text-gray-500 text-sm block">설명</span> {{ franchise.description || '-' }}
-          </div>
+          </div> <br>
           <div><span class="text-gray-500 text-sm block">등록일</span> {{ formatDate(franchise.createdAt) }}</div>
-          <div><span class="text-gray-500 text-sm block">상품 수</span> {{ franchise.productCount }}</div>
+          <div><span class="text-gray-500 text-sm block">최근 수정일</span> {{ formatDate(franchise.updatedAt) }}</div>
         </div>
       </div>
 
@@ -52,9 +54,11 @@
       >
         <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-white">주소 정보</h2>
         <div class="space-y-2">
-          <div>{{ franchise.address?.zipcode || '-' }}</div>
-          <div>{{ franchise.address?.city || '' }}</div>
-          <div>{{ franchise.address?.street || '' }} {{ franchise.address?.detail || '' }}</div>
+          <div><span class="text-gray-500 text-sm block">우편번호</span> {{ franchise.address?.zipcode || '-' }}</div>
+          <div><span class="text-gray-500 text-sm block">도시</span> {{ franchise.address?.city || '-' }}</div>
+          <div><span class="text-gray-500 text-sm block">도로명 주소</span> {{ franchise.address?.street || '-' }}</div>
+          <div><span class="text-gray-500 text-sm block">상세주소</span> {{ franchise.address?.detail || '-' }}</div>
+          <div><span class="text-gray-500 text-sm block">국가 코드</span> {{ franchise.address?.country || '-' }}</div>
         </div>
       </div>
     </section>
@@ -76,48 +80,39 @@ const route = useRoute()
 const router = useRouter()
 const franchise = ref(null)
 
-// ✅ 더미 데이터 (API 실패 시 대체)
-const dummyFranchise = {
-  id: 1,
-  franchiseCode: 'FR-2025001',
-  name: '올리브뷰티 강남점',
-  phoneNumber: '02-567-1234',
-  email: 'gangnam@olivebeauty.co.kr',
-  status: 'ACTIVE',
-  description: '서울 강남구에 위치한 가맹점으로, 스킨케어 및 메이크업 전문 매장입니다.',
-  productCount: 124,
-  createdAt: '2025-01-12T10:30:00Z',
-  address: {
-    zipcode: '06241',
-    city: '서울특별시 강남구',
-    street: '테헤란로 152',
-    detail: '3층 가맹영업부',
-  },
-}
-
+// ✅ 가맹점 상세 조회
 const fetchFranchise = async () => {
   try {
     const res = await axios.get(`/api/franchises/${route.params.id}`)
-    franchise.value = res.data?.results || dummyFranchise
+    franchise.value = res.data?.results || null
   } catch (err) {
     console.error('❌ 가맹점 상세 조회 실패:', err)
-    franchise.value = dummyFranchise
+    alert('가맹점 정보를 불러오는 중 오류가 발생했습니다.')
   }
 }
 
-const suspendFranchise = async () => {
-  if (!confirm('이 가맹점의 거래를 중단하시겠습니까?')) return
-  alert('거래가 중단되었습니다.')
-  router.push('/franchise')
-}
+// ✅ 거래 중단
+// const suspendFranchise = async () => {
+//   if (!confirm('이 가맹점의 거래를 중단하시겠습니까?')) return
+//   alert('거래가 중단되었습니다.')
+//   router.push({ name: 'franchiseList' })
+// }
 
+// ✅ 수정 이동 (name 기반)
 const editFranchise = () => {
-  router.push(`/franchise/edit/${route.params.id}`)
+  router.push({ name: 'franchiseUpdate', params: { id: route.params.id } })
 }
 
+// ✅ 날짜 포맷
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString('ko-KR')
+  return new Date(dateStr).toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 onMounted(fetchFranchise)

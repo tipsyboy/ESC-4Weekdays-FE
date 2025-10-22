@@ -149,8 +149,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import {ref} from 'vue'
+import {useRouter} from 'vue-router'
 import axios from 'axios'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
@@ -181,7 +181,9 @@ const createFranchise = async () => {
     const res = await axios.post('/api/franchises', form.value)
     if (res.data?.success) {
       alert('가맹점이 등록되었습니다.')
-      router.push('/franchise')
+      router.push({name: 'franchiseDetail', params: {id: res.data.results}})
+      // or
+      // router.push({ name: 'FranchiseList'})
     } else {
       alert('등록 실패: ' + (res.data?.message || '알 수 없는 오류'))
     }
