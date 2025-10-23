@@ -17,6 +17,5 @@ export default [
     path: '/product/:id',
     name: 'ProductDetail',
     component: ProductDetail,
-    props: true, // id를 route param으로 전달받음
   },
 ]

@@ -129,6 +129,7 @@ import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
+import ProductApi from '@/api/product/index.js'
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -159,8 +160,8 @@ const filteredProductNames = ref([])
 
 // ✅ 상품 데이터 로드
 const fetchProducts = async () => {
-  const res = await axios.get(`/api/products?page=${page.value}&size=${size.value}`)
-  const data = res.data.results
+  const res = await ProductApi.productList(page.value, size.value)
+  const data = res.results
   totalPages.value = data.totalPages
 
   const list = data.content.map(p => ({
