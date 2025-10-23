@@ -98,7 +98,7 @@ const columns = [
 // ✅ axios로 vendor 목록 불러오기
 const fetchVendors = async () => {
   try {
-    const res = await axios.get('/api/vendors/list', { params: { page: 0, size: 20 } })
+    const res = await axios.get('/api/vendors', { params: { page: 0, size: 20 } })
     vendors.value = res.data?.results?.content || []
   } catch (err) {
     console.error('❌ Vendor 목록 조회 실패:', err)
