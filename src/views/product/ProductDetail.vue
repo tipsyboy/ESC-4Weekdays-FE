@@ -65,20 +65,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import axios from 'axios'
+import {onMounted, ref} from 'vue'
+import {useRoute} from 'vue-router'
 
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
+import ProductApi from '@/api/product/index.js'
 
 const route = useRoute()
 const product = ref(null)
 
 const fetchProductDetail = async () => {
-  const res = await axios.get(`/api/products/${route.params.id}`)
-  product.value = res.data.results
+  const res = await ProductApi.productDetail(route.params.id)
+  product.value = res.results
 }
 
 const getStatusLabel = (status) =>

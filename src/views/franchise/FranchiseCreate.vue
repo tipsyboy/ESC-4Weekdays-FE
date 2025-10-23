@@ -179,7 +179,6 @@ const createFranchise = async () => {
 
   try {
     const res = await franchiseApi.franchiseCreate(form.value)
-    console.log(res.success)
     if (res.success) {
       alert('가맹점이 등록되었습니다.')
       router.push({name: 'franchiseDetail', params: {id: res.results}})
