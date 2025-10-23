@@ -11,7 +11,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // console.log('요청 보내기 전 실행')
-    console.log("요청 URL:", config.baseURL + config.url); // 테스트용
+    // console.log("요청 URL:", config.baseURL + config.url); // 테스트용
     return config
   },
   (error) => {
