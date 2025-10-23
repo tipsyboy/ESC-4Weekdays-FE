@@ -12,6 +12,7 @@ import WorkerTaskView from '@/views/task/WorkerTaskView.vue'
 import vendorRoutes from '@/router/vendorRoutes.js'
 import franchiseRoutes from '@/router/franchiseRoutes.js'
 import announcementRoutes from './announcementRoutes'
+import warehouseRoutes from "@/router/warehouseRoutes.js";
 
 const routes = [
   {
@@ -37,6 +38,7 @@ const routes = [
   ...vendorRoutes,
   ...franchiseRoutes,
   ...announcementRoutes,
+  ...warehouseRoutes,
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

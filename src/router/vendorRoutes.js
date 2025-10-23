@@ -4,17 +4,17 @@ import vendorDetail from '@/views/vendor/VendorDetail.vue'
 
 const vendorRoutes = [
   {
-    path: '/vendor',
+    path: '/vendors',
     name: 'vendorList',
     component: vendorList,
   },
   {
-    path: '/vendor/create',
+    path: '/vendors/create',
     name: 'vendorCreate',
     component: vendorCreate,
   },
   {
-    path: '/vendor/:id',
+    path: '/vendors/:id',
     name: 'vendorDetail',
     component: vendorDetail,
     props: true,
