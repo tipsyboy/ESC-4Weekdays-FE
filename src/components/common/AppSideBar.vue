@@ -74,7 +74,7 @@ const munus = [
   { label: '재고', icon: 'inventory_2', route: '/2' },
   { label: '리포트', icon: 'bar_chart', route: '/3' },
   { label: '상품 관리', icon: 'Shop', route: '/product' },
-  { label: '외부 업체(Vendor)', icon: 'handshake', route: '/vendor' },
+  { label: '외부 업체(Vendor)', icon: 'handshake', route: '/vendors' },
   { label: '가맹점(Franchise)', icon: 'handshake', route: '/franchise' },
   { label: '직원 관리', icon: 'assignment_ind', route: '/employee' },
   { label: '작업 관리', icon: 'task', route: '/task/list' },
@@ -90,7 +90,7 @@ const toggleDarkMode = () => {
   isDarkMode.value = document.documentElement.classList.contains('dark')
 }
 
-// ✅ 반응형 자동 접힘
+// 반응형 자동 접힘
 const handleResize = () => {
   if (window.innerWidth < 1024) {
     // lg 미만일 때 닫기

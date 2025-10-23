@@ -1,148 +1,155 @@
 <template>
   <AppPageLayout>
+    <!-- 페이지 헤더 -->
     <template #header>
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">외부 업체 등록</h1>
+          <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">공급업체 등록</h1>
           <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            신규 외부 협력업체 정보를 입력하세요
+            새로운 공급업체를 등록합니다.
           </p>
         </div>
-        <div class="flex gap-2">
-          <ButtonComp color="secondary" icon="arrow_back" @click="$router.back()">뒤로가기</ButtonComp>
-          <ButtonComp color="primary" icon="save" @click="createVendor">등록</ButtonComp>
-        </div>
+        <ButtonComp color="secondary" icon="arrow_back" @click="$router.back()">뒤로가기</ButtonComp>
       </div>
     </template>
 
+    <!-- 본문 -->
     <section
       class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
              rounded-xl shadow-sm p-6 md:p-8 backdrop-blur-sm space-y-8"
     >
       <!-- 기본 정보 -->
-      <div class="space-y-5">
-        <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">기본 정보</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-medium text-slate-700 dark:text-slate-200">업체명 *</span>
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">기본 정보</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">공급업체명</label>
             <input
               v-model="form.name"
               type="text"
-              placeholder="업체명을 입력하세요"
-              class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              placeholder="예: 아모레퍼시픽"
+              class="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 py-2.5
+                     text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-800
+                     placeholder-slate-400 dark:placeholder-slate-500
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
             />
-          </label>
+          </div>
 
-          <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-medium text-slate-700 dark:text-slate-200">연락처</span>
-            <input
-              v-model="form.phoneNumber"
-              type="text"
-              placeholder="예: 02-1234-5678"
-              class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
-            />
-          </label>
-
-          <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-medium text-slate-700 dark:text-slate-200">이메일</span>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">이메일</label>
             <input
               v-model="form.email"
               type="email"
               placeholder="example@company.com"
-              class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              class="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 py-2.5
+                     text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-800
+                     placeholder-slate-400 dark:placeholder-slate-500
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
             />
-          </label>
+          </div>
 
-          <label class="flex flex-col gap-1.5 md:col-span-2">
-            <span class="text-xs font-medium text-slate-700 dark:text-slate-200">설명</span>
-            <textarea
-              v-model="form.description"
-              rows="3"
-              placeholder="업체 설명을 입력하세요"
-              class="w-full px-3 py-2 text-sm rounded-md resize-none
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">전화번호</label>
+            <input
+              v-model="form.phoneNumber"
+              type="text"
+              placeholder="예: 02-1234-5678"
+              class="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 py-2.5
+                     text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-800
+                     placeholder-slate-400 dark:placeholder-slate-500
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
             />
-          </label>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">설명</label>
+            <input
+              v-model="form.description"
+              type="text"
+              placeholder="공급업체 관련 설명"
+              class="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 py-2.5
+                     text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-800
+                     placeholder-slate-400 dark:placeholder-slate-500
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+            />
+          </div>
         </div>
       </div>
 
       <!-- 주소 정보 -->
-      <div class="space-y-5">
-        <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">주소 정보</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-medium text-slate-700 dark:text-slate-200">우편번호</span>
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">주소 정보</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">우편번호</label>
             <input
-              v-model="form.address.zipcode"
+              v-model="form.zipcode"
               type="text"
-              placeholder="예: 06241"
-              class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              placeholder="예: 12345"
+              class="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 py-2.5
+                     text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-800
+                     placeholder-slate-400 dark:placeholder-slate-500
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
             />
-          </label>
+          </div>
 
-          <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-medium text-slate-700 dark:text-slate-200">도시</span>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">도로명 주소</label>
             <input
-              v-model="form.address.city"
+              v-model="form.street"
+              type="text"
+              placeholder="예: 서울특별시 강남구 테헤란로 123"
+              class="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 py-2.5
+                     text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-800
+                     placeholder-slate-400 dark:placeholder-slate-500
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">상세 주소</label>
+            <input
+              v-model="form.detail"
+              type="text"
+              placeholder="예: ○○빌딩 3층"
+              class="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 py-2.5
+                     text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-800
+                     placeholder-slate-400 dark:placeholder-slate-500
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">도시</label>
+            <input
+              v-model="form.city"
               type="text"
               placeholder="예: 서울특별시 강남구"
-              class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              class="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 py-2.5
+                     text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-800
+                     placeholder-slate-400 dark:placeholder-slate-500
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
             />
-          </label>
+          </div>
 
-          <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-medium text-slate-700 dark:text-slate-200">도로명 주소</span>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">국가 코드</label>
             <input
-              v-model="form.address.street"
+              v-model="form.country"
               type="text"
-              placeholder="예: 테헤란로 123"
-              class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              placeholder="예: KR"
+              class="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 px-3 py-2.5
+                     text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-800
+                     placeholder-slate-400 dark:placeholder-slate-500
+                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
             />
-          </label>
-
-          <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-medium text-slate-700 dark:text-slate-200">상세주소</span>
-            <input
-              v-model="form.address.detail"
-              type="text"
-              placeholder="예: 5층 물류부"
-              class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
-            />
-          </label>
+          </div>
         </div>
+      </div>
+
+      <!-- 하단 버튼 -->
+      <div class="flex justify-end pt-6 border-t border-zinc-200 dark:border-zinc-700">
+        <ButtonComp color="primary" icon="save" @click="createVendor">저장</ButtonComp>
       </div>
     </section>
   </AppPageLayout>
@@ -151,7 +158,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import api from '@/api/vendor'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 
@@ -159,35 +166,23 @@ const router = useRouter()
 
 const form = ref({
   name: '',
-  phoneNumber: '',
   email: '',
+  phoneNumber: '',
   description: '',
-  address: {
-    zipcode: '',
-    street: '',
-    detail: '',
-    city: '',
-    country: 'KR',
-  },
+  zipcode: '',
+  street: '',
+  detail: '',
+  city: '',
+  country: '',
 })
 
 const createVendor = async () => {
-  if (!form.value.name) {
-    alert('업체명은 필수입니다.')
-    return
-  }
-
-  try {
-    const res = await axios.post('/api/vendors', form.value)
-    if (res.data?.success) {
-      alert('업체가 등록되었습니다.')
-      router.push('/vendor')
-    } else {
-      alert('등록 실패: ' + (res.data?.message || '알 수 없는 오류'))
-    }
-  } catch (err) {
-    console.error('❌ 등록 실패:', err)
-    alert('등록 실패: ' + (err.response?.data?.message || '서버 오류'))
+  if (!form.value.name) return alert('공급업체명을 입력해주세요.')
+  const res = await api.createVendor(form.value)
+  if (res.isSuccess) {
+    alert('공급업체가 등록되었습니다.')
+    router.push('/vendors')
   }
 }
 </script>
+
