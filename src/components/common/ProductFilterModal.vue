@@ -1,7 +1,12 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import ModalComp from '@/components/common/ModalComp.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
+import { useVendorStore } from '@/stores/vendorStore'
+
+// ✅ 전역에서 매입처 목록 가져오기
+const { vendorList } = storeToRefs(useVendorStore())
 
 const props = defineProps({
   open: Boolean,
@@ -9,8 +14,10 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'apply'])
 
-// 검색 조건 데이터
+// ✅ 검색 조건 데이터
 const form = ref({
+  vendors: [], // [{id, name}] 형태로 저장
+  selectedVendorId: '', // 현재 선택 중인 매입처 id
   code: '',
   name: '',
   unit: '',
@@ -21,15 +28,38 @@ const form = ref({
   updatedDate: '',
 })
 
-// “적용” 버튼 클릭 시 부모로 조건 전달
+// ✅ v-model이 바뀔 때마다 선택된 매입처를 vendors 배열에 추가
+watch(
+    () => form.value.selectedVendorId,
+    (id) => {
+      if (!id) return
+      const selected = vendorList.value.find(v => v.id === Number(id))
+      if (selected && !form.value.vendors.some(v => v.id === selected.id)) {
+        form.value.vendors.push(selected)
+      }
+      form.value.selectedVendorId = '' // 다시 선택 가능하도록 초기화
+    }
+)
+
+// ✅ 매입처 제거
+const removeVendor = (vendorId) => {
+  form.value.vendors = form.value.vendors.filter(v => v.id !== vendorId)
+}
+
+// ✅ “적용” 버튼 클릭 시 부모로 조건 전달
 const handleApply = () => {
-  emit('apply', { ...form.value })
+  emit('apply', {
+    ...form.value,
+    vendors: form.value.vendors.map(v => v.id), // id만 전달
+  })
   emit('close')
 }
 
-// 초기화 버튼 클릭 시
+// ✅ 초기화 버튼 클릭 시
 const handleReset = () => {
   form.value = {
+    vendors: [],
+    selectedVendorId: '',
     code: '',
     name: '',
     unit: '',
@@ -40,6 +70,11 @@ const handleReset = () => {
     updatedDate: '',
   }
 }
+
+// ✅ 중복된 vendor는 선택 목록에서 제외
+const availableVendors = computed(() =>
+    vendorList.value.filter(v => !form.value.vendors.some(sel => sel.id === v.id))
+)
 </script>
 
 <template>
@@ -50,6 +85,44 @@ const handleReset = () => {
       @close="emit('close')"
   >
     <form class="space-y-4">
+
+      <!-- ✅ 0행: 매입처 -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          매입처
+        </label>
+
+        <!-- v-model 기반 선택 -->
+        <select v-model="form.selectedVendorId" class="input">
+          <option value="" hidden>매입처 선택...</option> <!-- ✅ 문자열로 value -->
+          <option
+              v-for="vendor in availableVendors"
+              :key="vendor.id"
+              :value="vendor.id"
+          >
+            {{ vendor.name }}
+          </option>
+        </select>
+
+        <!-- 선택된 매입처 태그 -->
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span
+              v-for="vendor in form.vendors"
+              :key="vendor.id"
+              class="flex items-center gap-1 bg-primary/10 text-primary text-sm font-medium px-2 py-1 rounded-full"
+          >
+            {{ vendor.name }}
+            <button
+                type="button"
+                class="text-primary hover:text-red-500 font-bold"
+                @click="removeVendor(vendor.id)"
+            >
+              ×
+            </button>
+          </span>
+        </div>
+      </div>
+
       <!-- 1행: 상품 코드 / 상품 이름 -->
       <div class="grid grid-cols-2 gap-4">
         <div>
