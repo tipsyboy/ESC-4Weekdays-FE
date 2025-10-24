@@ -2,6 +2,12 @@
     <AppPageLayout>
         <div class="p-6 space-y-8">
             <!-- 헤더 -->
+            <div class="bg-yellow-50 border border-yellow-300 text-yellow-800 rounded-lg py-3 px-6 mx-auto mb-6 max-w-3xl
+         flex justify-center items-center gap-3 cursor-pointer hover:bg-yellow-100 transition"
+                @click="$router.push('/announcement')">
+                <span class="text-lg">📢</span>
+                <span class="font-medium truncate">[공지] {{ latestAnnouncement?.title || '공지사항을 확인하세요!' }}</span>
+            </div>
             <div class="flex items-center justify-between border-b pb-4">
                 <div>
                     <h1 class="text-2xl font-semibold text-gray-800">입출고 및 반품 현황</h1>
@@ -190,6 +196,9 @@ import { ref, onMounted, nextTick } from 'vue'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import { Doughnut, Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale, } from 'chart.js'
+import announcementApi from '@/api/announcement'
+
+const latestAnnouncement = ref(null)
 const filters = ['기간']
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
 
@@ -312,7 +321,19 @@ const vendorReturnOptions = ref({
 const pieChart = ref(null)
 const barChart = ref(null)
 
+const fetchLatestAnnouncement = async () => {
+    try {
+        const response = await announcementApi.announcementList(0, 1);
+        if (response && response.results && response.results.content && response.results.content.length > 0) {
+            latestAnnouncement.value = response.results.content[0];
+        }
+    } catch (error) {
+        console.error('Error fetching latest announcement:', error);
+    }
+};
+
 onMounted(async () => {
+    fetchLatestAnnouncement()
     await nextTick()
     pieChart.value?.chart.reset()
     pieChart.value?.chart.update()
