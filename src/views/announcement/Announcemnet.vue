@@ -61,6 +61,7 @@ import ButtonComp from '@/components/common/ButtonComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
 import announcementApi from '@/api/announcement/index.js'
+import { formatDate } from '@/utils/date.js'
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -91,7 +92,7 @@ const fetchAnnouncements = async () => {
         id: item.id,
         title: item.title,
         name: item.name,
-        createdAt: item.createdAt,
+        createdAt: formatDate(item.createdAt),
     }))
 
     announcementList.value = list
