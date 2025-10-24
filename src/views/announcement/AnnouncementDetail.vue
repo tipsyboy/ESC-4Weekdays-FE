@@ -32,7 +32,7 @@
                 <!-- 작성 정보 -->
                 <div class="flex items-center gap-4 text-sm text-gray-500 mt-3">
                     <span>작성자: {{ announcement.name }}</span>
-                    <span>작성일: {{ announcement.createdAt }}</span>
+                    <span>작성일: {{ formatDate(announcement.createdAt) }}</span>
                 </div>
             </div>
 
@@ -100,6 +100,7 @@ import ButtonComp from '@/components/common/ButtonComp.vue'
 import ModalComp from '@/components/common/ModalComp.vue'
 import { useRouter, useRoute } from 'vue-router'
 import announcementApi from '@/api/announcement/index.js'
+import { formatDate } from '@/utils/date.js'
 
 const router = useRouter()
 const route = useRoute()
