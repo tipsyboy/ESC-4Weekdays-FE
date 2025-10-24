@@ -7,9 +7,9 @@
       <RouterView v-slot="{ Component, route }" class="flex-1 overflow-y-auto">
         <transition
           mode="out-in"
-          enter-active-class="transition-opacity duration-300"
+          enter-active-class="transition-opacity duration-200"
           enter-from-class="opacity-0"
-          leave-active-class="transition-opacity duration-300"
+          leave-active-class="transition-opacity duration-200"
           leave-to-class="opacity-0"
         >
           <!-- page fade 기능 구현 -->
