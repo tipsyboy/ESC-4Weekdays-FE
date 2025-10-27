@@ -17,24 +17,16 @@
     </template>
 
     <!-- 본문 -->
-    <section
-      class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-             rounded-xl shadow-sm p-6 md:p-8 space-y-6"
-    >
+    <section class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
+             rounded-xl shadow-sm p-6 md:p-8 space-y-6">
       <!-- 🔹 필터 영역 -->
-      <div
-        class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
-               rounded-lg p-4 grid grid-cols-1 md:grid-cols-4 gap-4"
-      >
+      <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+               rounded-lg p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
         <!-- 브랜드 -->
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">브랜드</label>
-          <select
-            v-model="filters.vendorName"
-            @change="filterProductNames"
-            class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
-                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-          >
+          <select v-model="filters.vendorName" @change="filterProductNames" class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
+                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
             <option value="">전체</option>
             <option value="자체 생산">자체 생산</option>
             <option v-for="v in vendorOptions" :key="v" :value="v">{{ v }}</option>
@@ -44,11 +36,8 @@
         <!-- 상품명 -->
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">상품명</label>
-          <select
-            v-model="filters.name"
-            class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
-                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-          >
+          <select v-model="filters.name" class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
+                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
             <option value="">전체</option>
             <option v-for="n in filteredProductNames" :key="n" :value="n">{{ n }}</option>
           </select>
@@ -57,11 +46,8 @@
         <!-- 가격 정렬 -->
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">가격 정렬</label>
-          <select
-            v-model="filters.priceOrder"
-            class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
-                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-          >
+          <select v-model="filters.priceOrder" class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
+                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
             <option value="">기본 순서</option>
             <option value="asc">가격 낮은 순</option>
             <option value="desc">가격 높은 순</option>
@@ -71,11 +57,8 @@
         <!-- 상태 -->
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">상태</label>
-          <select
-            v-model="filters.status"
-            class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
-                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-          >
+          <select v-model="filters.status" class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
+                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
             <option value="">전체</option>
             <option value="ACTIVE">활성</option>
             <option value="INACTIVE">품절</option>
@@ -90,11 +73,8 @@
       <!-- 테이블 -->
       <TableComp :columns="columns" :data="filteredAndSortedList" class="min-h-[400px]">
         <template #cell="{ row, col }">
-          <span
-            v-if="col.key === 'productCode' || col.key === 'name'"
-            class="text-indigo-600 hover:underline cursor-pointer"
-            @click="goDetail(row)"
-          >
+          <span v-if="col.key === 'productCode' || col.key === 'name'"
+            class="text-indigo-600 hover:underline cursor-pointer" @click="goDetail(row)">
             {{ row[col.key] }}
           </span>
           <span v-else>{{ row[col.key] }}</span>
@@ -103,19 +83,10 @@
 
       <!-- 페이지네이션 -->
       <div class="flex justify-center items-center gap-2">
-        <ButtonComp
-          color="secondary"
-          icon="arrow_back"
-          :disabled="page === 0"
-          @click="changePage(page - 1)"
-        />
+        <ButtonComp color="secondary" icon="arrow_back" :disabled="page === 0" @click="changePage(page - 1)" />
         <span class="text-sm text-slate-600">페이지 {{ page + 1 }} / {{ totalPages }}</span>
-        <ButtonComp
-          color="secondary"
-          icon="arrow_forward"
-          :disabled="page >= totalPages - 1"
-          @click="changePage(page + 1)"
-        />
+        <ButtonComp color="secondary" icon="arrow_forward" :disabled="page >= totalPages - 1"
+          @click="changePage(page + 1)" />
       </div>
     </section>
   </AppPageLayout>

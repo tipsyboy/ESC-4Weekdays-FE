@@ -13,8 +13,8 @@ export const STATUS_MAP = {
 
   // 직원
   active: { label: '재직', color: 'success' },
-  inactive: { label: '퇴사', color: 'gray' },
-  leave: { label: '휴직', color: 'warning' },
+  inactive: { label: '휴직', color: 'warning' },
+  lock: { label: '퇴사', color: 'gray' },
 
   // 배송 / 물류
   preparing: { label: '준비 중', color: 'warning' },
@@ -30,6 +30,11 @@ export const STATUS_MAP = {
   canceled: { label: '취소됨', color: 'danger' },
   error: { label: '에러', color: 'danger' },
   unknown: { label: '알 수 없음', color: 'gray' },
+
+  //권한
+  worker: { label: '작업자', color: 'info' },
+  manager: { label: '매니저', color: 'primary' },
+  admin: { label: '관리자', color: 'danger' },
 }
 
 // 레이블

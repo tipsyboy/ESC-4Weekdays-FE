@@ -31,11 +31,15 @@
         <!-- 데이터 테이블 -->
         <TableComp :columns="columns" :data="filteredEmployees">
             <template #cell-name="{ row }">
-                <RouterLink to="/employee/detail" class="text-sky-500 hover:underline">{{ row.name }}</RouterLink>
+                <span @click="goDetail(row)" class="text-sky-500 hover:underline">{{ row.name }}</span>
             </template>
             <!-- 상태 컬럼 -->
             <template #cell-status="{ row }">
                 <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)" />
+            </template>
+            <!-- 권한 컬럼 -->
+            <template #cell-role="{ row }">
+                <BadgeComp :color="getStatusColor(row.role)" :label="getStatusLabel(row.role)" />
             </template>
         </TableComp>
 
@@ -57,6 +61,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { getStatusLabel, getStatusColor } from '@/utils/statusMapper.js'
 import member from '@/api/member'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
@@ -64,6 +69,8 @@ import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
+
+const router = useRouter()
 
 // 검색어 상태
 const query = ref('')
@@ -127,5 +134,8 @@ const filteredEmployees = computed(() => {
 const handleSearch = () => {
 
     console.log('검색 실행:', query.value)
+}
+const goDetail = (row) => {
+    router.push(`/employee/${row.id}`)
 }
 </script>

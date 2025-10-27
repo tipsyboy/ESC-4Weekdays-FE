@@ -12,7 +12,7 @@ import WorkerTaskView from '@/views/task/WorkerTaskView.vue'
 import vendorRoutes from '@/router/vendorRoutes.js'
 import franchiseRoutes from '@/router/franchiseRoutes.js'
 import announcementRoutes from './announcementRoutes'
-import warehouseRoutes from "@/router/warehouseRoutes.js";
+import warehouseRoutes from '@/router/warehouseRoutes.js'
 
 const routes = [
   {
@@ -23,10 +23,7 @@ const routes = [
     path: '/test',
     component: ModalTest,
   },
-  {
-    path: '/ab',
-    component: WorkerTaskView,
-  },
+
   ...purchaseOrderRoutes,
   ...inboundRoutes,
   ...dashboardRoutes,

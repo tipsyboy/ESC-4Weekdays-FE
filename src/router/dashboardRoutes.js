@@ -1,12 +1,11 @@
-import DashBoardMain from "@/views/dashboard/DashboardMain.vue"
-import EmployeeCreate from "@/views/employee/EmployeeCreate.vue"
+import DashBoardMain from '@/views/dashboard/DashboardMain.vue'
 
 const dashboardRoutes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: DashBoardMain
-  }
+    component: DashBoardMain,
+  },
 ]
 
 export default dashboardRoutes
