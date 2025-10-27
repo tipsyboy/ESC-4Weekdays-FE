@@ -204,13 +204,11 @@ const getStatusLabel = (status) => {
   return map[status] || '-'
 }
 
-// 상세 조회
 const loadVendor = async () => {
   const res = await api.getVendorDetail(route.params.id)
   if (res.success) vendor.value = res.results
 }
 
-// 수정 모달 열기
 const openEditModal = async () => {
   editForm.value = {
     ...vendor.value,
@@ -226,7 +224,6 @@ const openEditModal = async () => {
   isEditModal.value = true
 }
 
-// 수정 저장
 const submitUpdate = async () => {
   const req = {
     name: editForm.value.name,
@@ -246,7 +243,6 @@ const submitUpdate = async () => {
   }
 }
 
-// 상태 변경 (활성화 / 중단)
 const updateStatus = async (newStatus) => {
   const confirmMsg =
     newStatus === 'SUSPENDED'
