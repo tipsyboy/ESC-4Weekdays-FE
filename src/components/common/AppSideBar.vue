@@ -72,7 +72,6 @@ const munus = [
   { label: '입고', icon: 'inventory', route: '/inbound' },
   { label: '출고', icon: 'local_shipping', route: '/outbound' },
   { label: '재고', icon: 'inventory_2', route: '/2' },
-  { label: '리포트', icon: 'bar_chart', route: '/3' },
   { label: '상품 관리', icon: 'Shop', route: '/product' },
   { label: '외부 업체(Vendor)', icon: 'handshake', route: '/vendors' },
   { label: '가맹점(Franchise)', icon: 'handshake', route: '/franchise' },
