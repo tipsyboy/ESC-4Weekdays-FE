@@ -48,12 +48,12 @@ const memberList = async (page, size) => {
   return data
 }
 
-const memberEdit = async (id) => {
+const memberEdit = async (id, req) => {
   let data = {}
   let url = `/api/member/${id}`
 
   await api
-    .patch(url)
+    .patch(url, req)
     .then((res) => {
       data = res.data
     })
@@ -95,5 +95,28 @@ const memberEmailCheck = async (req) => {
 
   return data
 }
+const memberDetail = async (id) => {
+  let data = {}
+  let url = `/api/member/${id}`
 
-export default { memberLogin, memberLogout, memberList, memberEdit, memberCreate, memberEmailCheck }
+  await api
+    .get(url)
+    .then((res) => {
+      data = res.data
+    })
+    .catch((error) => {
+      data = error.data
+    })
+
+  return data
+}
+
+export default {
+  memberLogin,
+  memberLogout,
+  memberList,
+  memberEdit,
+  memberCreate,
+  memberEmailCheck,
+  memberDetail,
+}
