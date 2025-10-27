@@ -38,12 +38,27 @@
                 <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)" />
             </template>
         </TableComp>
+
+        <!-- 페이지네이션 -->
+
+        <div class="flex justify-center items-center gap-2">
+
+            <ButtonComp color="secondary" icon="arrow_back" :disabled="currentPage === 1"
+                @click="handlePageChange(currentPage - 1)" />
+
+            <span class="text-sm text-slate-600">페이지 {{ currentPage }} / {{ totalPages }}</span>
+
+            <ButtonComp color="secondary" icon="arrow_forward" :disabled="currentPage >= totalPages"
+                @click="handlePageChange(currentPage + 1)" />
+
+        </div>
     </AppPageLayout>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { getStatusLabel, getStatusColor } from '@/utils/statusMapper.js'
+import member from '@/api/member'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
@@ -60,55 +75,43 @@ const filters = ['부서', '권한', '상태']
 const columns = [
     { key: 'email', label: '이메일', width: '20%' },
     { key: 'name', label: '이름', width: '10%' },
-    { key: 'phone', label: '전화번호', width: '15%', align: 'center' },
+    { key: 'phoneNumber', label: '전화번호', width: '15%', align: 'center' },
     { key: 'role', label: '권한', width: '10%', align: 'center' },
     { key: 'status', label: '상태', width: '10%', align: 'center' },
 ]
 
-// ✅ 직원 목업 데이터
-const employees = ref([
-    {
-        email: 'kimcs@company.com',
-        name: '김철수',
-        phone: '010-1234-5678',
-        position: '사원',
-        role: 'WORKER',
-        status: 'active', // ✅ 재직
-    },
-    {
-        email: 'leeyh@company.com',
-        name: '이영희',
-        phone: '010-2345-6789',
-        position: '대리',
-        role: 'ADMINE',
-        status: 'active', // ✅ 재직
-    },
-    {
-        email: 'parkms@company.com',
-        name: '박민수',
-        phone: '010-3456-7890',
-        position: '과장',
-        role: 'WORKER',
-        status: 'leave', // ✅ 휴직
-    },
-    {
-        email: 'jungsj@company.com',
-        name: '정수진',
-        phone: '010-4567-8901',
-        position: '차장',
-        role: 'ADMINE',
-        status: 'inactive', // ✅ 퇴사
-    },
-    {
-        email: 'kimcs2@company.com',
-        name: '김철수',
-        phone: '010-9876-5432',
-        position: '부장',
-        role: 'MASTER',
-        status: 'active', // ✅ 재직
-    },
-])
+const page = ref(0)
+const size = ref(10)
+const totalPages = ref(1)
+const employees = ref([])
 
+const fetchEmployees = async () => {
+    const res = await member.memberList(page.value, size.value)
+    const data = res.results
+    totalPages.value = data.totalPages
+
+    employees.value = data.content.map((item) => ({
+        id: item.id,
+        email: item.email,
+        name: item.name,
+        phoneNumber: item.phoneNumber,
+        role: item.role,
+        status: item.status,
+    }))
+}
+
+const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages.value) {
+        page.value = newPage - 1
+        fetchEmployees()
+    }
+}
+
+const currentPage = computed(() => page.value + 1)
+
+onMounted(() => {
+    fetchEmployees()
+})
 
 // ✅ 검색 결과 필터링
 const filteredEmployees = computed(() => {
@@ -122,6 +125,7 @@ const filteredEmployees = computed(() => {
 
 // 검색 실행
 const handleSearch = () => {
+
     console.log('검색 실행:', query.value)
 }
 </script>

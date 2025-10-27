@@ -31,4 +31,69 @@ const memberLogout = async (req) => {
 
   return data
 }
-export default { memberLogin, memberLogout }
+
+const memberList = async (page, size) => {
+  let data = {}
+  let url = '/api/member/list'
+
+  await api
+    .get(url, { params: { page, size } })
+    .then((res) => {
+      data = res.data
+    })
+    .catch((error) => {
+      data = error.data
+    })
+
+  return data
+}
+
+const memberEdit = async (id) => {
+  let data = {}
+  let url = `/api/member/${id}`
+
+  await api
+    .patch(url)
+    .then((res) => {
+      data = res.data
+    })
+    .catch((error) => {
+      data = error.data
+    })
+
+  return data
+}
+
+const memberCreate = async (req) => {
+  let data = {}
+  let url = '/api/member/signup'
+
+  await api
+    .post(url, req)
+    .then((res) => {
+      data = res.data
+    })
+    .catch((error) => {
+      data = error.data
+    })
+
+  return data
+}
+
+const memberEmailCheck = async (req) => {
+  let data = {}
+  let url = '/api/member/check-email'
+
+  await api
+    .post(url, req)
+    .then((res) => {
+      data = res.data
+    })
+    .catch((error) => {
+      data = error.data
+    })
+
+  return data
+}
+
+export default { memberLogin, memberLogout, memberList, memberEdit, memberCreate, memberEmailCheck }
