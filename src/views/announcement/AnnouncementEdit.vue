@@ -18,6 +18,12 @@
 
         <section v-if="announcement"
             class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-8 space-y-6 max-w-4xl mx-auto">
+            <!-- 중요 공지 체크박스 -->
+            <div class="flex items-center gap-2">
+                <input id="pinned" type="checkbox" v-model="announcement.pinned"
+                    class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500" />
+                <label for="pinned" class="text-sm text-gray-700">중요 공지로 표시</label>
+            </div>
             <!-- 제목 -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">제목</label>
@@ -31,6 +37,8 @@
                 <textarea v-model="announcement.content" rows="10"
                     class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500"></textarea>
             </div>
+
+
         </section>
 
         <!-- ✅ 수정 완료 모달 -->
@@ -92,11 +100,14 @@ const handleUpdate = async () => {
         const payload = {
             title: announcement.value.title,
             content: announcement.value.content,
+            pinned: announcement.value.pinned, // ✅ 중요 공지 여부 함께 전송
         }
 
-        const res = await announcementApi.announcementUpdate(route.params.id, payload)
+        const res = await announcementApi.announcementEdit(route.params.id, payload)
         if (res?.success) {
-            showSuccessModal.value = true // ✅ 모달 열기
+            showSuccessModal.value = true
+            alert('수정에 성공했습니다.')
+            router.push(`/announcement`)
         } else {
             alert('수정에 실패했습니다.')
         }

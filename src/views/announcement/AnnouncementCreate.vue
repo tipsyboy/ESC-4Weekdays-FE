@@ -17,7 +17,7 @@
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-sm font-medium text-gray-700">제목</label>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input v-model="form.isPinned" type="checkbox"
+                            <input v-model="form.pinned" type="checkbox"
                                 class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500" />
                             <span class="text-sm font-medium text-red-600">중요 공지 (상단 고정)</span>
                         </label>
@@ -76,7 +76,7 @@ const router = useRouter()
 const form = ref({
     title: '',
     content: '',
-    isPinned: false,
+    pinned: false,
     targetRoles: [],
 })
 
