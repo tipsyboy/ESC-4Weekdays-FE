@@ -31,13 +31,26 @@
                 </div>
             </div>
 
-            <!-- 테이블 -->
             <TableComp :columns="columns" :data="filteredList" class="min-h-[400px]">
                 <template #cell="{ row, col }">
+                    <!-- 제목 컬럼 -->
                     <span v-if="col.key === 'title'" class="text-indigo-600 hover:underline cursor-pointer"
                         @click="goDetail(row)">
                         {{ row[col.key] }}
                     </span>
+
+                    <!-- 번호 컬럼: pinned면 '중요' 버튼 -->
+                    <template v-else-if="col.key === 'id'">
+                        <div class="flex justify-center">
+                            <ButtonComp v-if="row.pinned" color="danger" size="sm"
+                                class="font-semibold cursor-default select-none">
+                                중요
+                            </ButtonComp>
+                            <span v-else class="text-center w-full">{{ row[col.key] }}</span>
+                        </div>
+                    </template>
+
+                    <!-- 기본 -->
                     <span v-else>{{ row[col.key] }}</span>
                 </template>
             </TableComp>
@@ -93,6 +106,7 @@ const fetchAnnouncements = async () => {
         title: item.title,
         name: item.name,
         createdAt: formatDate(item.createdAt),
+        pinned: item.pinned
     }))
 
     announcementList.value = list

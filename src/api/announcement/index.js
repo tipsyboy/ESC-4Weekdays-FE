@@ -64,17 +64,19 @@ const announcementDelete = async (id) => {
   return data
 }
 
-const announcementEdit = async (id) => {
+const announcementEdit = async (id, payload) => {
   let data = {}
-  let url = `/api/announcement/${id}`
+  const url = `/api/announcement/${id}`
 
   await api
-    .patch(url)
+    .patch(url, payload, {
+      headers: { 'Content-Type': 'application/json' },
+    })
     .then((res) => {
       data = res.data
     })
     .catch((error) => {
-      data = error.data
+      data = error.response?.data || error
     })
 
   return data
