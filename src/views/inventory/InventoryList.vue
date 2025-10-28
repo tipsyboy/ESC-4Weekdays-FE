@@ -49,7 +49,7 @@
     </div>
 
     <!-- 데이터 테이블 -->
-    <TableComp :columns="columns" :data="inventoryData">
+    <TableComp :columns="columns" :data="state.inventories">
       <template #cell-productCode="{ row }">
         <RouterLink
           v-if="row.productCode"
@@ -70,7 +70,7 @@
       </template>
 
       <template #cell-vendor="{ row }">
-        <span>{{ row.vendor }}</span>
+        <span>{{ row.vendorName }}</span>
       </template>
     </TableComp>
   </AppPageLayout>
@@ -84,7 +84,7 @@ import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import InventoryApi from '@/api/inventory/index.js'
-import InventorySearchRequest from '@/entity/InventorySearchRequest.js'
+import InventorySearchRequest from '@/entity/inventory/InventorySearchRequest.js'
 
 const filters = ['카테고리', '보관 위치', '수량 상태', '물류센터']
 
@@ -94,56 +94,28 @@ const columns = [
   { key: 'totalQuantity', label: '총 수량' },
   { key: 'vendor', label: '공급 업체' },
 ]
+const state = reactive({
+  inventories: []
+})
 
-const inventoryData = ref([
-  {
-    productCode: 'PRD-1001',
-    productName: '피부에 안좋은 화장품',
-    totalQuantity: 35,
-    vendor: '테크 서플라이',
-    inboundDate: '2025-10-10',
-  },
-  {
-    productCode: 'PRD-1002',
-    productName: '좀 더 구린 화장품',
-    totalQuantity: 18,
-    vendor: '키보드 코리아',
-    inboundDate: '2025-09-28',
-  },
-  {
-    productCode: 'PRD-1003',
-    productName: '27인치 모니터',
-    totalQuantity: 9,
-    vendor: '디스플레이 월드',
-    inboundDate: '2025-10-02',
-  },
-  {
-    productCode: 'PRD-1004',
-    productName: 'USB-C 케이블',
-    totalQuantity: 120,
-    vendor: '케이블 프로',
-    inboundDate: '2025-10-13',
-  },
-])
-
-const searchQuery = ref('')
-const filterStartDate = ref('')
-const filterEndDate = ref('')
 const form = reactive({
   inventorySearchRequest: new InventorySearchRequest(),
 })
 
+const searchQuery = ref('')
+const filterStartDate = ref('')
+const filterEndDate = ref('')
+
 onMounted(() => {
-  InventoryApi.getInventoryListByPaging(0, 2, form.inventorySearchRequest)
+  InventoryApi.getInventorySummaryForList(0, 10, form.inventorySearchRequest)
     .then((response) => {
-      console.log(response)
+      state.inventories = response.results.content
     })
     .catch((error) => {
       console.error(error)
     })
 })
 
-// ✅ 필터 적용 로직
 const filteredStock = computed(() => {
   return stockData.value.filter((item) => {
     const nameMatch = item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
@@ -158,10 +130,3 @@ const filteredStock = computed(() => {
   })
 })
 </script>
-
-<!--<style scoped>-->
-<!--.material-symbols-outlined {-->
-<!--    font-size: 18px;-->
-<!--    vertical-align: middle;-->
-<!--}-->
-<!--</style>-->

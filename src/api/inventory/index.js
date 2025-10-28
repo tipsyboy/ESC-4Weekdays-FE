@@ -1,18 +1,15 @@
 import api from '@/plugin/axiosInterceptor'
 
-const getInventoryListByPaging = async (page, size, request) => {
-  let data = {}
-  const url = `/api/inventories?page=${page}&size=${size}`
+const getInventorySummaryForList = async (page, size, request) => {
+  const requestUrl = `/api/inventories/summary?page=${page}&size=${size}`
 
-  await api.post(url, request)
+  return await api.post(requestUrl, request)
     .then((response) => {
-      console.log(response)
+      return response.data;
     })
     .catch((err) => {
-      data = err.response?.data || { success: false, results: {} }
+      return err.response?.data || { success: false, results: {} }
     })
-
-  return data
 }
 
-export default { getInventoryListByPaging }
+export default { getInventorySummaryForList }
