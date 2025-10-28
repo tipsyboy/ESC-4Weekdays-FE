@@ -24,11 +24,7 @@
             상품 상세 조건
           </ButtonComp>
 
-          <SearchBarComp
-            v-model="query"
-            placeholder="입고서 검색..."
-            @search="handleSearch"
-          />
+          <SearchBarComp v-model="query" placeholder="입고서 검색..." @search="handleSearch" />
         </div>
       </div>
     </template>
@@ -38,9 +34,7 @@
       <button
         v-for="filter in filters"
         :key="filter"
-        class="flex items-center gap-2 rounded border border-zinc-300 dark:border-zinc-700
-               bg-background-light dark:bg-zinc-900 px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300
-               hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors whitespace-nowrap"
+        class="flex items-center gap-2 rounded border border-zinc-300 dark:border-zinc-700 bg-background-light dark:bg-zinc-900 px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors whitespace-nowrap"
       >
         <span>{{ filter }}</span>
         <span class="material-symbols-outlined text-base">expand_more</span>
@@ -48,11 +42,7 @@
     </div>
 
     <!-- 입고 목록 테이블 -->
-    <TableComp
-      :columns="columns"
-      :data="pagedInbounds"
-      :items="pagedInbounds"
-    >
+    <TableComp :columns="columns" :data="pagedInbounds" :items="pagedInbounds">
       <template #cell-inboundNumber="{ row }">
         <RouterLink :to="`/inbound/${row.id}`">
           <span class="text-primary font-semibold hover:underline">{{ row.inboundNumber }}</span>
@@ -109,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import api from '@/api/inbound'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
@@ -130,6 +120,7 @@ const columns = [
   { key: 'inboundNumber', label: '입고번호' },
   { key: 'orderNumber', label: '발주번호' },
   { key: 'vendorName', label: '거래처명' },
+  { key: 'productName', label: '상품명' },
   { key: 'status', label: '상태' },
   { key: 'managerName', label: '담당자' },
   { key: 'scheduledDate', label: '입고예정일' },
@@ -146,7 +137,7 @@ const pagedInbounds = computed(() => {
 
 const fetchInboundList = async () => {
   const res = await api.getInboundList({ page: page.value, size: pageSize })
-  const list = res?.results?.content || []
+  const list = res?.results?.content || res || []
 
   inbounds.value = list.map((item) => ({
     id: item.id,
@@ -156,16 +147,18 @@ const fetchInboundList = async () => {
     status: item.status,
     managerName: item.managerName,
     scheduledDate: item.scheduledDate,
+    productName: item.items?.map(i => i.productName).join(', ') || '-',
   }))
 }
 
 const handleSearch = () => {
   if (!query.value) return fetchInboundList()
   const q = query.value.toLowerCase()
-  inbounds.value = inbounds.value.filter((i) =>
-    i.inboundNumber.toLowerCase().includes(q) ||
-    i.orderNumber.toLowerCase().includes(q) ||
-    i.vendorName.toLowerCase().includes(q)
+  inbounds.value = inbounds.value.filter(
+    (i) =>
+      i.inboundNumber.toLowerCase().includes(q) ||
+      i.orderNumber.toLowerCase().includes(q) ||
+      i.vendorName.toLowerCase().includes(q),
   )
 }
 
@@ -185,26 +178,56 @@ const formatDate = (dateStr) => {
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'SCHEDULED': return 'blue'
-    case 'INSPECTING': return 'yellow'
-    case 'COMPLETED': return 'green'
-    case 'CANCELLED': return 'red'
-    default: return 'gray'
+    case 'SCHEDULED':
+      return 'blue'
+    case 'INSPECTING':
+      return 'yellow'
+    case 'COMPLETED':
+      return 'green'
+    case 'CANCELLED':
+      return 'red'
+    default:
+      return 'gray'
   }
 }
 
 const getStatusLabel = (status) => {
   switch (status) {
-    case 'SCHEDULED': return '입고예정'
-    case 'INSPECTING': return '검수중'
-    case 'COMPLETED': return '완료'
-    case 'CANCELLED': return '취소'
-    default: return '미정'
+    case 'SCHEDULED':
+      return '입고예정'
+    case 'INSPECTING':
+      return '검수중'
+    case 'COMPLETED':
+      return '완료'
+    case 'CANCELLED':
+      return '취소'
+    default:
+      return '미정'
   }
 }
 
-const applyProductFilter = (filters) => {
+// 상품 상세 조건 검색(모달창)
+const applyProductFilter = async (filters) => {
   console.log('필터 적용:', filters)
+
+  const params = {
+    vendorIds: filters.vendors,
+    productName: filters.name,
+  }
+
+  const res = await api.getInboundsSearch(params)
+  const list = res?.results?.content || res || []
+
+  inbounds.value = list.map((item) => ({
+    id: item.id,
+    inboundNumber: item.inboundNumber,
+    orderNumber: item.purchaseOrder?.orderNumber || '-',
+    vendorName: item.purchaseOrder?.vendorName || '-',
+    status: item.status,
+    managerName: item.managerName,
+    scheduledDate: item.scheduledDate,
+  }))
+  isProductFilterOpen.value = false
 }
 
 onMounted(fetchInboundList)

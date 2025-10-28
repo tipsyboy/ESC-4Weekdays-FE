@@ -16,6 +16,23 @@ const getInboundList = async (params) => {
   return data
 }
 
+// 조건 검색
+const getInboundsSearch = async (params) => {
+  let data = {}
+  const url = '/api/inbounds/search'
+
+  await api
+    .get(url, { params })
+    .then((res) => {
+      data = res.data
+    })
+    .catch((err) => {
+      data = err.response?.data || { success: false, results: {} }
+    })
+
+  return data
+}
+
 const getInboundDetail = async (inboundId) => {
   let data = {}
   const url = `/api/inbounds/${inboundId}`
@@ -35,4 +52,5 @@ const getInboundDetail = async (inboundId) => {
 export default {
   getInboundList,
   getInboundDetail,
+  getInboundsSearch,
 }

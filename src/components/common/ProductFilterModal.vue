@@ -50,7 +50,7 @@ const removeVendor = (vendorId) => {
 const handleApply = () => {
   emit('apply', {
     ...form.value,
-    vendors: form.value.vendors.map(v => v.id), // id만 전달
+    vendors: form.value.vendors.map(v => v.id),
   })
   emit('close')
 }
