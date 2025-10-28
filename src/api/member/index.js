@@ -111,6 +111,32 @@ const memberDetail = async (id) => {
   return data
 }
 
+const MemberSearch = async (page, size, searchParams = {}) => {
+  let data = {}
+  const url = '/api/member/search'
+
+  const params = {
+    page,
+    size,
+    name: searchParams.name || '',
+    role: searchParams.role || '',
+    status: searchParams.status || '',
+    fromDate: searchParams.fromDate || '',
+    toDate: searchParams.toDate || '',
+  }
+
+  await api
+    .get(url, { params })
+    .then((res) => {
+      data = res.data
+    })
+    .catch((error) => {
+      data = error.response?.data || error
+    })
+
+  return data
+}
+
 export default {
   memberLogin,
   memberLogout,
@@ -119,4 +145,5 @@ export default {
   memberCreate,
   memberEmailCheck,
   memberDetail,
+  MemberSearch,
 }
