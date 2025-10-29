@@ -9,6 +9,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  size: {
+    type: String,
+    default: 'max-w-md',
+  },
 })
 const emit = defineEmits(['close'])
 
@@ -37,7 +41,10 @@ onUnmounted(() => document.removeEventListener('keydown', handleEsc))
     >
       <!-- 모달 본문 -->
       <div
-        class="relative bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-8 rounded-2xl shadow-2xl w-full max-w-md"
+        :class="[
+          'relative bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-8 rounded-2xl shadow-2xl w-full',
+          size, // ✅ 이제 문자열로 받아서 Tailwind 클래스 적용됨
+        ]"
         @click.stop
       >
         <!-- 닫기 버튼 -->

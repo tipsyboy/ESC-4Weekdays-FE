@@ -83,6 +83,7 @@ const availableVendors = computed(() =>
       title="상품 상세 조건 검색"
       icon="tune"
       @close="emit('close')"
+      size="max-w-5xl"
   >
     <form class="space-y-4">
 

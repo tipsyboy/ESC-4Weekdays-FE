@@ -12,6 +12,7 @@ import vendorRoutes from '@/router/vendorRoutes.js'
 import franchiseRoutes from '@/router/franchiseRoutes.js'
 import announcementRoutes from './announcementRoutes'
 import warehouseRoutes from '@/router/warehouseRoutes.js'
+import asnRoutes from '@/router/asnRoutes.js'
 
 const routes = [
   {
@@ -35,6 +36,7 @@ const routes = [
   ...franchiseRoutes,
   ...announcementRoutes,
   ...warehouseRoutes,
+  ...asnRoutes,
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
