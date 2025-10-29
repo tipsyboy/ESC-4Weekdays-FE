@@ -1,17 +1,17 @@
 import InventoryList from "@/views/inventory/InventoryList.vue";
 import InventoryDetail from "@/views/inventory/InventoryDetail.vue";
 
-const stockList = [
+const inventoryRoutes = [
     {
-        path: '/2',
+        path: '/inventory',
         name: 'inventoryList',
         component: InventoryList,
     },
     {
-        path: '/inventory/detail',
+        path: '/inventory/detail/:id',
         name: 'inventoryDetail',
         component: InventoryDetail,
     },
 ]
 
-export default stockList
+export default inventoryRoutes
