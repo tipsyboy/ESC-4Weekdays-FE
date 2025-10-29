@@ -8,7 +8,7 @@ const inventoryRoutes = [
         component: InventoryList,
     },
     {
-        path: '/inventory/detail/:id',
+        path: '/inventory/detail/:productCode',
         name: 'inventoryDetail',
         component: InventoryDetail,
     },

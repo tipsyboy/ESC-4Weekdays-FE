@@ -4,6 +4,7 @@
  * @returns {string} 포맷된 금액 문자열
  */
 export const formatWon = (value) => {
+  if (value == null || isNaN(value)) return '-'
     return value.toLocaleString('ko-KR', {
         style: 'currency',
         currency: 'KRW',
