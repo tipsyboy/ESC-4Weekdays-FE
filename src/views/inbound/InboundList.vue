@@ -179,13 +179,13 @@ const formatDate = (dateStr) => {
 const getStatusColor = (status) => {
   switch (status) {
     case 'SCHEDULED':
-      return 'blue'
+      return 'info'
     case 'INSPECTING':
-      return 'yellow'
+      return 'warning'
     case 'COMPLETED':
-      return 'green'
+      return 'success'
     case 'CANCELLED':
-      return 'red'
+      return 'danger'
     default:
       return 'gray'
   }

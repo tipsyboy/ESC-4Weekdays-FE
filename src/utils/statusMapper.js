@@ -1,15 +1,20 @@
 // 상태 매핑 테이블 (공통)
 export const STATUS_MAP = {
   // 발주
-  pending: { label: '보류 중', color: 'gray' },
-  approved: { label: '승인 완료', color: 'warning' },
-  shipped: { label: '배송 중', color: 'info' },
-  received: { label: '입고 완료', color: 'success' },
+  requested: { label: '발주 요청', color: 'info' }, // 승인 대기
+  approved: { label: '승인 완료', color: 'success' }, // 공급사로 발주 전송
+  awaiting_delivery: { label: '납품 대기', color: 'warning' }, // ASN 수신 후
+  completed: { label: '배송 완료', color: 'success' },
+  cancelled: { label: '취소됨', color: 'danger' },
 
   // 입고
-  draft: { label: '임시저장', color: 'gray' },
-  in_progress: { label: '입고 중', color: 'warning' },
-  completed: { label: '입고 완료', color: 'success' },
+  created: { label: '입고서 생성', color: 'gray' },
+  scheduled: { label: '입고 예정', color: 'info' },
+  arrived: { label: '도착', color: 'warning' },
+  inspecting: { label: '검수 중', color: 'warning' },
+  putaway: { label: '적치 중', color: 'info' },
+  completed_inbound: { label: '입고 완료', color: 'success' }, // 중복 구분용
+  cancelled_inbound: { label: '입고 취소', color: 'danger' },
 
   // 직원
   active: { label: '재직', color: 'success' },
