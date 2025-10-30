@@ -1,8 +1,14 @@
 <template>
   <AppPageLayout>
+    <!-- 헤더 -->
     <template #header>
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">발주 상세</h1>
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">발주 상세</h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            발주 상세 내역을 확인합니다.
+          </p>
+        </div>
 
         <div class="flex gap-2">
           <ButtonComp
@@ -16,7 +22,7 @@
 
           <ButtonComp
             color="danger"
-            icon="x"
+            icon="close"
             :disabled="order.status !== 'REQUESTED'"
             @click="cancelOrder"
           >
@@ -30,31 +36,74 @@
       </div>
     </template>
 
+    <!-- 상세 내용 -->
     <section
       v-if="order.id"
-      class="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-700 space-y-6"
+      class="bg-gray-50 dark:bg-slate-900/40 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700 space-y-8"
     >
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><strong>발주번호:</strong> {{ order.orderNumber }}</div>
-        <div><strong>공급업체:</strong> {{ order.vendorName }}</div>
-        <div><strong>발주일:</strong> {{ formatDate(order.orderDate) }}</div>
-        <div><strong>입고예정일:</strong> {{ formatDate(order.expectedDate) }}</div>
-        <div>
-          <strong>상태:</strong>
-          <BadgeComp :color="statusColor(order.status)" :label="getStatusLabel(order.status)" />
+      <!-- 기본 정보 -->
+      <div>
+        <h2 class="text-lg font-semibold mb-6 text-gray-900 dark:text-gray-100">기본 정보</h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-5 text-sm text-gray-700 dark:text-gray-200">
+          <div>
+            <p class="font-medium text-gray-500 dark:text-gray-400">발주번호</p>
+            <p class="mt-1">{{ order.orderNumber }}</p>
+          </div>
+
+          <div>
+            <p class="font-medium text-gray-500 dark:text-gray-400">공급업체</p>
+            <p class="mt-1">{{ order.vendorName }}</p>
+          </div>
+
+          <div>
+            <p class="font-medium text-gray-500 dark:text-gray-400">상태</p>
+            <p class="mt-1">
+              <BadgeComp
+                :color="statusColor(order.status)"
+                :label="getStatusLabel(order.status)"
+              />
+            </p>
+          </div>
+
+          <div>
+            <p class="font-medium text-gray-500 dark:text-gray-400">발주일</p>
+            <p class="mt-1">{{ formatDate(order.orderDate) }}</p>
+          </div>
+
+          <div>
+            <p class="font-medium text-gray-500 dark:text-gray-400">입고 예정일</p>
+            <p class="mt-1">{{ formatDate(order.expectedDate) }}</p>
+          </div>
+
+          <div>
+            <p class="font-medium text-gray-500 dark:text-gray-400">총 금액</p>
+            <p class="mt-1">{{ formatWon(order.totalAmount) }}</p>
+          </div>
+
+          <div class="col-span-2 md:col-span-3">
+            <p class="font-medium text-gray-500 dark:text-gray-400">비고</p>
+            <p class="mt-1">{{ order.description || '-' }}</p>
+          </div>
         </div>
-        <div><strong>총금액:</strong> {{ formatWon(order.totalAmount) }}</div>
-        <div class="md:col-span-2"><strong>비고:</strong> {{ order.description || '-' }}</div>
       </div>
 
       <!-- 품목 목록 -->
       <div>
-        <h2 class="text-lg font-semibold mb-3">발주 품목 목록</h2>
-        <TableComp :columns="itemColumns" :data="formattedItems" empty-text="등록된 품목이 없습니다." />
+        <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">발주 품목 목록</h2>
+
+        <TableComp
+          :columns="itemColumns"
+          :data="formattedItems"
+          empty-text="등록된 품목이 없습니다."
+        />
       </div>
     </section>
 
-    <div v-else class="text-center py-20 text-slate-500 dark:text-slate-400">
+    <div
+      v-else
+      class="text-center py-20 text-slate-500 dark:text-slate-400"
+    >
       데이터를 불러오는 중입니다...
     </div>
   </AppPageLayout>
@@ -82,16 +131,14 @@ const itemColumns = [
   { key: 'totalPrice', label: '금액', align: 'right' },
 ]
 
-// 상품별 금액 계산된 데이터
 const formattedItems = computed(() =>
   order.value.items.map((item) => ({
     ...item,
     unitPrice: formatWon(item.unitPrice || 0),
     totalPrice: formatWon((item.unitPrice || 0) * (item.orderedQuantity || 0)),
-  })),
+  }))
 )
 
-// 상태 색상 매핑
 const statusColor = (status) => {
   switch (status) {
     case 'REQUESTED':
@@ -107,11 +154,8 @@ const statusColor = (status) => {
 
 const loadDetail = async () => {
   const res = await api.getPurchaseOrderDetail(route.params.id)
-  if (res.success && res.results) {
-    order.value = res.results
-  } else if (res.isSuccess && res.result) {
-    order.value = res.result
-  }
+  if (res.success && res.results) order.value = res.results
+  else if (res.isSuccess && res.result) order.value = res.result
 }
 
 const approveOrder = async () => {
