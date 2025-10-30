@@ -31,6 +31,7 @@
                     <BadgeComp :color="column.color" :label="column.list.length.toString()" />
                 </h2>
 
+
                 <!-- 작업 리스트 (드래그앤드롭 가능) -->
                 <div class="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600"
                     @dragover.prevent @drop="onDrop(column.status)">
