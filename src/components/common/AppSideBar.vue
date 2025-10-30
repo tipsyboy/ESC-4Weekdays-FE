@@ -71,16 +71,14 @@ const munus = [
   { label: '발주', icon: 'assignment', route: '/purchase' },
   { label: '입고', icon: 'inventory', route: '/inbound' },
   { label: '출고', icon: 'local_shipping', route: '/outbound' },
-  { label: '재고', icon: 'inventory_2', route: '/2' },
+  { label: '재고', icon: 'inventory_2', route: '/inventory' },
   { label: '상품 관리', icon: 'Shop', route: '/product' },
   { label: '외부 업체(Vendor)', icon: 'handshake', route: '/vendors' },
   { label: '가맹점(Franchise)', icon: 'handshake', route: '/franchise' },
   { label: '직원 관리', icon: 'assignment_ind', route: '/employee' },
-  { label: '작업 관리', icon: 'task', route: '/task/Kanban' },
+  { label: '작업 관리', icon: 'task', route: '/task/list' },
+  { label: 'ASN', icon: 'task', route: '/asn/vendor' },
   { label: '물류창고', icon: 'warehouse', route: '/warehouse' },
-  { label: '모달 테스트', icon: 'frame_bug', route: '/modaltest' },
-  { label: '테스트', icon: 'frame_bug', route: '/test' },
-
 ]
 
 const isActive = (path) => route.path === path

@@ -5,14 +5,14 @@ import inboundRoutes from '@/router/inboundRoutes.js'
 import dashboardRoutes from './dashboardRoutes'
 import productRoutes from '@/router/productRoutes.js'
 import outboundRoutes from '@/router/outboundRoutes.js'
-import stockList from '@/router/stockRoutes.js'
+import inventoryRoutes from '@/router/inventoryRoutes.js'
 import taskRoutes from '@/router/taskRoutes.js'
 import employeeRoutes from './employeeRoutes'
 import vendorRoutes from '@/router/vendorRoutes.js'
 import franchiseRoutes from '@/router/franchiseRoutes.js'
 import announcementRoutes from './announcementRoutes'
 import warehouseRoutes from '@/router/warehouseRoutes.js'
-import TaskKanban from '@/views/task/TaskKanban.vue'
+import asnRoutes from '@/router/asnRoutes.js'
 
 const routes = [
   {
@@ -23,15 +23,12 @@ const routes = [
     path: '/test',
     component: ModalTest,
   },
-  {
-    path: '/test1',
-    component: TaskKanban,
-  },
+ 
 
   ...purchaseOrderRoutes,
   ...inboundRoutes,
   ...dashboardRoutes,
-  ...stockList,
+  ...inventoryRoutes,
   ...productRoutes,
   ...outboundRoutes,
   ...taskRoutes,
@@ -40,6 +37,7 @@ const routes = [
   ...franchiseRoutes,
   ...announcementRoutes,
   ...warehouseRoutes,
+  ...asnRoutes,
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

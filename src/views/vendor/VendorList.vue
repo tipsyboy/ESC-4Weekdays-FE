@@ -8,6 +8,8 @@
     </template>
 
     <!-- 검색창 -->
+    <section class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
+         rounded-xl shadow-sm p-6 md:p-8 space-y-6">
     <SearchBarComp v-model="searchText" placeholder="공급업체명 / 코드 검색" />
 
     <!-- 테이블 -->
@@ -25,6 +27,7 @@
         />
       </template>
     </TableComp>
+    </section>
   </AppPageLayout>
 </template>
 

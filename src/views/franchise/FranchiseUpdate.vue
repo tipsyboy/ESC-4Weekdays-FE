@@ -167,12 +167,16 @@ const fetchFranchise = async () => {
 // ✅ PATCH 수정 요청
 const updateFranchise = async () => {
   try {
-    const res = await franchiseApi.franchiseUpdate(form.value)
-    if (res.data?.success) {
+
+    const id = form.value.id
+    const payload = { ...form.value}
+
+    const res = await franchiseApi.franchiseUpdate(id, payload)
+    if (res?.success || res?.data?.success) {
       alert('가맹점 정보가 수정되었습니다.')
-      router.push({ name: 'franchiseDetail', params: { id: route.params.id } })
+      router.push({ name: 'franchiseDetail', params: { id } })
     } else {
-      alert('수정 실패: ' + (res.data?.message || '알 수 없는 오류'))
+      alert('수정 실패: ' + (res?.message || res?.data?.message || '알 수 없는 오류'))
     }
   } catch (err) {
     console.error('❌ 수정 실패:', err)
