@@ -4,30 +4,45 @@
     <template #header>
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">ASN 응답 내역</h1>
+          <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">ASN 목록</h1>
           <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            공급사로부터 승인/거절된 ASN 내역을 확인합니다.
+            공급사로부터 발송된 ASN 목록을 조회합니다.
           </p>
         </div>
 
-        <div class="flex items-center gap-3">
-          <SearchBarComp
-            v-model="query"
-            placeholder="ASN 코드 또는 발주 코드 검색"
-            @search="handleSearch"
-          />
-        </div>
+        <SearchBarComp
+          v-model="query"
+          placeholder="ASN 코드 또는 발주 코드 검색"
+          @search="handleSearch"
+        />
       </div>
     </template>
 
     <!-- ASN 목록 테이블 -->
     <TableComp :columns="columns" :data="pagedAsns">
-      <template #cell-status="{ row }">
-        <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)" />
+      <!-- ASN 코드 -->
+      <template #cell-asnCode="{ row }">
+        <RouterLink
+          :to="`/asn/${row.id}`"
+          class="text-primary font-semibold hover:underline"
+        >
+          {{ row.asnCode }}
+        </RouterLink>
       </template>
 
+      <!-- 발주 코드 -->
+      <template #cell-purchaseOrderCode="{ row }">
+        {{ row.purchaseOrderCode || '-' }}
+      </template>
+
+      <!-- 입고 예정일 -->
       <template #cell-expectedDate="{ row }">
         {{ row.expectedDate ? formatDate(row.expectedDate) : '-' }}
+      </template>
+
+      <!-- 상태 -->
+      <template #cell-status="{ row }">
+        <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)" />
       </template>
     </TableComp>
 
@@ -54,6 +69,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import TableComp from '@/components/common/TableComp.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
@@ -69,28 +85,27 @@ const query = ref('')
 const page = ref(0)
 const pageSize = 10
 const total = ref(0)
-const loading = ref(false)
 
+// ---------------------------
+// 컬럼 정의
+// ---------------------------
 const columns = [
   { key: 'asnCode', label: 'ASN 코드' },
   { key: 'purchaseOrderCode', label: '발주 코드' },
-  { key: 'vendorName', label: '거래처명' },
-  { key: 'expectedDate', label: '납기 예정일' },
+  { key: 'expectedDate', label: '입고 예정일' },
   { key: 'status', label: '상태' },
-  { key: 'description', label: '비고' },
 ]
 
 // ---------------------------
-// 페이지네이션
+// 데이터 페이징
 // ---------------------------
 const totalPages = computed(() => Math.ceil(total.value / pageSize))
 const pagedAsns = computed(() => asns.value)
 
 // ---------------------------
-// 데이터 불러오기
+// 데이터 로드
 // ---------------------------
 const fetchAsnList = async () => {
-  loading.value = true
   const res = await api.getAsnList(page.value, pageSize)
   const list = res?.results?.content || []
   total.value = res?.results?.totalElements || 0
@@ -98,41 +113,28 @@ const fetchAsnList = async () => {
   asns.value = list.map((item) => ({
     id: item.id,
     asnCode: item.asnCode,
-    purchaseOrderCode: item.purchaseOrderCode,
-    vendorName: item.vendorName,
-    description: item.description,
+    purchaseOrderCode: item.purchaseOrderCode || '-',
     expectedDate: item.expectedDate,
-    status: item.status,
+    status: item.expectedDate ? 'ACCEPTED' : 'REJECTED', // 예상일 없는건 거절 처리
   }))
-  loading.value = false
 }
 
-// ---------------------------
-// 검색
-// ---------------------------
 const handleSearch = () => {
   if (!query.value) return fetchAsnList()
   const q = query.value.toLowerCase()
   asns.value = asns.value.filter(
     (i) =>
       i.asnCode.toLowerCase().includes(q) ||
-      i.purchaseOrderCode.toLowerCase().includes(q) ||
-      i.vendorName.toLowerCase().includes(q)
+      i.purchaseOrderCode.toLowerCase().includes(q)
   )
 }
 
-// ---------------------------
-// 페이지 변경
-// ---------------------------
 const changePage = (newPage) => {
   if (newPage < 0 || newPage >= totalPages.value) return
   page.value = newPage
   fetchAsnList()
 }
 
-// ---------------------------
-// 유틸
-// ---------------------------
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
   return new Date(dateStr).toLocaleDateString('ko-KR', {
@@ -164,6 +166,5 @@ const getStatusLabel = (status) => {
   }
 }
 
-// ---------------------------
 onMounted(fetchAsnList)
 </script>
