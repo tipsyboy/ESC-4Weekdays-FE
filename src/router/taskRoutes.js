@@ -14,4 +14,9 @@ export default [
     name: 'TaskDetail',
     component: () => import('@/views/task/WorkerTaskView.vue'),
   },
+  {
+    path: '/task/Kanban',
+    name: 'TaskKanban',
+    component: () => import('@/views/task/TaskKanban.vue'),
+  },
 ]
