@@ -28,6 +28,56 @@
 ## 화면 설계서
 [🔗화면 설계서(figma)](https://www.figma.com/design/3VoI4uiK22G8sYgli5Eijz/ESC_4WeekDays?node-id=0-1&t=utTqOXOI4A3VjwGC-1)
 
+## ⚙️ 주요 기능 시연
+
+<details>
+<summary>로그인</summary>
+  
+![로그인](./docs/features/login.gif)
+
+</details>
+
+<details>
+<summary>공지사항</summary>
+  
+![공지사항](./docs/features/announcement.gif)
+
+</details>
+
+<details>
+<summary>직원</summary>
+  
+![직원](./docs/features/member.gif)
+
+</details>
+
+<details>
+<summary>가맹점</summary>
+  
+![가맹점](./docs/features/franchise.gif)
+
+</details>
+
+<details>
+<summary>외부 업체</summary>
+  
+![외부 업체](./docs/features/vendor.gif)
+
+</details>
+
+<details>
+<summary>상품 등록</summary>
+  
+![상품 등록](./docs/features/product.gif)
+
+</details>
+
+<details>
+<summary>발주</summary>
+  
+![발주](./docs/features/purchaseorder.gif)
+
+</details>
 
 ## Project Setup
 
