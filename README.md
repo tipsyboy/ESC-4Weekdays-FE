@@ -85,7 +85,8 @@
 
 <br/>
 
-📃 [DevOps](https://github.com/beyond-sw-camp/be17-fin-ESC-4Weekdays-BE/blob/main/devops/README.md)  
+📃 [DevOps](https://github.com/beyond-sw-camp/be17-fin-ESC-4Weekdays-BE/blob/dev/devops/README.md)
+
 
 <br/>
 
