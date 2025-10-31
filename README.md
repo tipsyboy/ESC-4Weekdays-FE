@@ -79,6 +79,16 @@
 
 </details>
 
+## 📂 백엔드 · DevOps 프로젝트 폴더 바로가기
+
+📄 [Backend](https://github.com/beyond-sw-camp/be17-fin-ESC-4Weekdays-BE)  
+
+<br/>
+
+📃 [DevOps](https://github.com/beyond-sw-camp/be17-fin-ESC-4Weekdays-BE/blob/main/devops/README.md)  
+
+<br/>
+
 ## Project Setup
 
 ```sh
