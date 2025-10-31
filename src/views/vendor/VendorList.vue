@@ -8,31 +8,32 @@
     </template>
 
     <!-- 검색창 -->
-    <section class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-         rounded-xl shadow-sm p-6 md:p-8 space-y-6">
-    <SearchBarComp v-model="searchText" placeholder="공급업체명 / 코드 검색" />
+    <section
+      class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-6 md:p-8 space-y-6"
+    >
+      <SearchBarComp v-model="searchText" placeholder="공급업체명 / 코드 검색" />
 
-    <!-- 테이블 -->
-    <TableComp :columns="columns" :data="displayList">
-      <template #cell-name="{ row }">
-        <RouterLink :to="`/vendors/${row.id}`" class="text-primary font-semibold hover:underline">
-          {{ row.name }}
-        </RouterLink>
-      </template>
+      <!-- 테이블 -->
+      <TableComp :columns="columns" :data="displayList">
+        <template #cell-name="{ row }">
+          <RouterLink :to="`/vendors/${row.id}`" class="text-primary font-semibold hover:underline">
+            {{ row.name }}
+          </RouterLink>
+        </template>
 
-      <template #cell-status="{ row }">
-        <BadgeComp
+        <template #cell-status="{ row }">
+          <BadgeComp
             :color="row.status === 'ACTIVE' ? 'success' : 'danger'"
             :label="row.status === 'ACTIVE' ? '거래중' : '중단'"
-        />
-      </template>
-    </TableComp>
+          />
+        </template>
+      </TableComp>
     </section>
   </AppPageLayout>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useVendorStore } from '@/stores/vendorStore'
@@ -61,6 +62,14 @@ const columns = [
   { key: 'status', label: '상태', align: 'center' },
 ]
 
+// 페이지 진입 시 최신 목록 불러오기
+onMounted(async () => {
+  const res = await api.getVendors({ page: 0, size: 20 })
+  if (res.success) {
+    vendorStore.vendorList = res.results.content || []
+  }
+})
+
 watch(searchText, async (val) => {
   if (!val) {
     searchResult.value = []
@@ -81,4 +90,3 @@ const displayList = computed(() => {
   return searchText.value ? searchResult.value : vendorList.value
 })
 </script>
-

@@ -9,15 +9,16 @@
           </p>
         </div>
         <div class="flex gap-2">
-          <ButtonComp color="secondary" icon="arrow_back" @click="$router.back()">뒤로가기</ButtonComp>
+          <ButtonComp color="secondary" icon="arrow_back" @click="$router.back()"
+            >뒤로가기
+          </ButtonComp>
           <ButtonComp color="primary" icon="save" @click="createFranchise">등록</ButtonComp>
         </div>
       </div>
     </template>
 
     <section
-        class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-             rounded-xl shadow-sm p-6 md:p-8 backdrop-blur-sm space-y-8"
+      class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-6 md:p-8 backdrop-blur-sm space-y-8"
     >
       <!-- 기본 정보 -->
       <div class="space-y-5">
@@ -27,56 +28,40 @@
           <label class="flex flex-col gap-1.5">
             <span class="text-xs font-medium text-slate-700 dark:text-slate-200">가맹점명 *</span>
             <input
-                v-model="form.name"
-                type="text"
-                placeholder="가맹점명을 입력하세요"
-                class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              v-model="form.name"
+              type="text"
+              placeholder="가맹점명을 입력하세요"
+              class="w-full h-10 px-3 text-sm rounded-md bg-background-light dark:bg-background-dark border border-primary/20 dark:border-primary/30 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 dark:text-white"
             />
           </label>
 
           <label class="flex flex-col gap-1.5">
             <span class="text-xs font-medium text-slate-700 dark:text-slate-200">연락처</span>
             <input
-                v-model="form.phoneNumber"
-                type="text"
-                placeholder="예: 02-1234-5678"
-                class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              v-model="form.phoneNumber"
+              type="text"
+              placeholder="예: 02-1234-5678"
+              class="w-full h-10 px-3 text-sm rounded-md bg-background-light dark:bg-background-dark border border-primary/20 dark:border-primary/30 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 dark:text-white"
             />
           </label>
 
           <label class="flex flex-col gap-1.5">
             <span class="text-xs font-medium text-slate-700 dark:text-slate-200">이메일</span>
             <input
-                v-model="form.email"
-                type="email"
-                placeholder="example@franchise.com"
-                class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              v-model="form.email"
+              type="email"
+              placeholder="example@franchise.com"
+              class="w-full h-10 px-3 text-sm rounded-md bg-background-light dark:bg-background-dark border border-primary/20 dark:border-primary/30 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 dark:text-white"
             />
           </label>
 
           <label class="flex flex-col gap-1.5 md:col-span-2">
             <span class="text-xs font-medium text-slate-700 dark:text-slate-200">설명</span>
             <textarea
-                v-model="form.description"
-                rows="3"
-                placeholder="가맹점 설명을 입력하세요"
-                class="w-full px-3 py-2 text-sm rounded-md resize-none
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              v-model="form.description"
+              rows="3"
+              placeholder="가맹점 설명을 입력하세요"
+              class="w-full px-3 py-2 text-sm rounded-md resize-none bg-background-light dark:bg-background-dark border border-primary/20 dark:border-primary/30 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 dark:text-white"
             />
           </label>
         </div>
@@ -90,56 +75,40 @@
           <label class="flex flex-col gap-1.5">
             <span class="text-xs font-medium text-slate-700 dark:text-slate-200">우편번호</span>
             <input
-                v-model="form.address.zipcode"
-                type="text"
-                placeholder="예: 06241"
-                class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              v-model="form.address.zipcode"
+              type="text"
+              placeholder="예: 06241"
+              class="w-full h-10 px-3 text-sm rounded-md bg-background-light dark:bg-background-dark border border-primary/20 dark:border-primary/30 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 dark:text-white"
             />
           </label>
 
           <label class="flex flex-col gap-1.5">
             <span class="text-xs font-medium text-slate-700 dark:text-slate-200">도시</span>
             <input
-                v-model="form.address.city"
-                type="text"
-                placeholder="예: 서울특별시 강남구"
-                class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              v-model="form.address.city"
+              type="text"
+              placeholder="예: 서울특별시 강남구"
+              class="w-full h-10 px-3 text-sm rounded-md bg-background-light dark:bg-background-dark border border-primary/20 dark:border-primary/30 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 dark:text-white"
             />
           </label>
 
           <label class="flex flex-col gap-1.5">
             <span class="text-xs font-medium text-slate-700 dark:text-slate-200">도로명 주소</span>
             <input
-                v-model="form.address.street"
-                type="text"
-                placeholder="예: 테헤란로 123"
-                class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              v-model="form.address.street"
+              type="text"
+              placeholder="예: 테헤란로 123"
+              class="w-full h-10 px-3 text-sm rounded-md bg-background-light dark:bg-background-dark border border-primary/20 dark:border-primary/30 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 dark:text-white"
             />
           </label>
 
           <label class="flex flex-col gap-1.5">
             <span class="text-xs font-medium text-slate-700 dark:text-slate-200">상세주소</span>
             <input
-                v-model="form.address.detail"
-                type="text"
-                placeholder="예: 5층 물류부"
-                class="w-full h-10 px-3 text-sm rounded-md
-                     bg-background-light dark:bg-background-dark
-                     border border-primary/20 dark:border-primary/30
-                     focus:ring-2 focus:ring-primary/50 focus:border-primary
-                     outline-none transition-all text-slate-800 dark:text-white"
+              v-model="form.address.detail"
+              type="text"
+              placeholder="예: 5층 물류부"
+              class="w-full h-10 px-3 text-sm rounded-md bg-background-light dark:bg-background-dark border border-primary/20 dark:border-primary/30 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 dark:text-white"
             />
           </label>
         </div>
@@ -149,11 +118,12 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
-import {useRouter} from 'vue-router'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
-import franchiseApi from "@/api/franchise/index.js";
+import franchiseApi from '@/api/franchise/index.js'
+import FranchiseList from '@/views/franchise/FranchiseList.vue'
 
 const router = useRouter()
 
@@ -181,7 +151,7 @@ const createFranchise = async () => {
     const res = await franchiseApi.franchiseCreate(form.value)
     if (res.success) {
       alert('가맹점이 등록되었습니다.')
-      router.push({name: 'franchiseDetail', params: {id: res.results}})
+      router.push({ name: 'franchiseList', params: { id: res.results } })
       // or
       // router.push({ name: 'FranchiseList'})
     } else {
