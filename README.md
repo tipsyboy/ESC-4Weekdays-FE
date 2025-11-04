@@ -2,6 +2,9 @@
 <p align="center">
   <img src="./docs/logo.png" width="600" alt="ESC 로고" />
 
+# 🔗 접속 주소
+[4WeekDays](https://www.fourweeeek.kro.kr/)
+
 # 👨‍💻 팀원 구성
 <div align="center">
   <table>
