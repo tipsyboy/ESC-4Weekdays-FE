@@ -6,7 +6,7 @@
       <!-- 로고 -->
       <RouterLink to="/" class="flex items-center gap-2 text-zinc-900 dark:text-white">
         <span class="material-symbols-outlined text-primary text-2xl"> local_shipping </span>
-        <span class="text-2xl font-bold">green</span>
+        <span class="text-2xl font-bold">4Weekdays!</span>
       </RouterLink>
     </div>
 
