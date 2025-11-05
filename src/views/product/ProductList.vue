@@ -95,7 +95,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { useVendorStore } from '@/stores/vendorStore' // ✅ 정확한 경로로 import
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
@@ -103,6 +103,7 @@ import TableComp from '@/components/common/TableComp.vue'
 import ProductApi from '@/api/product/index.js'
 
 const router = useRouter()
+const vendorStore = useVendorStore() // ✅ Pinia 스토어 사용
 const searchQuery = ref('')
 const page = ref(0)
 const size = ref(10)
@@ -125,7 +126,11 @@ const columns = [
   { label: '상태', key: 'statusLabel' },
 ]
 
-const vendorOptions = ref([])
+// ✅ 스토어의 vendorList를 사용
+const vendorOptions = computed(() =>
+    (vendorStore.vendorList || []).map(v => v.name)
+)
+
 const productNames = ref([])
 const filteredProductNames = ref([])
 
@@ -147,7 +152,6 @@ const fetchProducts = async () => {
   }))
 
   productList.value = list
-  vendorOptions.value = [...new Set(list.map(p => p.vendorName))]
   productNames.value = [...new Set(list.map(p => p.name))]
   filteredProductNames.value = [...productNames.value]
 }
@@ -158,8 +162,8 @@ const filterProductNames = () => {
     filteredProductNames.value = [...productNames.value]
   } else {
     const names = productList.value
-      .filter(p => p.vendorName === filters.value.vendorName)
-      .map(p => p.name)
+        .filter(p => p.vendorName === filters.value.vendorName)
+        .map(p => p.name)
     filteredProductNames.value = [...new Set(names)]
   }
   filters.value.name = ''
@@ -188,7 +192,7 @@ const filteredAndSortedList = computed(() => {
     list = list.filter(p => p.status === filters.value.status)
   if (searchQuery.value)
     list = list.filter(p =>
-      p.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        p.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     )
 
   if (filters.value.priceOrder === 'asc')
@@ -208,5 +212,10 @@ const changePage = newPage => {
 const goDetail = row => router.push(`/product/${row.id}`)
 const goRegister = () => router.push('/product/register')
 
-onMounted(fetchProducts)
+// ✅ vendorStore 로드 후 상품 불러오기
+onMounted(async () => {
+  await vendorStore.fetchVendors()
+  await fetchProducts()
+})
 </script>
+
