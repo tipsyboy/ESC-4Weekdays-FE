@@ -2,7 +2,7 @@ import api from '@/plugin/axiosInterceptor.js'
 
 const memberLogin = async (req) => {
   let data = {}
-  let url = '/login'
+  let url = '/api/login'
 
   await api
     .post(url, req)
@@ -18,7 +18,7 @@ const memberLogin = async (req) => {
 
 const memberLogout = async (req) => {
   let data = {}
-  let url = '/logout'
+  let url = '/api/logout'
 
   await api
     .post(url, req)
