@@ -16,9 +16,11 @@ import TaskKanban from '@/views/task/TaskKanban.vue'
 import loginRoutes from './loginRouter'
 import { useAuthStore } from '@/stores/authStore.js'
 import { useUIStore } from '@/stores/uiStore.js'
+import asn from '@/api/asn'
+import asnRoutes from './asnRoutes'
 
 const routes = [
-  { path: '/', redirect: '/loginPage' },
+  { path: '/', redirect: '/auth/login' },
   {
     path: '/modaltest',
     component: ModalTest,
@@ -41,6 +43,7 @@ const routes = [
   ...announcementRoutes,
   ...warehouseRoutes,
   ...loginRoutes,
+  ...asnRoutes,
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,7 +55,7 @@ router.beforeEach((to, from, next) => {
   const ui = useUIStore()
 
   // 로그인 페이지는 인증이 필요하지 않음
-  if (to.path === '/loginPage') {
+  if (to.path === '/auth/login') {
     return next()
   }
 
@@ -61,7 +64,7 @@ router.beforeEach((to, from, next) => {
     ui.openNotificationModal({
       title: '로그인 필요',
       message: '로그인이 필요한 서비스입니다. 로그인 페이지로 이동합니다.',
-      onConfirm: () => next('/loginPage'),
+      onConfirm: () => next('/auth/login'),
       icon: 'lock',
     })
   } else {

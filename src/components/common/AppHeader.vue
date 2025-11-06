@@ -12,7 +12,7 @@
 
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-4">
-        <button v-if="!auth.isAuthenticated" @click="router.push('/loginPage')"
+        <button v-if="!auth.isAuthenticated" @click="router.push('/auth/login')"
           class="text-gray-700 dark:text-gray-200 hover:text-primary">
           로그인
         </button>
@@ -35,7 +35,7 @@ const router = useRouter()
 
 const logoutAndRedirect = async () => {
   await auth.logout()
-  router.push('/loginPage')
+  router.push('/auth/login')
 }
 </script>
 
