@@ -71,7 +71,7 @@ const onLogin = async () => {
     if (res.status === 20000 || res.message === '요청에 성공하였습니다.') {
       auth.login()
       ui.closeLoginModal()
-      if (res.results.role = "WORKER") {
+      if (res.results.role === "WORKER") {
         router.push('/task/Worker/view')
       }
     } else {
