@@ -4,7 +4,7 @@
     :class="isCollapsed ? 'w-20' : 'w-64'"
   >
     <!-- 메뉴 -->
-    <nav class="flex-1 px-3 py-5 space-y-1 overflow-hidden">
+    <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
       <RouterLink
         v-for="menu in munus"
         :key="menu.label"
@@ -32,46 +32,34 @@
           {{ menu.label }}
         </span>
       </RouterLink>
+
+      <!-- 버튼들 -->
+      <div
+        class="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700 flex justify-center gap-2"
+      >
+        <!-- 다크모드 -->
+        <button
+          class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary/10 dark:hover:bg-primary/20 transition-all"
+          @click="handleToggleDarkMode"
+          title="Toggle dark mode"
+        >
+          <span class="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-300">
+            {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
+          </span>
+        </button>
+
+        <!-- 사이드바 토글 -->
+        <button
+          @click="isCollapsed = !isCollapsed"
+          class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary/10 dark:hover:bg-primary/20 transition-all"
+          title="Toggle sidebar"
+        >
+          <span class="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-300">
+            {{ isCollapsed ? 'menu' : 'menu_open' }}
+          </span>
+        </button>
+      </div>
     </nav>
-
-    <!-- 하단: Settings + 다크모드 + 토글 -->
-    <div
-      class="mt-auto p-5 border-t border-gray-200 dark:border-gray-800 transition-all flex items-center justify-between gap-3"
-      :class="isCollapsed ? 'flex-col' : ''"
-    >
-      <!-- Settings -->
-      <RouterLink
-        to="/"
-        class="flex items-center gap-2 px-3 py-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary transition-all"
-        :class="isCollapsed ? 'justify-center w-full' : ''"
-        :title="isCollapsed ? 'Settings' : ''"
-      >
-        <span class="material-symbols-outlined text-[20px]">settings</span>
-        <span v-if="!isCollapsed" class="text-sm font-medium">Settings</span>
-      </RouterLink>
-
-      <!-- 다크모드 -->
-      <button
-        class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary/10 dark:hover:bg-primary/20 transition-all"
-        @click="handleToggleDarkMode"
-        title="Toggle dark mode"
-      >
-        <span class="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-300">
-          {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
-        </span>
-      </button>
-
-      <!-- 사이드바 토글 -->
-      <button
-        @click="isCollapsed = !isCollapsed"
-        class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary/10 dark:hover:bg-primary/20 transition-all"
-        title="Toggle sidebar"
-      >
-        <span class="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-300">
-          {{ isCollapsed ? 'menu' : 'menu_open' }}
-        </span>
-      </button>
-    </div>
   </aside>
 </template>
 
