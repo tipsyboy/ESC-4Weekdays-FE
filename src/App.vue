@@ -22,6 +22,26 @@
 
   <!-- 로그인 모달창 -->
   <LoginModal v-if="ui.isLoginModalOpen"/>
+
+  <!-- 알림 모달 -->
+  <ModalComp
+    :open="ui.isNotificationModalOpen"
+    :title="ui.notificationModalTitle"
+    :icon="ui.notificationModalIcon"
+    @close="handleConfirm"
+  >
+    <p>{{ ui.notificationModalMessage }}</p>
+    <template #footer>
+      <div class="flex justify-end">
+        <button
+          @click="handleConfirm"
+          class="px-4 py-2 bg-primary text-white rounded-md"
+        >
+          확인
+        </button>
+      </div>
+    </template>
+  </ModalComp>
 </template>
 
 <script setup>
@@ -29,6 +49,7 @@ import AppHeader from '@/components/common/AppHeader.vue'
 import AppSidebar from '@/components/common/AppSideBar.vue'
 import AppFooter from '@/components/common/AppFooter.vue'
 import LoginModal from '@/components/auth/LoginModal.vue'
+import ModalComp from '@/components/common/ModalComp.vue' // 추가
 import {useUIStore} from '@/stores/uiStore.js'
 import {useVendorStore} from "@/stores/vendorStore.js";
 import {onMounted} from "vue";
@@ -40,4 +61,11 @@ onMounted(() => {
 })
 
 const ui = useUIStore()
+
+const handleConfirm = () => {
+  if (ui.notificationModalOnConfirm) {
+    ui.notificationModalOnConfirm()
+  }
+  ui.closeNotificationModal()
+}
 </script>

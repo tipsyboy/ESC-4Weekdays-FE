@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import MemberApi from '@/api/member/index.js'
-import router from '@/router'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -14,7 +13,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         await MemberApi.memberLogout({})
         this.isAuthenticated = false
-        router.push('/')
+        // 라우터 이동은 logout을 호출하는 컴포넌트에서 처리
       } catch (error) {
         console.error('Logout failed:', error)
       }

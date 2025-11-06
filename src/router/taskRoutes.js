@@ -11,7 +11,7 @@ export default [
   },
   {
     path: '/task/Worker/view',
-    name: 'TaskDetail',
+    name: 'TaskWorkerView',
     component: () => import('@/views/task/WorkerTaskView.vue'),
   },
   {

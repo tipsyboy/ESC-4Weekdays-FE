@@ -145,14 +145,18 @@ const onDrop = async (newStatus) => {
         } else if (newStatus === 'IN_PROGRESS') {
             endpoint = `/api/tasks/${draggedTask.id}/start`
         } else if (newStatus === 'COMPLETED') {
-            endpoint = `/api/tasks/${draggedTask.id}/complete`
+            if (draggedTask.category === 'INSPECTION') {
+                endpoint = `/api/inbound-tasks/inspection/${draggedTask.id}/complete`
+            } else {
+                endpoint = `/api/tasks/${draggedTask.id}/complete`
+            }
         } else if (newStatus === 'CANCELLED') {
             endpoint = `/api/tasks/${draggedTask.id}/cancel?reason=관리자취소`
         }
 
         if (!endpoint) return
 
-        await api.post(endpoint)
+        await api.post(endpoint, {})
 
         // 상태 업데이트
         draggedTask.status = newStatus

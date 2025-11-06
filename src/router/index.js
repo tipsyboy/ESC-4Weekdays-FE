@@ -12,9 +12,13 @@ import vendorRoutes from '@/router/vendorRoutes.js'
 import franchiseRoutes from '@/router/franchiseRoutes.js'
 import announcementRoutes from './announcementRoutes'
 import warehouseRoutes from '@/router/warehouseRoutes.js'
-import asnRoutes from '@/router/asnRoutes.js'
+import TaskKanban from '@/views/task/TaskKanban.vue'
+import loginRoutes from './loginRouter'
+import { useAuthStore } from '@/stores/authStore.js'
+import { useUIStore } from '@/stores/uiStore.js'
 
 const routes = [
+  { path: '/', redirect: '/loginPage' },
   {
     path: '/modaltest',
     component: ModalTest,
@@ -23,7 +27,6 @@ const routes = [
     path: '/test',
     component: ModalTest,
   },
- 
 
   ...purchaseOrderRoutes,
   ...inboundRoutes,
@@ -37,11 +40,33 @@ const routes = [
   ...franchiseRoutes,
   ...announcementRoutes,
   ...warehouseRoutes,
-  ...asnRoutes,
+  ...loginRoutes,
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+})
+
+router.beforeEach((to, from, next) => {
+  const auth = useAuthStore()
+  const ui = useUIStore()
+
+  // 로그인 페이지는 인증이 필요하지 않음
+  if (to.path === '/loginPage') {
+    return next()
+  }
+
+  // 인증되지 않은 사용자는 알림 모달을 띄움
+  if (!auth.isAuthenticated) {
+    ui.openNotificationModal({
+      title: '로그인 필요',
+      message: '로그인이 필요한 서비스입니다. 로그인 페이지로 이동합니다.',
+      onConfirm: () => next('/loginPage'),
+      icon: 'lock',
+    })
+  } else {
+    next()
+  }
 })
 
 export default router
