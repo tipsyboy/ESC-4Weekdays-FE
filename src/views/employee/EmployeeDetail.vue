@@ -94,7 +94,7 @@
 
             <!-- 버튼 영역 -->
             <div class="mt-8 flex justify-end gap-3">
-                <ButtonComp v-if="!isEditMode" color="primary" icon="edit" @click="toggleEditMode">
+                <ButtonComp v-if="!isEditMode && auth.isAdmin" color="primary" icon="edit" @click="toggleEditMode">
                     수정
                 </ButtonComp>
                 <ButtonComp v-if="isEditMode" color="primary" icon="save" @click="saveEmployee">
@@ -117,10 +117,11 @@ import { useRoute, useRouter } from 'vue-router'
 import member from '@/api/member'
 import { getStatusLabel, getStatusColor } from '@/utils/statusMapper.js'
 import { formatDate } from '@/utils/date.js'
+import { useAuthStore } from '@/stores/authStore'
 
 const route = useRoute()
 const router = useRouter()
-
+const auth = useAuthStore()
 const employee = ref({})
 const editableEmployee = ref({})
 const isEditMode = ref(false)

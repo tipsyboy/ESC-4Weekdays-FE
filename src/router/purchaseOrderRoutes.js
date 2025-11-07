@@ -7,16 +7,19 @@ const purchaseOrderRoutes = [
     path: '/purchase',
     name: 'purchaseOrder',
     component: PurchaseOrderList,
+    meta: { roles: ['MANAGER'] },
   },
   {
     path: '/purchase/create',
     name: 'purchaseOrderCreate',
     component: PurchaseOrderCreate,
+    meta: { roles: ['MANAGER'] },
   },
   {
     path: '/purchase/:id',
     name: 'purchaseOrderDetail',
     component: PurchaseOrderDetail,
+    meta: { roles: ['MANAGER'] },
   },
 ]
 

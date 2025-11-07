@@ -13,15 +13,11 @@
         <div class="flex items-center gap-3">
           <!-- 신규 등록 -->
           <RouterLink to="/warehouse/create" class="w-40">
-            <ButtonComp color="primary" icon="add" class="whitespace-nowrap">신규 창고</ButtonComp>
+            <ButtonComp v-if="auth.isAdmin" color="primary" icon="add" class="whitespace-nowrap">신규 창고</ButtonComp>
           </RouterLink>
 
           <!-- 검색창 -->
-          <SearchBarComp
-              v-model="query"
-              placeholder="창고명 또는 이메일 검색..."
-              @search="handleSearch"
-          />
+          <SearchBarComp v-model="query" placeholder="창고명 또는 이메일 검색..." @search="handleSearch" />
         </div>
       </div>
     </template>
@@ -30,10 +26,8 @@
     <TableComp :columns="columns" :data="filteredWarehouses">
       <!-- 창고명 클릭 시 상세로 이동 -->
       <template #cell-name="{ row }">
-        <RouterLink
-            :to="{ name: 'warehouseDetail', params: { id: row.id } }"
-            class="text-blue-600 dark:text-blue-400 hover:underline font-medium"
-        >
+        <RouterLink :to="{ name: 'warehouseDetail', params: { id: row.id } }"
+          class="text-blue-600 dark:text-blue-400 hover:underline font-medium">
           {{ row.name }}
         </RouterLink>
       </template>
@@ -53,6 +47,7 @@ import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import warehouseApi from '@/api/warehouse/index.js'
+import { useAuthStore } from '@/stores/authStore'
 
 // ✅ 테이블 컬럼 정의 (id 제거)
 const columns = [
@@ -64,6 +59,7 @@ const columns = [
 
 const warehouses = ref([])
 const query = ref('')
+const auth = useAuthStore()
 
 // ✅ 데이터 조회
 const fetchWarehouses = async () => {
@@ -80,9 +76,9 @@ const filteredWarehouses = computed(() => {
   const q = query.value.trim().toLowerCase()
   if (!q) return warehouses.value
   return warehouses.value.filter((w) =>
-      [w.name, w.email, w.phoneNumber].some((field) =>
-          field?.toLowerCase().includes(q)
-      )
+    [w.name, w.email, w.phoneNumber].some((field) =>
+      field?.toLowerCase().includes(q)
+    )
   )
 })
 

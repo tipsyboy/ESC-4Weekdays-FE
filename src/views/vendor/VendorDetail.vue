@@ -6,24 +6,15 @@
         <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">공급업체 상세</h1>
 
         <div class="flex flex-wrap items-center gap-2 md:gap-3">
-          <ButtonComp color="primary" icon="edit" @click="openEditModal">수정</ButtonComp>
+          <ButtonComp v-if="auth.isAdmin" color="primary" icon="edit" @click="openEditModal">수정</ButtonComp>
 
           <!-- 상태별 버튼 분기 -->
-          <ButtonComp
-            v-if="vendor.status === 'ACTIVE'"
-            color="danger"
-            icon="block"
-            @click="updateStatus('SUSPENDED')"
-          >
+          <ButtonComp v-if="vendor.status === 'ACTIVE'" color="danger" icon="block" @click="updateStatus('SUSPENDED')">
             거래 중단
           </ButtonComp>
 
-          <ButtonComp
-            v-else-if="vendor.status === 'SUSPENDED'"
-            color="success"
-            icon="check_circle"
-            @click="updateStatus('ACTIVE')"
-          >
+          <ButtonComp v-else-if="vendor.status === 'SUSPENDED'" color="success" icon="check_circle"
+            @click="updateStatus('ACTIVE')">
             거래 활성화
           </ButtonComp>
 
@@ -35,11 +26,8 @@
     </template>
 
     <!-- 기본 정보 -->
-    <section
-      v-if="vendor.id"
-      class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-             rounded-xl shadow-sm p-6 backdrop-blur-sm space-y-6"
-    >
+    <section v-if="vendor.id" class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
+             rounded-xl shadow-sm p-6 backdrop-blur-sm space-y-6">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-white">기본 정보</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -67,8 +55,7 @@
           <span class="text-xs text-gray-500 block mb-1">상태</span>
           <BadgeComp
             :color="vendor.status === 'ACTIVE' ? 'success' : vendor.status === 'INACTIVE' ? 'warning' : 'danger'"
-            :label="getStatusLabel(vendor.status)"
-          />
+            :label="getStatusLabel(vendor.status)" />
         </div>
 
         <div class="lg:col-span-3">
@@ -89,11 +76,8 @@
     </section>
 
     <!-- 주소 정보 -->
-    <section
-      v-if="vendor.id"
-      class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-             rounded-xl shadow-sm p-6 backdrop-blur-sm space-y-6"
-    >
+    <section v-if="vendor.id" class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
+             rounded-xl shadow-sm p-6 backdrop-blur-sm space-y-6">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-white">주소 정보</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -120,12 +104,7 @@
     </section>
 
     <!-- 수정 모달 -->
-    <ModalComp
-      :open="isEditModal"
-      title="공급업체 정보 수정"
-      icon="edit"
-      @close="isEditModal = false"
-    >
+    <ModalComp :open="isEditModal" title="공급업체 정보 수정" icon="edit" @close="isEditModal = false">
       <div class="space-y-4">
         <label class="flex flex-col gap-1.5">
           <span class="text-xs font-medium text-slate-700 dark:text-slate-200">공급업체명</span>
@@ -187,12 +166,14 @@ import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
 import ModalComp from '@/components/common/ModalComp.vue'
+import { useAuthStore } from '@/stores/authStore'
 
 const route = useRoute()
 const router = useRouter()
 const vendor = ref({})
 const isEditModal = ref(false)
 const editForm = ref({})
+const auth = useAuthStore()
 
 // 상태 라벨 매핑
 const getStatusLabel = (status) => {

@@ -7,21 +7,25 @@ const warehouseRoutes = [
         path: '/warehouse',
         name: 'warehouseList',
         component: WarehouseList,
+        meta: { roles: ['MANAGER'] },
     },
     {
         path: '/warehouse/create',
         name: 'warehouseCreate',
         component: WarehouseCreate,
+        meta: { roles: ['MANAGER'] },
     },
     {
         path: '/warehouse/:id',
         name: 'warehouseDetail',
         component: WarehouseDetail,
+        meta: { roles: ['MANAGER'] },
     },
     {
         path: '/warehouse/update/:id',
         name: 'warehouseUpdate',
         component: WarehouseDetail,
+        meta: { roles: ['MANAGER'] },
     },
 ]
 

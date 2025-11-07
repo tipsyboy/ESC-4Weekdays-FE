@@ -7,16 +7,19 @@ const employeeRoutes = [
     path: '/employee',
     name: 'employee',
     component: EmployeeManegment,
+    meta: { roles: ['MANAGER'] },
   },
   {
     path: '/employee/create',
     name: 'employeeCreate',
     component: EmployeeCreate,
+    meta: { roles: ['MANAGER'] },
   },
   {
     path: '/employee/:id',
     name: 'employeeId',
     component: EmployeeDetail,
+    meta: { roles: ['MANAGER'] },
   },
 ]
 

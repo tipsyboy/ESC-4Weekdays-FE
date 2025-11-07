@@ -1,10 +1,6 @@
 <template>
     <AppPageLayout>
-        <template #header>
-            <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">로그인</h1>
-        </template>
-
-        <div class="flex flex-col items-center justify-center min-h-[70vh]">
+        <div class="flex flex-col items-center justify-center min-h-screen">
             <div class="w-full max-w-md bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg text-center">
                 <div class="text-center mb-6">
                     <div
@@ -85,7 +81,7 @@ const onLogin = async () => {
         const res = await MemberApi.memberLogin(req)
 
         if (res.status === 20000 || res.message === '요청에 성공하였습니다.') {
-            auth.login()
+            auth.login(res.results.role)
             const role = res.results.role
             if (role === 'WORKER') {
                 router.push('/task/Worker/view')

@@ -10,7 +10,7 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <ButtonComp color="primary" icon="add" @click="goCreate">신규 공지</ButtonComp>
+                    <ButtonComp v-if="auth.isAdmin" color="primary" icon="add" @click="goCreate">신규 공지</ButtonComp>
                 </div>
             </div>
         </template>
@@ -75,6 +75,7 @@ import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
 import announcementApi from '@/api/announcement/index.js'
 import { formatDate } from '@/utils/date.js'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -82,6 +83,7 @@ const page = ref(0)
 const size = ref(10)
 const totalPages = ref(1)
 const announcementList = ref([])
+const auth = useAuthStore()
 
 const filters = ref({
     startDate: '',

@@ -1,71 +1,41 @@
 <template>
   <div class="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
-    <AppHeader/>
-    <!-- Main (Sidebar + Contents) -->
+    <!-- 헤더 -->
+    <AppHeader v-if="!isLoginPage" />
+
     <div class="flex flex-1 min-h-0">
-      <AppSidebar/>
+      <AppSidebar v-if="!isLoginPage" />
+
       <RouterView v-slot="{ Component, route }" class="flex-1 overflow-y-auto">
-        <transition
-          mode="out-in"
-          enter-active-class="transition-opacity duration-200"
-          enter-from-class="opacity-0"
-          leave-active-class="transition-opacity duration-200"
-          leave-to-class="opacity-0"
-        >
-          <!-- page fade 기능 구현 -->
-          <component :is="Component" :key="route.fullPath"/>
+        <transition mode="out-in" enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0"
+          leave-active-class="transition-opacity duration-200" leave-to-class="opacity-0">
+          <component :is="Component" :key="route.fullPath" />
         </transition>
       </RouterView>
     </div>
   </div>
-  <AppFooter/>
 
-  <!-- 로그인 모달창 -->
-  <LoginModal v-if="ui.isLoginModalOpen"/>
-
-  <!-- 알림 모달 -->
-  <ModalComp
-    :open="ui.isNotificationModalOpen"
-    :title="ui.notificationModalTitle"
-    :icon="ui.notificationModalIcon"
-    @close="handleConfirm"
-  >
-    <p>{{ ui.notificationModalMessage }}</p>
-    <template #footer>
-      <div class="flex justify-end">
-        <button
-          @click="handleConfirm"
-          class="px-4 py-2 bg-primary text-white rounded-md"
-        >
-          확인
-        </button>
-      </div>
-    </template>
-  </ModalComp>
+  <!-- 푸터 -->
+  <AppFooter v-if="!isLoginPage" />
 </template>
 
 <script setup>
+import { computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+
 import AppHeader from '@/components/common/AppHeader.vue'
 import AppSidebar from '@/components/common/AppSideBar.vue'
 import AppFooter from '@/components/common/AppFooter.vue'
-import LoginModal from '@/components/auth/LoginModal.vue'
-import ModalComp from '@/components/common/ModalComp.vue' // 추가
-import {useUIStore} from '@/stores/uiStore.js'
-import {useVendorStore} from "@/stores/vendorStore.js";
-import {onMounted} from "vue";
 
-const vendorStore = useVendorStore();
+import { useVendorStore } from '@/stores/vendorStore.js'
+
+const vendorStore = useVendorStore()
+const route = useRoute()
 
 onMounted(() => {
   vendorStore.fetchVendors()
 })
 
-const ui = useUIStore()
-
-const handleConfirm = () => {
-  if (ui.notificationModalOnConfirm) {
-    ui.notificationModalOnConfirm()
-  }
-  ui.closeNotificationModal()
-}
+// 로그인 페이지에서는 전역 레이아웃 숨김
+const isLoginPage = computed(() => route.path === '/auth/login')
 </script>
