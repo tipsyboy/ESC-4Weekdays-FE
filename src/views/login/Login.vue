@@ -38,7 +38,7 @@
 
                     <p v-if="error" class="text-red-500 text-sm text-center -mt-2">{{ error }}</p>
 
-                    <button @click="onLogin()" type="submit"
+                    <button type="submit"
                         class="w-full bg-primary text-white py-2.5 rounded-lg font-medium text-lg hover:bg-primary/90 transition">
                         로그인
                     </button>
