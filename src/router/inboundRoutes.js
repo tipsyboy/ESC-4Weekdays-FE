@@ -7,17 +7,20 @@ const inboundRoutes = [
     path: '/inbound',
     name: 'inboundList',
     component: InboundList,
+    meta: { roles: ['MANAGER'] },
   },
   {
     path: '/inbound/create',
     name: 'inboundCreate',
     component: InboundCreate,
+    meta: { roles: ['MANAGER'] },
   },
   {
     path: '/inbound/:id',
     name: 'inboundDetail',
     component: InboundDetail,
     props: true,
+    meta: { roles: ['MANAGER'] },
   },
 ]
 

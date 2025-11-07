@@ -7,17 +7,20 @@ const vendorRoutes = [
     path: '/vendors',
     name: 'vendorList',
     component: vendorList,
+    meta: { roles: ['MANAGER'] },
   },
   {
     path: '/vendors/create',
     name: 'vendorCreate',
     component: vendorCreate,
+    meta: { roles: ['MANAGER'] },
   },
   {
     path: '/vendors/:id',
     name: 'vendorDetail',
     component: vendorDetail,
     props: true,
+    meta: { roles: ['MANAGER'] },
   },
 ]
 

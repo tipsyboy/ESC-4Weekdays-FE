@@ -15,7 +15,7 @@
           <ButtonComp color="secondary" icon="arrow_back" @click="$router.push({ name: 'franchiseList' })">
             뒤로가기
           </ButtonComp>
-          <ButtonComp color="primary" icon="edit" @click="editFranchise">
+          <ButtonComp v-if="auth.isAdmin" color="primary" icon="edit" @click="editFranchise">
             수정
           </ButtonComp>
           <!--          <ButtonComp color="danger" icon="block" @click="suspendFranchise">-->
@@ -27,10 +27,8 @@
 
     <section v-if="franchise" class="space-y-8">
       <!-- 기본 정보 -->
-      <div
-          class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-               rounded-xl shadow-sm p-6 backdrop-blur-sm"
-      >
+      <div class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
+               rounded-xl shadow-sm p-6 backdrop-blur-sm">
         <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-white">기본 정보</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
@@ -49,10 +47,8 @@
       </div>
 
       <!-- 주소 정보 -->
-      <div
-          class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-               rounded-xl shadow-sm p-6 backdrop-blur-sm"
-      >
+      <div class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
+               rounded-xl shadow-sm p-6 backdrop-blur-sm">
         <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-white">주소 정보</h2>
         <div class="space-y-2">
           <div><span class="text-gray-500 text-sm block">우편번호</span> {{ franchise.address?.zipcode || '-' }}</div>
@@ -71,15 +67,17 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import franchiseApi from "@/api/franchise/index.js";
+import { useAuthStore } from '@/stores/authStore';
 
 const route = useRoute()
 const router = useRouter()
 const franchise = ref(null)
+const auth = useAuthStore()
 
 // ✅ 가맹점 상세 조회
 const getFranchises = async () => {
@@ -100,7 +98,7 @@ const getFranchises = async () => {
 
 // ✅ 수정 이동 (name 기반)
 const editFranchise = () => {
-  router.push({name: 'franchiseUpdate', params: {id: route.params.id}})
+  router.push({ name: 'franchiseUpdate', params: { id: route.params.id } })
 }
 
 // ✅ 날짜 포맷
