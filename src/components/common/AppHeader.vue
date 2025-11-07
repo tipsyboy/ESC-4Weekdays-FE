@@ -12,11 +12,11 @@
 
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-4">
-        <button v-if="!auth.isAuthenticated" @click="ui.openLoginModal"
+        <button v-if="!auth.isAuthenticated" @click="router.push('/auth/login')"
           class="text-gray-700 dark:text-gray-200 hover:text-primary">
           로그인
         </button>
-        <button v-else @click="auth.logout" class="text-gray-700 dark:text-gray-200 hover:text-primary">
+        <button v-else @click="logoutAndRedirect" class="text-gray-700 dark:text-gray-200 hover:text-primary">
           로그아웃
         </button>
       </div>
@@ -27,9 +27,16 @@
 <script setup>
 import { useUIStore } from '@/stores/uiStore.js'
 import { useAuthStore } from '@/stores/authStore.js'
+import { useRouter } from 'vue-router'
 
 const ui = useUIStore()
 const auth = useAuthStore()
+const router = useRouter()
+
+const logoutAndRedirect = async () => {
+  await auth.logout()
+  router.push('/auth/login')
+}
 </script>
 
 <style scoped></style>

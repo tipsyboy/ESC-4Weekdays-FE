@@ -13,7 +13,7 @@
                 <div class="flex items-center gap-3">
                     <!-- 신규 직원 등록 -->
                     <RouterLink to="/employee/create" class="w-40">
-                        <ButtonComp color="primary" icon="add">직원 등록</ButtonComp>
+                        <ButtonComp v-if="auth.isAdmin" color="primary" icon="add">직원 등록</ButtonComp>
                     </RouterLink>
                 </div>
             </div>
@@ -128,8 +128,10 @@ import BadgeComp from '@/components/common/BadgeComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
 import { getStatusLabel, getStatusColor } from '@/utils/statusMapper.js'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
+const auth = useAuthStore()
 
 // 🔍 검색 조건
 const searchParams = ref({

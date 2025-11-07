@@ -34,52 +34,61 @@
       </button>
     </div>
 
-    <TableComp :columns="columns" :data="filteredOrders">
-      <template #cell-orderNumber="{ row }">
-        <RouterLink :to="`/purchase/${row.id}`">
-          <span class="text-primary font-semibold hover:underline">
-            {{ row.orderNumber }}
-          </span>
-        </RouterLink>
-      </template>
-
-      <!-- 공급업체 -->
-      <template #cell-vendorName="{ row }">
-        <span class="text-slate-800 dark:text-slate-200">{{ row.vendorName }}</span>
-      </template>
-
-      <!-- 상태 -->
+    <!-- 발주 목록 확장 테이블 -->
+    <ExpandableTable
+      :columns="mainColumns"
+      :rows="filteredOrders"
+      :sub-columns="subColumns"
+      :expanded-ids="expandedIds"
+      sub-key="items"
+      link-key="orderNumber"
+      link-path="/purchase"
+      @toggle-expand="toggleExpand"
+    >
       <template #cell-status="{ row }">
         <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)" />
       </template>
 
-      <!-- 금액 -->
       <template #cell-totalAmount="{ row }">
         {{ formatWon(row.totalAmount) }}
       </template>
 
-      <!-- 발주일 -->
       <template #cell-orderDate="{ row }">
         {{ formatDate(row.orderDate) }}
       </template>
 
-      <!-- 입고예정일 -->
       <template #cell-expectedDate="{ row }">
         {{ formatDate(row.expectedDate) }}
       </template>
-    </TableComp>
+
+      <template #sub-row="{ subItem }">
+        <td
+          class="px-6 py-3 text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+          @click.stop="handleProductClick(subItem.productId)"
+        >
+          <span class="text-blue-600 dark:text-blue-400 hover:underline">
+            {{ subItem.productCode }}
+          </span>
+        </td>
+        <td class="px-6 py-3 text-sm text-middle font-medium">{{ subItem.productName }}</td>
+        <td class="px-6 py-3 text-sm text-right font-medium">{{ subItem.orderedQuantity }}</td>
+        <td class="px-6 py-3 text-sm text-right">{{ formatWon(subItem.unitPrice) }}</td>
+        <td class="px-6 py-3 text-sm text-right font-semibold">{{ formatWon(subItem.totalPrice) }}</td>
+        <td class="px-6 py-3 text-sm">{{ subItem.description || '-' }}</td>
+      </template>
+    </ExpandableTable>
   </AppPageLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import api from '@/api/purchase'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
-import TableComp from '@/components/common/TableComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
+import ExpandableTable from '@/components/common/ExpandableTable.vue'
 import { formatDate, formatWon } from '@/utils/format.js'
 import { getStatusLabel, getStatusColor } from '@/utils/statusMapper.js'
 
@@ -87,14 +96,28 @@ const filters = ['기간', '공급업체', '상태']
 
 const list = ref([])
 const query = ref('')
+const expandedIds = ref(new Set())
 
-const columns = [
+const router = useRouter()
+
+// 메인 테이블 컬럼 (발주 기준)
+const mainColumns = [
   { key: 'orderNumber', label: '발주 번호' },
   { key: 'vendorName', label: '공급 업체' },
   { key: 'status', label: '상태', align: 'center' },
   { key: 'totalAmount', label: '총 금액', align: 'right' },
   { key: 'orderDate', label: '발주일' },
   { key: 'expectedDate', label: '입고 예정일' },
+]
+
+// 서브 테이블 컬럼 (발주 상품 목록)
+const subColumns = [
+  { key: 'productCode', label: '상품코드' },
+  { key: 'productName', label: '상품명' },
+  { key: 'orderedQuantity', label: '발주수량', align: 'right' },
+  { key: 'unitPrice', label: '단가', align: 'right' },
+  { key: 'totalPrice', label: '금액', align: 'right' },
+  { key: 'description', label: '비고' },
 ]
 
 // 데이터 로드
@@ -118,5 +141,19 @@ const filteredOrders = computed(() => {
 
 const handleSearch = () => {
   console.log('검색 실행:', query.value)
+}
+
+// 토글 확장/축소
+const toggleExpand = (orderId) => {
+  if (expandedIds.value.has(orderId)) {
+    expandedIds.value.delete(orderId)
+  } else {
+    expandedIds.value.add(orderId)
+  }
+}
+
+// 상품 클릭 시 상품 상세 페이지로 이동
+const handleProductClick = (productId) => {
+  router.push(`/product/${productId}`)
 }
 </script>

@@ -8,8 +8,8 @@
                 </div>
                 <div class="flex gap-2">
                     <ButtonComp color="secondary" @click="$router.back()">뒤로가기</ButtonComp>
-                    <ButtonComp color="primary" @click="goToEdit">수정</ButtonComp>
-                    <ButtonComp color="danger" @click="openDeleteModal">삭제</ButtonComp>
+                    <ButtonComp v-if="auth.isAdmin" color="primary" @click="goToEdit">수정</ButtonComp>
+                    <ButtonComp v-if="auth.isAdmin" color="danger" @click="openDeleteModal">삭제</ButtonComp>
                 </div>
             </div>
         </template>
@@ -101,6 +101,7 @@ import ModalComp from '@/components/common/ModalComp.vue'
 import { useRouter, useRoute } from 'vue-router'
 import announcementApi from '@/api/announcement/index.js'
 import { formatDate } from '@/utils/date.js'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
 const route = useRoute()
@@ -109,6 +110,7 @@ const announcement = ref(null)
 const announcementList = ref([])
 const loading = ref(true)
 const error = ref(null)
+const auth = useAuthStore()
 
 // ✅ 모달 상태
 const showDeleteModal = ref(false)

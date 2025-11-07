@@ -45,13 +45,15 @@
       </div>
     </div>
 
-    <!-- 상품 리트스 -->
+    <!-- 상품 리스트 -->
     <ExpandableTable
       :columns="state.mainColumns"
       :rows="state.inventories"
       :sub-columns="state.subColumns"
       :expanded-ids="expandedIds"
       sub-key="inventories"
+      link-key="productCode"
+      link-path="/inventory/detail"
       @toggle-expand="toggleExpand"
     >
       <template #sub-row="{ subItem }">

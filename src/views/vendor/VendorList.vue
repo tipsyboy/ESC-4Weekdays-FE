@@ -3,14 +3,13 @@
     <template #header>
       <div class="flex justify-between items-center mb-4">
         <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">공급업체 목록</h1>
-        <ButtonComp color="primary" icon="add" @click="goCreate">신규 등록</ButtonComp>
+        <ButtonComp v-if="auth.isAdmin" color="primary" icon="add" @click="goCreate">신규 등록</ButtonComp>
       </div>
     </template>
 
     <!-- 검색창 -->
     <section
-      class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-6 md:p-8 space-y-6"
-    >
+      class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-6 md:p-8 space-y-6">
       <SearchBarComp v-model="searchText" placeholder="공급업체명 / 코드 검색" />
 
       <!-- 테이블 -->
@@ -22,10 +21,8 @@
         </template>
 
         <template #cell-status="{ row }">
-          <BadgeComp
-            :color="row.status === 'ACTIVE' ? 'success' : 'danger'"
-            :label="row.status === 'ACTIVE' ? '거래중' : '중단'"
-          />
+          <BadgeComp :color="row.status === 'ACTIVE' ? 'success' : 'danger'"
+            :label="row.status === 'ACTIVE' ? '거래중' : '중단'" />
         </template>
       </TableComp>
     </section>
@@ -44,6 +41,7 @@ import ButtonComp from '@/components/common/ButtonComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
 const goCreate = () => router.push('/vendors/create')
@@ -53,6 +51,7 @@ const { vendorList } = storeToRefs(vendorStore)
 
 const searchText = ref('')
 const searchResult = ref([])
+const auth = useAuthStore()
 
 const columns = [
   { key: 'vendorCode', label: '공급업체 코드' },

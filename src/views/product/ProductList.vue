@@ -11,7 +11,7 @@
         </div>
         <div class="flex items-center gap-2">
           <ButtonComp color="secondary" icon="refresh" @click="resetFilters">초기화</ButtonComp>
-          <ButtonComp color="primary" icon="add" @click="goRegister">상품 등록</ButtonComp>
+          <ButtonComp v-if="auth.isAdmin" color="primary" icon="add" @click="goRegister">상품 등록</ButtonComp>
         </div>
       </div>
     </template>
@@ -101,9 +101,11 @@ import ButtonComp from '@/components/common/ButtonComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
 import ProductApi from '@/api/product/index.js'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
 const vendorStore = useVendorStore() // ✅ Pinia 스토어 사용
+const auth = useAuthStore()
 const searchQuery = ref('')
 const page = ref(0)
 const size = ref(10)

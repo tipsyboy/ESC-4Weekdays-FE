@@ -5,6 +5,7 @@ const dashboardRoutes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: DashBoardMain,
+    meta: { roles: ['ADMIN', 'MANAGER'] },
   },
 ]
 

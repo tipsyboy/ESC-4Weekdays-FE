@@ -16,7 +16,7 @@
           <ButtonComp color="secondary" icon="arrow_back" @click="$router.push({ name: 'warehouseList' })">
             뒤로가기
           </ButtonComp>
-          <ButtonComp color="primary" icon="edit" @click="editWarehouse">
+          <ButtonComp v-if="auth.isAdmin" color="primary" icon="edit" @click="editWarehouse">
             수정
           </ButtonComp>
         </div>
@@ -26,10 +26,8 @@
     <!-- 상세 정보 -->
     <section v-if="warehouse" class="space-y-8">
       <!-- 기본 정보 -->
-      <div
-          class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-             rounded-xl shadow-sm p-6 backdrop-blur-sm"
-      >
+      <div class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
+             rounded-xl shadow-sm p-6 backdrop-blur-sm">
         <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-white">기본 정보</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
@@ -41,10 +39,8 @@
       </div>
 
       <!-- 주소 정보 -->
-      <div
-          class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-             rounded-xl shadow-sm p-6 backdrop-blur-sm"
-      >
+      <div class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
+             rounded-xl shadow-sm p-6 backdrop-blur-sm">
         <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-white">주소 정보</h2>
         <div class="space-y-2">
           <div><span class="text-gray-500 text-sm block">우편번호</span> {{ warehouse.address?.zipcode || '-' }}</div>
@@ -68,10 +64,12 @@ import { useRoute, useRouter } from 'vue-router'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import warehouseApi from '@/api/warehouse/index.js'
+import { useAuthStore } from '@/stores/authStore'
 
 const route = useRoute()
 const router = useRouter()
 const warehouse = ref(null)
+const auth = useAuthStore()
 
 // ✅ 상세 조회
 const getWarehouse = async () => {
