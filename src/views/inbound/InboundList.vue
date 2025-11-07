@@ -57,7 +57,14 @@
       </template>
 
       <template #sub-row="{ subItem }">
-        <td class="px-6 py-3 text-sm">{{ subItem.productCode }}</td>
+        <td
+          class="px-6 py-3 text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+          @click.stop="handleProductClick(subItem.productId)"
+        >
+          <span class="text-blue-600 dark:text-blue-400 hover:underline">
+            {{ subItem.productCode }}
+          </span>
+        </td>
         <td class="px-6 py-3 text-sm">{{ subItem.productName }}</td>
         <td class="px-6 py-3 text-sm text-right font-medium">{{ subItem.receivedQuantity }}</td>
         <td class="px-6 py-3 text-sm">
@@ -83,7 +90,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import api from '@/api/inbound'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
@@ -98,6 +105,7 @@ const page = ref(0)
 const pageSize = 10
 const isProductFilterOpen = ref(false)
 const expandedIds = ref(new Set())
+const router = useRouter()
 
 const filters = ['입고상태', '검수상태', '입고일자']
 
@@ -145,6 +153,10 @@ const handleSearch = () => {
       i.orderNumber.toLowerCase().includes(q) ||
       i.vendorName.toLowerCase().includes(q),
   )
+}
+
+const handleProductClick = (productId) => {
+  router.push(`/product/${productId}`)
 }
 
 const formatDate = (dateStr) => {
