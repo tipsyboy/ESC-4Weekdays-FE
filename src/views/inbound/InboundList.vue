@@ -41,53 +41,36 @@
       </button>
     </div>
 
-    <!-- 입고 목록 테이블 -->
-    <TableComp :columns="columns" :data="pagedInbounds" :items="pagedInbounds">
-      <template #cell-inboundNumber="{ row }">
-        <RouterLink :to="`/inbound/${row.id}`">
-          <span class="text-primary font-semibold hover:underline">{{ row.inboundNumber }}</span>
-        </RouterLink>
-      </template>
-
-      <template #cell-orderNumber="{ row }">
-        <span>{{ row.orderNumber }}</span>
-      </template>
-
-      <template #cell-vendorName="{ row }">
-        <span>{{ row.vendorName }}</span>
-      </template>
-
+    <!-- 입고 목록 확장 테이블 -->
+    <ExpandableTable
+      :columns="mainColumns"
+      :rows="inbounds"
+      :sub-columns="subColumns"
+      :expanded-ids="expandedIds"
+      sub-key="items"
+      link-key="inboundNumber"
+      link-path="/inbound"
+      @toggle-expand="toggleExpand"
+    >
       <template #cell-status="{ row }">
         <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)" />
       </template>
 
-      <template #cell-managerName="{ row }">
-        {{ row.managerName }}
+      <template #sub-row="{ subItem }">
+        <td class="px-6 py-3 text-sm">{{ subItem.productCode }}</td>
+        <td class="px-6 py-3 text-sm">{{ subItem.productName }}</td>
+        <td class="px-6 py-3 text-sm text-right font-medium">{{ subItem.receivedQuantity }}</td>
+        <td class="px-6 py-3 text-sm">
+          <span v-if="subItem.isFromPurchaseOrder" class="text-blue-600 dark:text-blue-400">
+            발주품목
+          </span>
+          <span v-else class="text-gray-600 dark:text-gray-400"> 추가품목 </span>
+        </td>
+        <td class="px-6 py-3 text-sm">
+          {{ subItem.description || '-' }}
+        </td>
       </template>
-
-      <template #cell-scheduledDate="{ row }">
-        {{ formatDate(row.scheduledDate) }}
-      </template>
-    </TableComp>
-
-    <!-- 페이지네이션 -->
-    <div class="flex justify-center items-center gap-2 mt-8">
-      <ButtonComp
-        color="secondary"
-        icon="arrow_back"
-        :disabled="page === 0"
-        @click="changePage(page - 1)"
-      />
-      <span class="text-sm text-slate-600 whitespace-nowrap">
-        페이지 {{ page + 1 }} / {{ totalPages }}
-      </span>
-      <ButtonComp
-        color="secondary"
-        icon="arrow_forward"
-        :disabled="page >= totalPages - 1"
-        @click="changePage(page + 1)"
-      />
-    </div>
+    </ExpandableTable>
 
     <!-- 상품 필터 모달 -->
     <ProductFilterModal
@@ -99,41 +82,43 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import api from '@/api/inbound'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
-import TableComp from '@/components/common/TableComp.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import ProductFilterModal from '@/components/common/ProductFilterModal.vue'
+import ExpandableTable from '@/components/common/ExpandableTable.vue'
 
 const inbounds = ref([])
 const query = ref('')
 const page = ref(0)
 const pageSize = 10
 const isProductFilterOpen = ref(false)
+const expandedIds = ref(new Set())
+
 const filters = ['입고상태', '검수상태', '입고일자']
 
-const columns = [
+// 메인 테이블 컬럼 (입고 기준)
+const mainColumns = [
   { key: 'inboundNumber', label: '입고번호' },
   { key: 'orderNumber', label: '발주번호' },
   { key: 'vendorName', label: '거래처명' },
-  { key: 'productName', label: '상품명' },
   { key: 'status', label: '상태' },
   { key: 'managerName', label: '담당자' },
   { key: 'scheduledDate', label: '입고예정일' },
 ]
 
-// -------------------------
-// 페이지네이션
-// -------------------------
-const totalPages = computed(() => Math.ceil(inbounds.value.length / pageSize))
-const pagedInbounds = computed(() => {
-  const start = page.value * pageSize
-  return inbounds.value.slice(start, start + pageSize)
-})
+// 서브 테이블 컬럼 (입고 상품 목록)
+const subColumns = [
+  { key: 'productCode', label: '상품코드' },
+  { key: 'productName', label: '상품명' },
+  { key: 'receivedQuantity', label: '입고수량', align: 'right' },
+  { key: 'type', label: '구분' },
+  { key: 'description', label: '비고' },
+]
 
 const fetchInboundList = async () => {
   const res = await api.getInboundList({ page: page.value, size: pageSize })
@@ -146,8 +131,8 @@ const fetchInboundList = async () => {
     vendorName: item.purchaseOrder?.vendorName || '-',
     status: item.status,
     managerName: item.managerName,
-    scheduledDate: item.scheduledDate,
-    productName: item.items?.map(i => i.productName).join(', ') || '-',
+    scheduledDate: formatDate(item.scheduledDate),
+    items: item.items || [], // 입고 상품 목록
   }))
 }
 
@@ -160,11 +145,6 @@ const handleSearch = () => {
       i.orderNumber.toLowerCase().includes(q) ||
       i.vendorName.toLowerCase().includes(q),
   )
-}
-
-const changePage = (newPage) => {
-  if (newPage < 0 || newPage >= totalPages.value) return
-  page.value = newPage
 }
 
 const formatDate = (dateStr) => {
@@ -206,6 +186,15 @@ const getStatusLabel = (status) => {
   }
 }
 
+// 토글 확장/축소
+const toggleExpand = (inboundId) => {
+  if (expandedIds.value.has(inboundId)) {
+    expandedIds.value.delete(inboundId)
+  } else {
+    expandedIds.value.add(inboundId)
+  }
+}
+
 // 상품 상세 조건 검색(모달창)
 const applyProductFilter = async (filters) => {
   console.log('필터 적용:', filters)
@@ -225,7 +214,8 @@ const applyProductFilter = async (filters) => {
     vendorName: item.purchaseOrder?.vendorName || '-',
     status: item.status,
     managerName: item.managerName,
-    scheduledDate: item.scheduledDate,
+    scheduledDate: formatDate(item.scheduledDate),
+    items: item.items || [], // 입고 상품 목록
   }))
   isProductFilterOpen.value = false
 }
