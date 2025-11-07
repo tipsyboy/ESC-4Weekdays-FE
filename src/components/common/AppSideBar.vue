@@ -63,7 +63,6 @@ const munus = [
   { label: 'ASN', icon: 'task', route: '/asn/list' },
   { label: '입고', icon: 'inventory', route: '/inbound' },
   { label: '재고', icon: 'inventory_2', route: '/inventory' },
-  { label: '주문', icon: 'assignment', route: '/order' },
   { label: '출고', icon: 'local_shipping', route: '/outbound' },
   { label: '상품 관리', icon: 'Shop', route: '/product' },
   { label: '공급 업체', icon: 'handshake', route: '/vendors' },
