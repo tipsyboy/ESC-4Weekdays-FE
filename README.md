@@ -5,6 +5,11 @@
 # 🔗 접속 주소
 [4WeekDays](https://www.fourweeeek.kro.kr/)
 
+### 관리자 계정
+ID: admin@warehouse.com
+
+PASSWORD: qwer1234
+
 # 👨‍💻 팀원 구성
 <div align="center">
   <table>
