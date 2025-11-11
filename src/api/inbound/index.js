@@ -1,56 +1,28 @@
 import api from '@/plugin/axiosInterceptor'
 
-const getInboundList = async (params) => {
-  let data = {}
-  const url = '/api/inbounds'
+const getInboundList = async (searchRequest, page = 0, size = 10) => {
 
-  await api
-    .get(url, { params })
-    .then((res) => {
-      data = res.data // 백엔드의 { success, code, message, results } 그대로 반환
+  const requestUrl = `/api/inbounds/search?page=${page}&size=${size}`
+
+  return await api
+    .post(requestUrl, searchRequest)
+    .then((response) => {
+      return response.data
     })
-    .catch((err) => {
-      data = err.response?.data || { success: false, results: {} }
+    .catch((error) => {
+      return error.response?.data || { success: false, results: {} }
     })
-
-  return data
-}
-
-// 조건 검색
-const getInboundsSearch = async (params) => {
-  let data = {}
-  const url = '/api/inbounds/search'
-
-  await api
-    .get(url, { params })
-    .then((res) => {
-      data = res.data
-    })
-    .catch((err) => {
-      data = err.response?.data || { success: false, results: {} }
-    })
-
-  return data
 }
 
 const getInboundDetail = async (inboundId) => {
-  let data = {}
-  const url = `/api/inbounds/${inboundId}`
-
-  await api
-    .get(url)
-    .then((res) => {
-      data = res.data
+  return await api
+    .get(`/api/inbounds/${inboundId}`)
+    .then((response) => {
+      return response.data
     })
-    .catch((err) => {
-      data = err.response?.data || { success: false, results: {} }
+    .catch((error) => {
+      return error.response?.data || { success: false, results: {} }
     })
-
-  return data
 }
 
-export default {
-  getInboundList,
-  getInboundDetail,
-  getInboundsSearch,
-}
+export default { getInboundList, getInboundDetail }
