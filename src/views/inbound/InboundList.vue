@@ -99,13 +99,23 @@ import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import ProductFilterModal from '@/components/common/ProductFilterModal.vue'
 import ExpandableTable from '@/components/common/ExpandableTable.vue'
 
+// 상태 관리
 const inbounds = ref([])
 const query = ref('')
 const page = ref(0)
 const pageSize = 10
+const totalPages = ref(1)
+const totalElements = ref(0)
 const isProductFilterOpen = ref(false)
 const expandedIds = ref(new Set())
 const router = useRouter()
+
+// 상품 필터 상태 (ProductFilterModal에서 설정)
+const productFilter = ref({
+  productName: '',
+  managerName: '',
+  vendorIds: [],
+})
 
 const filters = ['입고상태', '검수상태', '입고일자']
 
@@ -129,30 +139,68 @@ const subColumns = [
 ]
 
 const fetchInboundList = async () => {
-  const res = await api.getInboundList({ page: page.value, size: pageSize })
-  const list = res?.results?.content || res || []
+  try {
+    const searchRequest = {
+      inboundCode: query.value || null,
+      productName: productFilter.value.productName || null,
+      managerName: productFilter.value.managerName || null,
+      vendorIds: productFilter.value.vendorIds.length > 0 ? productFilter.value.vendorIds : null,
+    }
 
-  inbounds.value = list.map((item) => ({
-    id: item.id,
-    inboundNumber: item.inboundNumber,
-    orderNumber: item.purchaseOrder?.orderNumber || '-',
-    vendorName: item.purchaseOrder?.vendorName || '-',
-    status: item.status,
-    managerName: item.managerName,
-    scheduledDate: formatDate(item.scheduledDate),
-    items: item.items || [], // 입고 상품 목록
-  }))
+    const res = await api.getInboundList(searchRequest, page.value, pageSize)
+
+    if (res.success && res.results) {
+      const list = res.results.content || []
+      totalPages.value = res.results.totalPages ?? 1
+      totalElements.value = res.results.totalElements ?? list.length
+
+      inbounds.value = list.map((item) => ({
+        id: item.id,
+        inboundNumber: item.inboundNumber,
+        orderNumber: item.purchaseOrder?.orderNumber || '-',
+        vendorName: item.purchaseOrder?.vendorName || '-',
+        status: item.status,
+        managerName: item.managerName,
+        scheduledDate: formatDate(item.scheduledDate),
+        items: item.items || [],
+      }))
+    } else {
+      inbounds.value = []
+      totalPages.value = 1
+      totalElements.value = 0
+    }
+  } catch (error) {
+    console.error('입고 목록 조회 오류:', error)
+    inbounds.value = []
+  }
 }
 
+onMounted(() => {
+  fetchInboundList()
+})
+
 const handleSearch = () => {
-  if (!query.value) return fetchInboundList()
-  const q = query.value.toLowerCase()
-  inbounds.value = inbounds.value.filter(
-    (i) =>
-      i.inboundNumber.toLowerCase().includes(q) ||
-      i.orderNumber.toLowerCase().includes(q) ||
-      i.vendorName.toLowerCase().includes(q),
-  )
+  page.value = 0
+  fetchInboundList()
+}
+
+const applyProductFilter = (filters) => {
+  productFilter.value = {
+    productName: filters.name || '',
+    managerName: filters.managerName || '',
+    vendorIds: filters.vendors || [],
+  }
+  page.value = 0
+  fetchInboundList()
+  isProductFilterOpen.value = false
+}
+
+const toggleExpand = (inboundId) => {
+  if (expandedIds.value.has(inboundId)) {
+    expandedIds.value.delete(inboundId)
+  } else {
+    expandedIds.value.add(inboundId)
+  }
 }
 
 const handleProductClick = (productId) => {
@@ -170,67 +218,21 @@ const formatDate = (dateStr) => {
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'SCHEDULED':
-      return 'info'
-    case 'INSPECTING':
-      return 'warning'
-    case 'COMPLETED':
-      return 'success'
-    case 'CANCELLED':
-      return 'danger'
-    default:
-      return 'gray'
+    case 'SCHEDULED': return 'info'
+    case 'INSPECTING': return 'warning'
+    case 'COMPLETED': return 'success'
+    case 'CANCELLED': return 'danger'
+    default: return 'gray'
   }
 }
 
 const getStatusLabel = (status) => {
   switch (status) {
-    case 'SCHEDULED':
-      return '입고예정'
-    case 'INSPECTING':
-      return '검수중'
-    case 'COMPLETED':
-      return '완료'
-    case 'CANCELLED':
-      return '취소'
-    default:
-      return '미정'
+    case 'SCHEDULED': return '입고예정'
+    case 'INSPECTING': return '검수중'
+    case 'COMPLETED': return '완료'
+    case 'CANCELLED': return '취소'
+    default: return '미정'
   }
 }
-
-// 토글 확장/축소
-const toggleExpand = (inboundId) => {
-  if (expandedIds.value.has(inboundId)) {
-    expandedIds.value.delete(inboundId)
-  } else {
-    expandedIds.value.add(inboundId)
-  }
-}
-
-// 상품 상세 조건 검색(모달창)
-const applyProductFilter = async (filters) => {
-  console.log('필터 적용:', filters)
-
-  const params = {
-    vendorIds: filters.vendors,
-    productName: filters.name,
-  }
-
-  const res = await api.getInboundsSearch(params)
-  const list = res?.results?.content || res || []
-
-  inbounds.value = list.map((item) => ({
-    id: item.id,
-    inboundNumber: item.inboundNumber,
-    orderNumber: item.purchaseOrder?.orderNumber || '-',
-    vendorName: item.purchaseOrder?.vendorName || '-',
-    status: item.status,
-    managerName: item.managerName,
-    scheduledDate: formatDate(item.scheduledDate),
-    items: item.items || [], // 입고 상품 목록
-  }))
-  isProductFilterOpen.value = false
-}
-
-onMounted(fetchInboundList)
 </script>

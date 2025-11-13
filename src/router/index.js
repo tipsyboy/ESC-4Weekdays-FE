@@ -18,6 +18,7 @@ import { useAuthStore } from '@/stores/authStore.js'
 import { useUIStore } from '@/stores/uiStore.js'
 import asn from '@/api/asn'
 import asnRoutes from './asnRoutes'
+import orderRoutes from "@/router/orderRoutes.js";
 
 const routes = [
   { path: '/', redirect: '/auth/login' },
@@ -44,6 +45,7 @@ const routes = [
   ...warehouseRoutes,
   ...loginRoutes,
   ...asnRoutes,
+  ...orderRoutes,
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
