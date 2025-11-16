@@ -30,19 +30,19 @@ const productDetail = async (id) => {
     return data;
 };
 
-const productList = async (page, size) => {
-    let data = {};
-    let url = `/api/products`;
+const searchProducts = async (page, size, searchForm = {}) => {
+    const requestUrl = `/api/products/search?page=${page}&size=${size}`;
+    const requestUrlWithEs = `/api/products/search/es?page=${page}&size=${size}`;
 
-    await api.get(url, {params: {page, size}})
-        .then((res) => {
-            data = res.data;
+    return await api.post(requestUrl, searchForm)
+        .then((response) => {
+          console.log(response)
+          return response.data.results
         })
         .catch((error) => {
-            data = error.data;
+          console.error(error)
+          throw error;
         });
-
-    return data;
 };
 
-export default {productCreate, productDetail, productList};
+export default {productCreate, productDetail, searchProducts};
