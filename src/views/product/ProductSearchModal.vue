@@ -214,18 +214,22 @@ const closeModal = () => {
   emit('close');
 };
 
-const handleSearch = () => {
-  // null/undefined/빈 문자열 제거
-  const cleanParams = Object.fromEntries(
-    Object.entries(searchParams.value).filter(([_, value]) => {
-      return value !== null && value !== undefined && value !== '';
-    })
-  );
+// const handleSearch = () => {
+//   // null/undefined/빈 문자열 제거
+//   const cleanParams = Object.fromEntries(
+//     Object.entries(searchParams.value).filter(([_, value]) => {
+//       return value !== null && value !== undefined && value !== '';
+//     })
+//   );
+//
+//   emit('search', cleanParams);
+//   closeModal();
+// };
 
-  emit('search', cleanParams);
+const handleSearch = () => {
+  emit('search', { ...searchParams.value });
   closeModal();
 };
-
 const resetForm = () => {
   searchParams.value = {
     vendorName: '',
