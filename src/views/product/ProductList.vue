@@ -1,80 +1,47 @@
 <template>
   <AppPageLayout>
-    <!-- 헤더 -->
     <template #header>
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
           <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">상품 관리</h1>
           <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            상품 등록, 수정, 상태를 관리합니다
+            전체 {{ pagination.totalElements.toLocaleString() }}개의 상품
           </p>
         </div>
         <div class="flex items-center gap-2">
-          <ButtonComp color="secondary" icon="refresh" @click="resetFilters">초기화</ButtonComp>
-          <ButtonComp v-if="auth.isAdmin" color="primary" icon="add" @click="goRegister">상품 등록</ButtonComp>
+          <ButtonComp color="secondary" icon="filter_list" @click="openFilterModal"
+            >상세 검색</ButtonComp
+          >
+          <ButtonComp v-if="auth.isAdmin" color="primary" icon="add" @click="goRegister"
+            >상품 등록</ButtonComp
+          >
         </div>
       </div>
     </template>
 
-    <!-- 본문 -->
-    <section class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-             rounded-xl shadow-sm p-6 md:p-8 space-y-6">
-      <!-- 🔹 필터 영역 -->
-      <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
-               rounded-lg p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <!-- 브랜드 -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">브랜드</label>
-          <select v-model="filters.vendorName" @change="filterProductNames" class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
-                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-            <option value="">전체</option>
-            <option value="자체 생산">자체 생산</option>
-            <option v-for="v in vendorOptions" :key="v" :value="v">{{ v }}</option>
-          </select>
-        </div>
-
-        <!-- 상품명 -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">상품명</label>
-          <select v-model="filters.name" class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
-                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-            <option value="">전체</option>
-            <option v-for="n in filteredProductNames" :key="n" :value="n">{{ n }}</option>
-          </select>
-        </div>
-
-        <!-- 가격 정렬 -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">가격 정렬</label>
-          <select v-model="filters.priceOrder" class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
-                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-            <option value="">기본 순서</option>
-            <option value="asc">가격 낮은 순</option>
-            <option value="desc">가격 높은 순</option>
-          </select>
-        </div>
-
-        <!-- 상태 -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">상태</label>
-          <select v-model="filters.status" class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 w-full
-                   bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-            <option value="">전체</option>
-            <option value="ACTIVE">활성</option>
-            <option value="INACTIVE">품절</option>
-            <option value="DISCONTINUED">단종</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- 검색창 -->
-      <SearchBarComp v-model="searchQuery" placeholder="상품명으로 검색" />
-
-      <!-- 테이블 -->
-      <TableComp :columns="columns" :data="filteredAndSortedList" class="min-h-[400px]">
+    <section
+      class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-6 md:p-8 space-y-6"
+    >
+      <TableComp :columns="columns" :data="productList" class="min-h-[400px]">
         <template #cell="{ row, col }">
-          <span v-if="col.key === 'productCode' || col.key === 'name'"
-            class="text-indigo-600 hover:underline cursor-pointer" @click="goDetail(row)">
+          <span
+            v-if="col.key === 'productCode' || col.key === 'name'"
+            class="text-indigo-600 hover:underline cursor-pointer"
+            @click="goDetail(row)"
+          >
+            {{ row[col.key] }}
+          </span>
+          <span
+            v-else-if="col.key === 'statusLabel'"
+            :class="[
+              'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+              row.status === 'ACTIVE'
+                ? 'bg-green-100 text-green-800'
+                : row.status === 'INACTIVE'
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : 'bg-red-100 text-red-800',
+            ]"
+          >
             {{ row[col.key] }}
           </span>
           <span v-else>{{ row[col.key] }}</span>
@@ -82,142 +49,186 @@
       </TableComp>
 
       <!-- 페이지네이션 -->
-      <div class="flex justify-center items-center gap-2">
-        <ButtonComp color="secondary" icon="arrow_back" :disabled="page === 0" @click="changePage(page - 1)" />
-        <span class="text-sm text-slate-600">페이지 {{ page + 1 }} / {{ totalPages }}</span>
-        <ButtonComp color="secondary" icon="arrow_forward" :disabled="page >= totalPages - 1"
-          @click="changePage(page + 1)" />
+      <div class="flex items-center justify-center gap-2">
+        <!-- 첫 페이지 -->
+        <ButtonComp
+          color="secondary"
+          icon="first_page"
+          :disabled="pagination.page === 0"
+          @click="goToFirstPage"
+        />
+
+        <!-- 이전 페이지 -->
+        <ButtonComp
+          color="secondary"
+          icon="arrow_back"
+          :disabled="pagination.page === 0"
+          @click="goToPreviousPage"
+        />
+
+        <!-- 페이지 번호들 -->
+        <button
+          v-for="pageNum in pageNumbers"
+          :key="pageNum"
+          @click="goToPage(pageNum)"
+          :class="[
+            'min-w-[40px] h-10 px-4 rounded-lg font-medium text-sm transition-colors',
+            pageNum === pagination.page
+              ? 'bg-indigo-600 text-white'
+              : 'bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-700',
+          ]"
+        >
+          {{ pageNum + 1 }}
+        </button>
+
+        <!-- 다음 페이지 -->
+        <ButtonComp
+          color="secondary"
+          icon="arrow_forward"
+          :disabled="pagination.page >= pagination.totalPages - 1"
+          @click="goToNextPage"
+        />
+
+        <!-- 마지막 페이지 -->
+        <ButtonComp
+          color="secondary"
+          icon="last_page"
+          :disabled="pagination.page >= pagination.totalPages - 1"
+          @click="goToLastPage"
+        />
       </div>
     </section>
+
+    <ProductSearchModal
+      :is-open="state.isFilterModalOpen"
+      :initial-params="searchForm"
+      @close="closeFilterModal"
+      @search="handleSearch"
+    />
   </AppPageLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { useVendorStore } from '@/stores/vendorStore' // ✅ 정확한 경로로 import
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
-import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
 import ProductApi from '@/api/product/index.js'
 import { useAuthStore } from '@/stores/authStore'
+import ProductSearchModal from '@/views/product/ProductSearchModal.vue'
 
 const router = useRouter()
-const vendorStore = useVendorStore() // ✅ Pinia 스토어 사용
 const auth = useAuthStore()
-const searchQuery = ref('')
-const page = ref(0)
-const size = ref(10)
-const totalPages = ref(1)
-const productList = ref([])
-
-const filters = ref({
-  vendorName: '',
-  name: '',
-  priceOrder: '',
-  status: '',
-})
-
 const columns = [
   { label: '상품코드', key: 'productCode' },
   { label: '상품명', key: 'name' },
+  { label: '상태', key: 'statusLabel' },
   { label: '브랜드', key: 'vendorName' },
   { label: '단가(₩)', key: 'unitPrice' },
   { label: '유닛(낱개)', key: 'unit' },
-  { label: '상태', key: 'statusLabel' },
 ]
+const pagination = reactive({
+  page: 0,
+  size: 10,
+  totalPages: 1,
+  totalElements: 0,
+})
+const productList = ref([])
+const state = reactive({
+  isFilterModalOpen: false,
+})
+const searchForm = reactive({
+  vendorName: '',
+  productCode: '',
+  productName: '',
+  status: null,
+  minPrice: null,
+  maxPrice: null,
+  registeredFrom: '',
+  registeredTo: ''
+})
 
-// ✅ 스토어의 vendorList를 사용
-const vendorOptions = computed(() =>
-    (vendorStore.vendorList || []).map(v => v.name)
-)
+onMounted(() => {
+  fetchProducts()
+})
 
-const productNames = ref([])
-const filteredProductNames = ref([])
-
-// ✅ 상품 데이터 로드
-const fetchProducts = async () => {
-  const res = await ProductApi.productList(page.value, size.value)
-  const data = res.results
-  totalPages.value = data.totalPages
-
-  const list = data.content.map(p => ({
+const fetchProducts = async (pageNum = 0, params = {}) => {
+  const result = await ProductApi.searchProducts(pageNum, pagination.size, params)
+  console.log(result)
+  const pageData = result.page
+  productList.value = result.content.map((p) => ({
     id: p.id,
     productCode: p.productCode,
     name: p.name,
-    vendorName: p.vendor?.name || '자체 생산',
+    vendorName: p.vendorName,
     unitPrice: p.unitPrice,
     unit: p.unit,
     statusLabel: p.status === 'ACTIVE' ? '활성' : p.status === 'INACTIVE' ? '품절' : '단종',
     status: p.status,
   }))
 
-  productList.value = list
-  productNames.value = [...new Set(list.map(p => p.name))]
-  filteredProductNames.value = [...productNames.value]
+  Object.assign(pagination, {
+    page: pageData.number,
+    totalPages: pageData.totalPages,
+    totalElements: pageData.totalElements,
+  })
 }
 
-// ✅ 브랜드 선택 시 상품명 자동 필터링
-const filterProductNames = () => {
-  if (!filters.value.vendorName) {
-    filteredProductNames.value = [...productNames.value]
-  } else {
-    const names = productList.value
-        .filter(p => p.vendorName === filters.value.vendorName)
-        .map(p => p.name)
-    filteredProductNames.value = [...new Set(names)]
-  }
-  filters.value.name = ''
+const openFilterModal = () => {
+  state.isFilterModalOpen = true
 }
-
-// ✅ 필터 초기화
-const resetFilters = () => {
-  filters.value = {
-    vendorName: '',
-    name: '',
-    priceOrder: '',
-    status: '',
-  }
-  searchQuery.value = ''
-  filteredProductNames.value = [...productNames.value]
-}
-
-const filteredAndSortedList = computed(() => {
-  let list = [...productList.value]
-
-  if (filters.value.vendorName)
-    list = list.filter(p => p.vendorName === filters.value.vendorName)
-  if (filters.value.name)
-    list = list.filter(p => p.name === filters.value.name)
-  if (filters.value.status)
-    list = list.filter(p => p.status === filters.value.status)
-  if (searchQuery.value)
-    list = list.filter(p =>
-        p.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
-
-  if (filters.value.priceOrder === 'asc')
-    list.sort((a, b) => a.unitPrice - b.unitPrice)
-  else if (filters.value.priceOrder === 'desc')
-    list.sort((a, b) => b.unitPrice - a.unitPrice)
-
-  return list
-})
-
-const changePage = newPage => {
-  if (newPage < 0 || newPage >= totalPages.value) return
-  page.value = newPage
-  fetchProducts()
-}
-
-const goDetail = row => router.push(`/product/${row.id}`)
+const goDetail = (row) => router.push(`/product/${row.id}`)
 const goRegister = () => router.push('/product/register')
 
-// ✅ vendorStore 로드 후 상품 불러오기
-onMounted(async () => {
-  await vendorStore.fetchVendors()
-  await fetchProducts()
-})
-</script>
+const pageNumbers = computed(() => {
+  const pages = []
+  const maxPagesToShow = 5
 
+  let startPage = Math.max(0, pagination.page - Math.floor(maxPagesToShow / 2))
+  let endPage = Math.min(pagination.totalPages - 1, startPage + maxPagesToShow - 1)
+
+  if (endPage - startPage < maxPagesToShow - 1) {
+    startPage = Math.max(0, endPage - maxPagesToShow + 1)
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i)
+  }
+
+  return pages
+})
+
+const goToPage = (pageNum) => {
+  fetchProducts(pageNum, searchForm)
+}
+
+const goToFirstPage = () => {
+  fetchProducts(0, searchForm)
+}
+
+const goToLastPage = () => {
+  fetchProducts(pagination.totalPages - 1, searchForm)
+}
+
+const goToPreviousPage = () => {
+  if (pagination.page > 0) {
+    fetchProducts(pagination.page - 1, searchForm)
+  }
+}
+
+const goToNextPage = () => {
+  if (pagination.page < pagination.totalPages - 1) {
+    fetchProducts(pagination.page + 1, searchForm)
+  }
+}
+
+const closeFilterModal = () => {
+  state.isFilterModalOpen = false
+}
+
+const handleSearch = (params) => {
+  Object.assign(searchForm, params)
+  fetchProducts(0, searchForm)
+}
+</script>
