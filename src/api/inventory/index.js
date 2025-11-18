@@ -1,5 +1,4 @@
 import api from '@/plugin/axiosInterceptor'
-import product from '@/api/product/index.js'
 
 const getProductInventoryList = async (page, size, request) => {
   const requestUrl = `/api/inventories?page=${page}&size=${size}`
