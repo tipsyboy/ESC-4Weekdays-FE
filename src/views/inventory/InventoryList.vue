@@ -148,6 +148,7 @@ const state = reactive({
     { key: 'productCode', label: '상품 코드' },
     { key: 'productName', label: '상품명' },
     { key: 'totalQuantity', label: '총 수량' },
+    { key: 'vendorName', label: '공급 업체' },
   ],
 
   subColumns: [
