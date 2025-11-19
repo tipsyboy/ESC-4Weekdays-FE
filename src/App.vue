@@ -32,9 +32,9 @@ import { useVendorStore } from '@/stores/vendorStore.js'
 const vendorStore = useVendorStore()
 const route = useRoute()
 
-onMounted(() => {
-  vendorStore.fetchVendors()
-})
+// onMounted(() => {
+//   vendorStore.fetchVendors()
+// })
 
 // 로그인 페이지에서는 전역 레이아웃 숨김
 const isLoginPage = computed(() => route.path === '/auth/login')

@@ -67,7 +67,7 @@
       :expanded-ids="expandedIds"
       sub-key="inventories"
       link-key="productCode"
-      link-path="/product"
+      link-path="/inventory/detail"
       @toggle-expand="toggleExpand"
     >
       <template #sub-row="{ subItem }">
