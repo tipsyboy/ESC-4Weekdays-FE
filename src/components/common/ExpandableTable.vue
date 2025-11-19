@@ -56,8 +56,8 @@
                   v-if="col.key === linkKey && linkPath"
                   :to="`${linkPath}/${
                     linkIdKey && row[linkIdKey] != null
-                      ? row[linkIdKey] // 🔹 linkIdKey 있으면 이걸 우선 사용 (예: productId)
-                      : row.id || row[linkKey] // 🔹 없으면 기존 로직 그대로
+                      ? row[linkIdKey] // linkIdKey 있으면 이걸 우선 사용 (예: productId)
+                      : row.id || row[linkKey] // 없으면 기존 로직 그대로
                   }`"
                   class="text-blue-600 dark:text-blue-400 hover:underline"
                   @click.stop
