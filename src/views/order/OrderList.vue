@@ -29,9 +29,8 @@
     >
       <template #sub-row="{ subItem }">
         <td class="px-6 py-3 text-sm">{{ subItem.productName }}</td>
-        <td class="px-6 py-3 text-sm">{{ subItem.quantity }}</td>
+        <td class="px-6 py-3 text-sm">{{ subItem.orderedQuantity }}</td>
         <td class="px-6 py-3 text-sm">{{ subItem.unitPrice }}</td>
-        <td class="px-6 py-3 text-sm">{{ subItem.totalPrice }}</td>
       </template>
     </ExpandableTable>
 
@@ -81,13 +80,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import {computed, onMounted, reactive, ref} from 'vue'
 
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ExpandableTable from '@/components/common/ExpandableTable.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
-import BadgeComp from '@/components/common/BadgeComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 
 import orderApi from '@/api/order/index.js'
@@ -105,17 +102,16 @@ const pagination = reactive({
 const orders = ref([])
 
 const mainColumns = [
-  { key: 'orderCode', label: '주문 코드' },
-  { key: 'franchiseName', label: '가맹점명' },
-  { key: 'dueDate', label: '납기일' },
-  { key: 'statusLabel', label: '상태' },
+  {key: 'orderCode', label: '주문 코드'},
+  {key: 'franchiseName', label: '가맹점명'},
+  {key: 'dueDate', label: '납기일'},
+  {key: 'statusLabel', label: '상태'},
 ]
 
 const subColumns = [
-  { key: 'productName', label: '상품명' },
-  { key: 'quantity', label: '수량' },
-  { key: 'unitPrice', label: '단가' },
-  { key: 'totalPrice', label: '총액' },
+  {key: 'productName', label: '상품명'},
+  {key: 'orderedQuantity', label: '수량'},
+  {key: 'unitPrice', label: '단가'},
 ]
 
 const fetchOrders = async (pageNum = 0) => {
@@ -150,12 +146,18 @@ const handleSearch = () => {
 
 const getStatusLabel = (status) => {
   switch (status) {
-    case 'REQUESTED': return '주문 생성'
-    case 'APPROVED': return '승인 완료'
-    case 'SHIPPED': return '출하 완료'
-    case 'DELIVERED': return '배송 완료'
-    case 'CANCELLED': return '취소'
-    default: return '미정'
+    case 'REQUESTED':
+      return '주문 생성'
+    case 'APPROVED':
+      return '승인 완료'
+    case 'SHIPPED':
+      return '출하 완료'
+    case 'DELIVERED':
+      return '배송 완료'
+    case 'CANCELLED':
+      return '취소'
+    default:
+      return '미정'
   }
 }
 
