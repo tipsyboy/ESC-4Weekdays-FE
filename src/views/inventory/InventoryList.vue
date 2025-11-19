@@ -67,6 +67,7 @@
       :expanded-ids="expandedIds"
       sub-key="inventories"
       link-key="productCode"
+      link-id-key="productId"
       link-path="/product"
       @toggle-expand="toggleExpand"
     >
