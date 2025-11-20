@@ -48,33 +48,43 @@
       </div>
     </div>
 
-    <!-- 출고 목록 테이블 -->
-    <TableComp :columns="columns" :data="state.outbounds">
-      <!-- 출고 코드 -->
-      <template #cell-outboundCode="{ row }">
-        <RouterLink
-          :to="`/outbound/${row.id}`"
-          class="text-blue-600 hover:underline font-medium"
-        >
-          {{ row.outboundCode }}
-        </RouterLink>
-      </template>
-
-      <!-- 출고 유형 -->
-      <template #cell-outboundType="{ row }">
-        <BadgeComp :label="getTypeLabel(row.outboundType)" :color="getTypeColor(row.outboundType)" />
-      </template>
-
-      <!-- 상태 -->
+    <!-- 출고 목록 확장 테이블 -->
+    <ExpandableTable
+      :columns="columns"
+      :rows="state.outbounds"
+      :sub-columns="subColumns"
+      :expanded-ids="expandedIds"
+      sub-key="outboundProductItems"
+      link-key="outboundCode"
+      link-id-key="id"
+      link-path="/outbound"
+      @toggle-expand="toggleExpand"
+    >
+      <!-- 상태 커스텀 셀 -->
       <template #cell-status="{ row }">
         <BadgeComp :label="getStatusLabel(row.status)" :color="getStatusColor(row.status)" />
       </template>
 
-      <!-- 예정일 -->
-      <template #cell-scheduledDate="{ row }">
-        {{ formatDate(row.scheduledDate) }}
+      <!-- 하위 로우 (출고 품목) -->
+      <template #sub-row="{ subItem }">
+        <td
+          class="px-6 py-3 text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+          @click.stop="handleProductClick(subItem.productId)"
+        >
+          <span class="text-blue-600 dark:text-blue-400 hover:underline">
+            {{ subItem.productCode || subItem.productId }}
+          </span>
+        </td>
+
+        <td class="px-6 py-3 text-sm">{{ subItem.productName }}</td>
+
+        <td class="px-6 py-3 text-sm text-right font-medium">{{ subItem.orderedQuantity }}</td>
+
+        <td class="px-6 py-3 text-sm">{{ subItem.locationCode || '-' }}</td>
+
+        <td class="px-6 py-3 text-sm">{{ subItem.description || '-' }}</td>
       </template>
-    </TableComp>
+    </ExpandableTable>
 
     <!-- 페이지네이션 -->
     <div class="flex items-center justify-center gap-2 mt-6">
@@ -128,12 +138,15 @@
 </template>
 
 <script setup>
+import { onMounted, reactive, computed, ref } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
-import TableComp from '@/components/common/TableComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
-import { onMounted, reactive, computed } from 'vue'
+import ExpandableTable from '@/components/common/ExpandableTable.vue'
 import OutboundApi from '@/api/outbound/index.js'
+
+const router = useRouter()
 
 const state = reactive({
   outbounds: [],
@@ -156,15 +169,25 @@ const searchForm = reactive({
   scheduledDateTo: ''
 })
 
-// 테이블 컬럼
+// 테이블 컬럼 (메인)
 const columns = [
   { key: 'outboundCode', label: '출고 코드' },
   { key: 'status', label: '상태' },
-  { key: 'orderId', label: '주문 ID', align: 'right' },
   { key: 'outboundManagerName', label: '담당자' },
   { key: 'scheduledDate', label: '예정일' },
+]
+
+// 서브 컬럼 (출고 품목)
+const subColumns = [
+  { key: 'productCode', label: '상품코드' },
+  { key: 'productName', label: '상품명' },
+  { key: 'orderedQuantity', label: '출고수량', align: 'right' },
+  { key: 'locationCode', label: '적재위치' },
   { key: 'description', label: '비고' },
 ]
+
+// expandedIds은 Set 형태로 유지 (ExpandableTable이 Set을 기대)
+const expandedIds = ref(new Set())
 
 onMounted(() => {
   fetchOutbounds()
@@ -173,10 +196,37 @@ onMounted(() => {
 const fetchOutbounds = async (pageNum = 0, params = {}) => {
   try {
     const result = await OutboundApi.outboundRead(pageNum, pagination.size, params)
-    console.log(result)
+    if (!result || !result.results) {
+      state.outbounds = []
+      pagination.page = 0
+      pagination.totalPages = 1
+      pagination.totalElements = 0
+      return
+    }
 
     const pageData = result.results.page
-    state.outbounds = result.results.content
+    // API 응답의 content 구조을 그대로 할당 (하위 리스트: outboundProductItems)
+    state.outbounds = (result.results.content || []).map(o => ({
+      // 보수적으로 필요한 필드만 보장
+      id: o.id,
+      outboundCode: o.outboundCode,
+      outboundType: o.outboundType,
+      status: o.status,
+      orderId: o.orderId,
+      outboundManagerName: o.outboundManagerName,
+      scheduledDate: o.scheduledDate,
+      description: o.description,
+      outboundProductItems: (o.outboundProductItems || []).map(si => ({
+        id: si.id,
+        productId: si.productId,
+        // productCode는 API 샘플에 없으므로 productId fallback
+        productCode: si.productCode || si.productId,
+        productName: si.productName,
+        orderedQuantity: si.orderedQuantity,
+        locationCode: si.locationCode,
+        description: si.description
+      }))
+    }))
 
     Object.assign(pagination, {
       page: pageData.number,
@@ -184,20 +234,20 @@ const fetchOutbounds = async (pageNum = 0, params = {}) => {
       totalElements: pageData.totalElements,
     })
   } catch (error) {
-    console.error(error)
+    console.error('fetchOutbounds error', error)
   }
 }
 
 const openFilterModal = () => {
   state.isFilterModalOpen = true
 }
-
 const closeFilterModal = () => {
   state.isFilterModalOpen = false
 }
 
 const handleSearch = (params) => {
   Object.assign(searchForm, params)
+  // 페이지 초기화
   fetchOutbounds(0, searchForm)
 }
 
@@ -220,7 +270,6 @@ const formatDate = (dateStr) => {
   return dateStr.split('T')[0]
 }
 
-// 출고 유형 라벨
 const getTypeLabel = (type) => {
   const labels = {
     'SALE': '판매',
@@ -230,7 +279,6 @@ const getTypeLabel = (type) => {
   return labels[type] || type
 }
 
-// 출고 유형 색상
 const getTypeColor = (type) => {
   const colors = {
     'SALE': 'primary',
@@ -240,7 +288,6 @@ const getTypeColor = (type) => {
   return colors[type] || 'default'
 }
 
-// 상태 라벨
 const getStatusLabel = (status) => {
   const labels = {
     'REQUESTED': '요청',
@@ -254,7 +301,6 @@ const getStatusLabel = (status) => {
   return labels[status] || status
 }
 
-// 상태 색상
 const getStatusColor = (status) => {
   const colors = {
     'REQUESTED': 'info',
@@ -268,6 +314,20 @@ const getStatusColor = (status) => {
   return colors[status] || 'default'
 }
 
+// ExpandableTable 의 toggle 이벤트 처리: Set을 직접 수정
+const toggleExpand = (id) => {
+  if (!id && id !== 0) return
+  if (expandedIds.value.has(id)) expandedIds.value.delete(id)
+  else expandedIds.value.add(id)
+}
+
+// 상품 클릭 시 상세로 이동
+const handleProductClick = (productId) => {
+  if (!productId) return
+  router.push(`/product/${productId}`)
+}
+
+// pagination helpers
 const pageNumbers = computed(() => {
   const pages = []
   const maxPagesToShow = 5

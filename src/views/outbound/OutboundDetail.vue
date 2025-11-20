@@ -56,12 +56,7 @@
           >
             출고 완료
           </ButtonComp>
-          <ButtonComp
-            v-if="canCancel"
-            color="danger"
-            icon="cancel"
-            @click="cancelOutbound"
-          >
+          <ButtonComp v-if="canCancel" color="danger" icon="cancel" @click="cancelOutbound">
             출고 취소
           </ButtonComp>
           <ButtonComp color="secondary" icon="print">인쇄</ButtonComp>
@@ -73,8 +68,7 @@
     <section class="space-y-8">
       <!-- 출고 정보 -->
       <div
-        class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-               rounded-xl shadow-sm p-6 backdrop-blur-sm"
+        class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-6 backdrop-blur-sm"
       >
         <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-white">출고 정보</h2>
 
@@ -88,13 +82,19 @@
           <!-- 상태 -->
           <div class="flex justify-between md:block">
             <span class="text-xs text-slate-500 dark:text-slate-400 mb-1 block">출고 상태</span>
-            <BadgeComp :label="getStatusLabel(detail.status)" :color="getStatusColor(detail.status)" />
+            <BadgeComp
+              :label="getStatusLabel(detail.status)"
+              :color="getStatusColor(detail.status)"
+            />
           </div>
 
           <!-- 출고 유형 -->
           <div class="flex justify-between md:block">
             <span class="text-xs text-slate-500 dark:text-slate-400 mb-1 block">출고 유형</span>
-            <BadgeComp :label="getTypeLabel(detail.outboundType)" :color="getTypeColor(detail.outboundType)" />
+            <BadgeComp
+              :label="getTypeLabel(detail.outboundType)"
+              :color="getTypeColor(detail.outboundType)"
+            />
           </div>
 
           <!-- 주문 ID -->
@@ -119,8 +119,7 @@
           <div class="col-span-1 md:col-span-2 lg:col-span-3 pt-2">
             <span class="text-xs text-slate-500 dark:text-slate-400 mb-1 block">비고</span>
             <div
-              class="p-3 rounded-lg border border-zinc-200 dark:border-zinc-700
-                     bg-background-light dark:bg-zinc-900 text-sm text-zinc-700 dark:text-zinc-300"
+              class="p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-background-light dark:bg-zinc-900 text-sm text-zinc-700 dark:text-zinc-300"
             >
               {{ detail.description || '비고 없음' }}
             </div>
@@ -128,10 +127,27 @@
         </div>
       </div>
 
+      <div
+        class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-6"
+      >
+        <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-white">출고 품목</h2>
+
+        <TableComp :columns="itemColumns" :data="detail.outboundProductItems || []">
+          <template #cell-productName="{ row }">
+            {{ row.productName }}
+          </template>
+          <template #cell-orderedQuantity="{ row }">
+            <span class="block text-right font-mono">{{ row.orderedQuantity }}</span>
+          </template>
+          <template #cell-receivedQuantity="{ row }">
+            <span class="block text-right font-mono font-semibold">{{ row.orderedQuantity }}</span>
+          </template>
+        </TableComp>
+      </div>
+
       <!-- 진행 상태 타임라인 -->
       <div
-        class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700
-               rounded-xl shadow-sm p-6 backdrop-blur-sm"
+        class="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-6 backdrop-blur-sm"
       >
         <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-white">진행 상태</h2>
 
@@ -152,7 +168,10 @@
                   {{ step.icon }}
                 </span>
               </div>
-              <span class="text-xs mt-2 font-medium" :class="isCurrentOrPast(step.value) ? 'text-primary' : 'text-zinc-400'">
+              <span
+                class="text-xs mt-2 font-medium"
+                :class="isCurrentOrPast(step.value) ? 'text-primary' : 'text-zinc-400'"
+              >
                 {{ step.label }}
               </span>
             </div>
@@ -161,7 +180,11 @@
             <div
               v-if="index < statusSteps.length - 1"
               class="flex-1 h-0.5 mx-2 transition-colors"
-              :class="isCurrentOrPast(statusSteps[index + 1].value) ? 'bg-primary' : 'bg-zinc-300 dark:bg-zinc-700'"
+              :class="
+                isCurrentOrPast(statusSteps[index + 1].value)
+                  ? 'bg-primary'
+                  : 'bg-zinc-300 dark:bg-zinc-700'
+              "
             />
           </div>
         </div>
@@ -177,6 +200,7 @@ import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
 import OutboundApi from '@/api/outbound/index.js'
+import TableComp from '@/components/common/TableComp.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -197,6 +221,13 @@ const statusOrder = ['REQUESTED', 'APPROVED', 'PICKING', 'PACKING', 'INSPECTION'
 onMounted(async () => {
   await fetchOutboundDetail()
 })
+
+const itemColumns = [
+  { key: 'productName', label: '품목명' },
+  { key: 'orderedQuantity', label: '주문 수량', align: 'right' },
+  { key: 'orderedQuantity', label: '출고 수량', align: 'right' },
+]
+
 
 const fetchOutboundDetail = async () => {
   try {
@@ -220,9 +251,9 @@ const formatDate = (dateStr) => {
 // 출고 유형 라벨
 const getTypeLabel = (type) => {
   const labels = {
-    'SALE': '판매',
-    'RETURN': '반품',
-    'TRANSFER': '이동'
+    SALE: '판매',
+    RETURN: '반품',
+    TRANSFER: '이동',
   }
   return labels[type] || type || '-'
 }
@@ -230,9 +261,9 @@ const getTypeLabel = (type) => {
 // 출고 유형 색상
 const getTypeColor = (type) => {
   const colors = {
-    'SALE': 'primary',
-    'RETURN': 'warning',
-    'TRANSFER': 'info'
+    SALE: 'primary',
+    RETURN: 'warning',
+    TRANSFER: 'info',
   }
   return colors[type] || 'default'
 }
@@ -240,13 +271,13 @@ const getTypeColor = (type) => {
 // 상태 라벨
 const getStatusLabel = (status) => {
   const labels = {
-    'REQUESTED': '요청',
-    'APPROVED': '승인',
-    'PICKING': '피킹',
-    'PACKING': '패킹',
-    'INSPECTION': '검수',
-    'SHIPPED': '출고완료',
-    'CANCELLED': '취소'
+    REQUESTED: '요청',
+    APPROVED: '승인',
+    PICKING: '피킹',
+    PACKING: '패킹',
+    INSPECTION: '검수',
+    SHIPPED: '출고완료',
+    CANCELLED: '취소',
   }
   return labels[status] || status || '-'
 }
@@ -254,13 +285,13 @@ const getStatusLabel = (status) => {
 // 상태 색상
 const getStatusColor = (status) => {
   const colors = {
-    'REQUESTED': 'info',
-    'APPROVED': 'info',
-    'PICKING': 'warning',
-    'PACKING': 'warning',
-    'INSPECTION': 'warning',
-    'SHIPPED': 'success',
-    'CANCELLED': 'danger'
+    REQUESTED: 'info',
+    APPROVED: 'info',
+    PICKING: 'warning',
+    PACKING: 'warning',
+    INSPECTION: 'warning',
+    SHIPPED: 'success',
+    CANCELLED: 'danger',
   }
   return colors[status] || 'default'
 }
@@ -286,9 +317,9 @@ const isCurrentOrPast = (stepValue) => {
 
 // 취소 가능 여부
 const canCancel = computed(() => {
-  return detail.value.status &&
-    detail.value.status !== 'SHIPPED' &&
-    detail.value.status !== 'CANCELLED'
+  return (
+    detail.value.status && detail.value.status !== 'SHIPPED' && detail.value.status !== 'CANCELLED'
+  )
 })
 
 // 승인
