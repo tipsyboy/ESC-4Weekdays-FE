@@ -10,12 +10,7 @@
           </p>
         </div>
 
-        <div class="flex items-center gap-3">
-          <RouterLink to="/task/create" class="w-40">
-            <ButtonComp color="primary" icon="add">신규 작업</ButtonComp>
-          </RouterLink>
-          <SearchBarComp v-model="query" placeholder="작업 검색..." @search="handleSearch" />
-        </div>
+
       </div>
     </template>
 
