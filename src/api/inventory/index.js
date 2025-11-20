@@ -4,7 +4,7 @@ const getProductInventoryList = async (page, size, request) => {
   const requestUrl = `/api/inventories/search?page=${page}&size=${size}`
   const requestUrlWithEs = `/api/inventories/search/es?page=${page}&size=${size}`
 
-  return await api.post(requestUrl, request)
+  return await api.post(requestUrlWithEs, request)
     .then((response) => {
       return response.data;
     })
