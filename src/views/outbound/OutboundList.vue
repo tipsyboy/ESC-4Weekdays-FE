@@ -2,82 +2,55 @@
   <AppPageLayout>
     <!-- Header -->
     <template #header>
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div class="flex items-center justify-between w-full">
         <div>
-          <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">출고 관리</h1>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            출고 내역을 조회하고 관리합니다.
+          <h1 class="text-2xl font-semibold">출고 관리</h1>
+          <p class="text-gray-500 text-sm mt-1">
+            출고 내역을 조회하고 관리합니다. (총 {{ pagination.totalElements.toLocaleString() }}개)
           </p>
         </div>
 
         <div class="flex items-center gap-3">
-          <!-- 신규 출고 버튼 -->
-          <RouterLink to="/outbound/create" class="w-40">
+          <ButtonComp color="secondary" icon="filter_list" @click="openFilterModal">
+            상세 검색
+          </ButtonComp>
+          <RouterLink to="/outbound/create">
             <ButtonComp color="primary" icon="add">신규 출고</ButtonComp>
           </RouterLink>
-          <SearchBarComp v-model="filters.search" placeholder="출고 내역 검색..." />
         </div>
       </div>
     </template>
 
     <!-- 필터 버튼 영역 -->
     <div class="flex flex-wrap items-center gap-3 mb-8">
-      <!-- 출고 유형 -->
-      <div class="relative">
-        <button
-          @click="toggleDropdown('type')"
-          class="flex items-center gap-2 rounded border border-zinc-300 dark:border-zinc-700
-                 bg-background-light dark:bg-zinc-900 px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300
-                 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-        >
-          출고 유형
-          <span class="material-symbols-outlined text-base">expand_more</span>
-        </button>
-        <div
-          v-if="activeDropdown === 'type'"
-          class="absolute mt-1 w-40 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md shadow-lg z-20"
-        >
-          <button
-            v-for="option in typeOptions"
-            :key="option.value"
-            class="block w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800"
-            @click="selectType(option.value)"
-          >
-            {{ option.label }}
-          </button>
+      <!-- 검색 조건 표시 -->
+      <div v-if="hasActiveFilters" class="flex items-center gap-2">
+        <span class="text-sm text-zinc-500">검색 조건:</span>
+        <div v-if="searchForm.outboundCode" class="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded text-xs">
+          <span>출고코드: {{ searchForm.outboundCode }}</span>
+          <button @click="clearFilter('outboundCode')" class="text-blue-600 hover:text-blue-800">×</button>
         </div>
-      </div>
-
-      <!-- 출고 상태 -->
-      <div class="relative">
-        <button
-          @click="toggleDropdown('status')"
-          class="flex items-center gap-2 rounded border border-zinc-300 dark:border-zinc-700
-                 bg-background-light dark:bg-zinc-900 px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300
-                 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-        >
-          출고 상태
-          <span class="material-symbols-outlined text-base">expand_more</span>
-        </button>
-        <div
-          v-if="activeDropdown === 'status'"
-          class="absolute mt-1 w-40 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md shadow-lg z-20"
-        >
-          <button
-            v-for="option in statusOptions"
-            :key="option.value"
-            class="block w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800"
-            @click="selectStatus(option.value)"
-          >
-            {{ option.label }}
-          </button>
+        <div v-if="searchForm.outboundType" class="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded text-xs">
+          <span>출고유형: {{ getTypeLabel(searchForm.outboundType) }}</span>
+          <button @click="clearFilter('outboundType')" class="text-blue-600 hover:text-blue-800">×</button>
         </div>
+        <div v-if="searchForm.status" class="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded text-xs">
+          <span>상태: {{ getStatusLabel(searchForm.status) }}</span>
+          <button @click="clearFilter('status')" class="text-blue-600 hover:text-blue-800">×</button>
+        </div>
+        <div v-if="searchForm.outboundManagerName" class="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded text-xs">
+          <span>담당자: {{ searchForm.outboundManagerName }}</span>
+          <button @click="clearFilter('outboundManagerName')" class="text-blue-600 hover:text-blue-800">×</button>
+        </div>
+        <button @click="clearAllFilters" class="text-xs text-red-600 hover:text-red-800 underline">
+          전체 초기화
+        </button>
       </div>
     </div>
 
     <!-- 출고 목록 테이블 -->
-    <TableComp :columns="columns" :data="filteredList">
-      <!-- 출고 번호 -->
+    <TableComp :columns="columns" :data="state.outbounds">
+      <!-- 출고 코드 -->
       <template #cell-outboundCode="{ row }">
         <RouterLink
           :to="`/outbound/${row.id}`"
@@ -87,108 +60,231 @@
         </RouterLink>
       </template>
 
+      <!-- 출고 유형 -->
+      <template #cell-outboundType="{ row }">
+        <BadgeComp :label="getTypeLabel(row.outboundType)" :color="getTypeColor(row.outboundType)" />
+      </template>
+
       <!-- 상태 -->
       <template #cell-status="{ row }">
-        <BadgeComp :label="getStatusLabel(row.status)" :type="getStatusColor(row.status)" />
+        <BadgeComp :label="getStatusLabel(row.status)" :color="getStatusColor(row.status)" />
+      </template>
+
+      <!-- 예정일 -->
+      <template #cell-scheduledDate="{ row }">
+        {{ formatDate(row.scheduledDate) }}
       </template>
     </TableComp>
+
+    <!-- 페이지네이션 -->
+    <div class="flex items-center justify-center gap-2 mt-6">
+      <ButtonComp
+        color="secondary"
+        icon="first_page"
+        :disabled="pagination.page === 0"
+        @click="goToFirstPage"
+      />
+      <ButtonComp
+        color="secondary"
+        icon="arrow_back"
+        :disabled="pagination.page === 0"
+        @click="goToPreviousPage"
+      />
+      <button
+        v-for="pageNum in pageNumbers"
+        :key="pageNum"
+        @click="goToPage(pageNum)"
+        :class="[
+          'min-w-[40px] h-10 px-4 rounded-lg font-medium text-sm transition-colors',
+          pageNum === pagination.page
+            ? 'bg-emerald-600 text-white'
+            : 'bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-700',
+        ]"
+      >
+        {{ pageNum + 1 }}
+      </button>
+      <ButtonComp
+        color="secondary"
+        icon="arrow_forward"
+        :disabled="pagination.page >= pagination.totalPages - 1"
+        @click="goToNextPage"
+      />
+      <ButtonComp
+        color="secondary"
+        icon="last_page"
+        :disabled="pagination.page >= pagination.totalPages - 1"
+        @click="goToLastPage"
+      />
+    </div>
+
+    <!-- 검색 모달 -->
+    <OutboundSearchModal
+      :is-open="state.isFilterModalOpen"
+      :initial-params="searchForm"
+      @close="closeFilterModal"
+      @search="handleSearch"
+    />
   </AppPageLayout>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { getStatusLabel, getStatusColor } from '@/utils/statusMapper.js'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
+import ButtonComp from '@/components/common/ButtonComp.vue'
 import TableComp from '@/components/common/TableComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
-import SearchBarComp from '@/components/common/SearchBarComp.vue'
-import ButtonComp from '@/components/common/ButtonComp.vue'
+import { onMounted, reactive, computed } from 'vue'
+import OutboundApi from '@/api/outbound/index.js'
 
-const filters = ref({
-  type: '',
-  status: '',
-  search: '',
+const state = reactive({
+  outbounds: [],
+  isFilterModalOpen: false,
 })
 
-// dropdown 제어
-const activeDropdown = ref(null)
-const toggleDropdown = (menu) => {
-  activeDropdown.value = activeDropdown.value === menu ? null : menu
-}
+const pagination = reactive({
+  page: 0,
+  size: 10,
+  totalPages: 1,
+  totalElements: 0,
+})
 
-// 옵션 목록
-const typeOptions = [
-  { label: '전체', value: '' },
-  { label: '판매', value: 'SALE' },
-  { label: '반품', value: 'RETURN' },
-  { label: '이동', value: 'TRANSFER' },
-]
-
-const statusOptions = [
-  { label: '전체', value: '' },
-  { label: '대기', value: 'PENDING' },
-  { label: '진행 중', value: 'IN_PROGRESS' },
-  { label: '완료', value: 'COMPLETED' },
-  { label: '취소', value: 'CANCELED' },
-]
-
-// 선택 이벤트
-const selectType = (value) => {
-  filters.value.type = value
-  activeDropdown.value = null
-}
-const selectStatus = (value) => {
-  filters.value.status = value
-  activeDropdown.value = null
-}
+const searchForm = reactive({
+  outboundCode: '',
+  outboundType: '',
+  status: '',
+  outboundManagerName: '',
+  scheduledDateFrom: '',
+  scheduledDateTo: ''
+})
 
 // 테이블 컬럼
 const columns = [
-  { key: 'outboundCode', label: '출고 번호' },
-  { key: 'partnerName', label: '거래처' },
-  { key: 'productName', label: '상품명' },
-  { key: 'quantity', label: '수량', align: 'right' },
-  { key: 'type', label: '유형' },
+  { key: 'outboundCode', label: '출고 코드' },
   { key: 'status', label: '상태' },
-  { key: 'handler', label: '담당자' },
-  { key: 'outboundDate', label: '출고일' },
+  { key: 'orderId', label: '주문 ID', align: 'right' },
+  { key: 'outboundManagerName', label: '담당자' },
+  { key: 'scheduledDate', label: '예정일' },
+  { key: 'description', label: '비고' },
 ]
 
-// 목업 데이터
-const outboundList = ref([
-  {
-    id: 1,
-    outboundCode: 'OB-20250101',
-    partnerName: '거래처 A',
-    productName: '제주 감귤 5kg',
-    quantity: 10,
-    type: 'SALE',
-    status: 'PENDING',
-    handler: '김하늘',
-    outboundDate: '2025-01-10',
-  },
-  {
-    id: 2,
-    outboundCode: 'OB-20250102',
-    partnerName: '거래처 B',
-    productName: '청포도 3kg',
-    quantity: 5,
-    type: 'TRANSFER',
-    status: 'COMPLETED',
-    handler: '이민아',
-    outboundDate: '2025-01-12',
-  },
-])
+onMounted(() => {
+  fetchOutbounds()
+})
 
-// 필터링
-const filteredList = computed(() =>
-  outboundList.value.filter(
-    (item) =>
-      (!filters.value.type || item.type === filters.value.type) &&
-      (!filters.value.status || item.status === filters.value.status) &&
-      (!filters.value.search ||
-        item.partnerName.includes(filters.value.search) ||
-        item.productName.includes(filters.value.search))
-  )
-)
+const fetchOutbounds = async (pageNum = 0, params = {}) => {
+  try {
+    const result = await OutboundApi.outboundRead(pageNum, pagination.size, params)
+    console.log(result)
+
+    const pageData = result.results.page
+    state.outbounds = result.results.content
+
+    Object.assign(pagination, {
+      page: pageData.number,
+      totalPages: pageData.totalPages,
+      totalElements: pageData.totalElements,
+    })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const openFilterModal = () => {
+  state.isFilterModalOpen = true
+}
+
+const closeFilterModal = () => {
+  state.isFilterModalOpen = false
+}
+
+const handleSearch = (params) => {
+  Object.assign(searchForm, params)
+  fetchOutbounds(0, searchForm)
+}
+
+const clearFilter = (key) => {
+  searchForm[key] = ''
+  fetchOutbounds(0, searchForm)
+}
+
+const clearAllFilters = () => {
+  Object.keys(searchForm).forEach(key => searchForm[key] = '')
+  fetchOutbounds(0, {})
+}
+
+const hasActiveFilters = computed(() => {
+  return Object.values(searchForm).some(v => v !== '')
+})
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-'
+  return dateStr.split('T')[0]
+}
+
+// 출고 유형 라벨
+const getTypeLabel = (type) => {
+  const labels = {
+    'SALE': '판매',
+    'RETURN': '반품',
+    'TRANSFER': '이동'
+  }
+  return labels[type] || type
+}
+
+// 출고 유형 색상
+const getTypeColor = (type) => {
+  const colors = {
+    'SALE': 'primary',
+    'RETURN': 'warning',
+    'TRANSFER': 'info'
+  }
+  return colors[type] || 'default'
+}
+
+// 상태 라벨
+const getStatusLabel = (status) => {
+  const labels = {
+    'REQUESTED': '요청',
+    'APPROVED': '승인',
+    'PICKING': '피킹',
+    'PACKING': '패킹',
+    'INSPECTION': '검수',
+    'SHIPPED': '출고완료',
+    'CANCELLED': '취소'
+  }
+  return labels[status] || status
+}
+
+// 상태 색상
+const getStatusColor = (status) => {
+  const colors = {
+    'REQUESTED': 'info',
+    'APPROVED': 'info',
+    'PICKING': 'warning',
+    'PACKING': 'warning',
+    'INSPECTION': 'warning',
+    'SHIPPED': 'success',
+    'CANCELLED': 'danger'
+  }
+  return colors[status] || 'default'
+}
+
+const pageNumbers = computed(() => {
+  const pages = []
+  const maxPagesToShow = 5
+  let startPage = Math.max(0, pagination.page - Math.floor(maxPagesToShow / 2))
+  let endPage = Math.min(pagination.totalPages - 1, startPage + maxPagesToShow - 1)
+  if (endPage - startPage < maxPagesToShow - 1) {
+    startPage = Math.max(0, endPage - maxPagesToShow + 1)
+  }
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
+const goToPage = (pageNum) => fetchOutbounds(pageNum, searchForm)
+const goToFirstPage = () => fetchOutbounds(0, searchForm)
+const goToLastPage = () => fetchOutbounds(pagination.totalPages - 1, searchForm)
+const goToPreviousPage = () => pagination.page > 0 && fetchOutbounds(pagination.page - 1, searchForm)
+const goToNextPage = () => pagination.page < pagination.totalPages - 1 && fetchOutbounds(pagination.page + 1, searchForm)
 </script>
