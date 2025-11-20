@@ -1,8 +1,16 @@
 <template>
   <AppPageLayout>
     <template #header>
-      <div>
-        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">작업 상세 정보</h1>
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">작업 상세 정보</h1>
+        </div>
+
+        <div class="flex gap-2">
+          <ButtonComp color="secondary" icon="arrow_back" @click="$router.push('/task/kanban')">
+            뒤로가기
+          </ButtonComp>
+        </div>
       </div>
     </template>
 
@@ -10,17 +18,23 @@
       <!-- 좌측 -->
       <div class="md:col-span-2 flex flex-col gap-6">
         <!-- 지시사항 -->
-        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-900 p-6 shadow-sm">
+        <div
+          class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-900 p-6 shadow-sm"
+        >
           <h3 class="font-semibold text-slate-800 dark:text-slate-100 mb-4">작업 지시사항</h3>
 
           <div v-if="inboundDetails" class="space-y-3 text-sm text-slate-700 dark:text-slate-300">
             <p>
-              <strong class="inline-block w-20 text-slate-600 dark:text-slate-400">지시 사항:</strong>
+              <strong class="inline-block w-20 text-slate-600 dark:text-slate-400"
+                >지시 사항:</strong
+              >
               {{ inspectionInstruction }}
             </p>
 
             <div>
-              <strong class="inline-block w-20 text-slate-600 dark:text-slate-400 align-top">품목:</strong>
+              <strong class="inline-block w-20 text-slate-600 dark:text-slate-400 align-top"
+                >품목:</strong
+              >
               <div v-if="inboundDetails.items?.length" class="inline-block">
                 <ul class="list-disc pl-5">
                   <li v-for="item in inboundDetails.items" :key="item.id">
@@ -34,34 +48,54 @@
             <!-- ✅ 위치 선택 -->
             <!-- ✅ 위치 선택 -->
             <div v-if="task.category === 'PUTAWAY'">
-              <strong class="inline-block w-20 text-slate-600 dark:text-slate-400 align-top">위치:</strong>
+              <strong class="inline-block w-20 text-slate-600 dark:text-slate-400 align-top"
+                >위치:</strong
+              >
 
               <!-- 이미 할당된 위치 -->
               <div v-if="task.assignedLocationCode" class="inline-block">
-                <span class="text-slate-800 dark:text-slate-200">{{ task.assignedLocationCode }}</span>
+                <span class="text-slate-800 dark:text-slate-200">{{
+                  task.assignedLocationCode
+                }}</span>
               </div>
 
               <!-- 아직 미할당 상태라 선택해야 함 -->
-              <div v-else-if="task.status === 'PENDING' && availableLocations.length > 0" class="inline-block">
-                <select v-model="selectedLocationId"
-                  class="border border-gray-300 dark:border-gray-700 rounded-md p-2 text-sm bg-white dark:bg-zinc-800 text-slate-800 dark:text-slate-200">
+              <div
+                v-else-if="task.status === 'PENDING' && availableLocations.length > 0"
+                class="inline-block"
+              >
+                <select
+                  v-model="selectedLocationId"
+                  class="border border-gray-300 dark:border-gray-700 rounded-md p-2 text-sm bg-white dark:bg-zinc-800 text-slate-800 dark:text-slate-200"
+                >
                   <option disabled value="">위치를 선택하세요</option>
-                  <option v-for="location in availableLocations" :key="location.id" :value="location.id">
+                  <option
+                    v-for="location in availableLocations"
+                    :key="location.id"
+                    :value="location.id"
+                  >
                     {{ location.locationCode }}
                   </option>
                 </select>
               </div>
 
-              <span v-else-if="task.status === 'PENDING'" class="text-slate-500">추천 위치 없음</span>
+              <span v-else-if="task.status === 'PENDING'" class="text-slate-500"
+                >추천 위치 없음</span
+              >
             </div>
           </div>
         </div>
 
         <!-- 메모 -->
-        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-900 p-6 shadow-sm">
+        <div
+          class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-900 p-6 shadow-sm"
+        >
           <h3 class="font-semibold text-slate-800 dark:text-slate-100 mb-3">작업 메모</h3>
-          <textarea v-model="task.note" placeholder="메모를 입력하세요"
-            class="w-full border border-gray-300 dark:border-gray-700 rounded-md p-3 resize-none h-28 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary focus:outline-none" />
+          <textarea
+            v-model="task.note"
+            placeholder="메모를 입력하세요"
+            class="w-full border border-gray-300 dark:border-gray-700 rounded-md p-3 resize-none h-28 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary focus:outline-none"
+          />
           <div class="flex justify-end mt-3">
             <ButtonComp color="primary" icon="save" @click="saveMemo">메모 저장</ButtonComp>
           </div>
@@ -70,21 +104,27 @@
 
       <!-- 우측 -->
       <div
-        class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-900 p-6 shadow-sm flex flex-col justify-between">
+        class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-900 p-6 shadow-sm flex flex-col justify-between"
+      >
         <div class="space-y-2 text-sm text-slate-700 dark:text-slate-300">
           <p><strong>작업 번호:</strong> {{ task.referenceCode }}</p>
           <p><strong>작업 유형:</strong> {{ getCategoryLabel(task.category) }}</p>
-          <p><strong>상태:</strong>
+          <p>
+            <strong>상태:</strong>
             <BadgeComp :color="getStatusColor(task.status)" :label="getStatusLabel(task.status)" />
           </p>
           <p><strong>담당자:</strong> {{ task.workerName || '미할당' }}</p>
         </div>
 
         <div v-if="task.status === 'PENDING'" class="pt-6 flex flex-col gap-3">
-          <select v-model="selectedWorker"
-            class="border border-gray-300 dark:border-gray-700 rounded-md p-2 text-sm bg-white dark:bg-zinc-800 text-slate-800 dark:text-slate-200">
+          <select
+            v-model="selectedWorker"
+            class="border border-gray-300 dark:border-gray-700 rounded-md p-2 text-sm bg-white dark:bg-zinc-800 text-slate-800 dark:text-slate-200"
+          >
             <option disabled value="">작업자를 선택하세요</option>
-            <option v-for="worker in workers" :key="worker.id" :value="worker.id">{{ worker.name }}</option>
+            <option v-for="worker in workers" :key="worker.id" :value="worker.id">
+              {{ worker.name }}
+            </option>
           </select>
           <ButtonComp color="primary" @click="assignWorker">작업자 할당</ButtonComp>
         </div>
@@ -158,7 +198,10 @@ const fetchInboundDetails = async (code) => {
 // 추천 위치 조회
 const fetchAvailableLocations = async () => {
   if (!inboundDetails.value?.items) return
-  const minCapacity = inboundDetails.value.items.reduce((sum, i) => sum + (i.receivedQuantity || 0), 0)
+  const minCapacity = inboundDetails.value.items.reduce(
+    (sum, i) => sum + (i.receivedQuantity || 0),
+    0,
+  )
   const vendorId = inboundDetails.value.purchaseOrder?.vendorId
   if (vendorId && minCapacity > 0) {
     try {
@@ -195,7 +238,7 @@ const assignWorker = async () => {
         return
       }
 
-      const location = availableLocations.value.find(l => l.id === selectedLocationId.value)
+      const location = availableLocations.value.find((l) => l.id === selectedLocationId.value)
       if (!location || !location.locationCode) {
         alert('유효한 위치 정보를 찾을 수 없습니다.')
         return
@@ -206,9 +249,9 @@ const assignWorker = async () => {
         {
           locationCode: location.locationCode,
           workerId: selectedWorker.value,
-          note: task.value.note || ''
+          note: task.value.note || '',
         },
-        id  // ← taskId는 두 번째 파라미터!
+        id, // ← taskId는 두 번째 파라미터!
       )
 
       alert('적치 작업이 시작되었습니다.')
@@ -225,26 +268,31 @@ const assignWorker = async () => {
 }
 
 // 상태 라벨/색상
-const getStatusLabel = (s) => ({
-  PENDING: '대기중',
-  ASSIGNED: '할당됨',
-  IN_PROGRESS: '진행중',
-  COMPLETED: '완료'
-}[s] || '알 수 없음')
+const getStatusLabel = (s) =>
+  ({
+    PENDING: '대기중',
+    ASSIGNED: '할당됨',
+    IN_PROGRESS: '진행중',
+    COMPLETED: '완료',
+  })[s] || '알 수 없음'
 
-const getCategoryLabel = (c) => ({
-  INSPECTION: '검수',
-  PUTAWAY: '적치',
-  PICKING: '피킹',
-  PACKING: '포장'
-}[c] || c || '-')
+const getCategoryLabel = (c) =>
+  ({
+    INSPECTION: '검수',
+    PUTAWAY: '적치',
+    PICKING: '피킹',
+    PACKING: '포장',
+  })[c] ||
+  c ||
+  '-'
 
-const getStatusColor = (s) => ({
-  PENDING: 'default',
-  ASSIGNED: 'warning',
-  IN_PROGRESS: 'info',
-  COMPLETED: 'success'
-}[s] || 'default')
+const getStatusColor = (s) =>
+  ({
+    PENDING: 'default',
+    ASSIGNED: 'warning',
+    IN_PROGRESS: 'info',
+    COMPLETED: 'success',
+  })[s] || 'default'
 
 // 상태 변경
 const changeStatus = async (next) => {
