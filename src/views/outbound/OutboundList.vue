@@ -14,7 +14,7 @@
           <ButtonComp color="secondary" icon="filter_list" @click="openFilterModal">
             상세 검색
           </ButtonComp>
-          <RouterLink to="/outbound/create">
+          <RouterLink to="/outbound/create" class="w-40 whitespace-nowrap">
             <ButtonComp color="primary" icon="add">신규 출고</ButtonComp>
           </RouterLink>
         </div>

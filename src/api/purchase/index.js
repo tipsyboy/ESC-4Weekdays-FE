@@ -97,21 +97,15 @@ const getVendors = async () => {
 
 // 선택된 공급업체의 상품 목록 조회
 const getVendorProducts = async (vendorId) => {
-  let data = {}
-  const url = `/api/products?vendorId=${vendorId}`
-  await api
-    .get(url)
-    .then((res) => {
-      data = {
-        isSuccess: res.data.success,
-        code: res.data.code,
-        result: res.data.results?.content || [],
-      }
+  const requestUrl = `/api/products?vendorId=${vendorId}`
+  return await api
+    .get(requestUrl)
+    .then((response) => {
+      return response.data.results;
     })
     .catch((err) => {
-      data = err.response?.data || { isSuccess: false, result: [] }
+      throw err;
     })
-  return data
 }
 export default {
   getPurchaseOrders,

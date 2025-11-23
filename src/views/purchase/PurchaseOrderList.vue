@@ -8,31 +8,30 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <RouterLink to="/purchase/create" class="w-40">
+          <RouterLink to="/purchase/create" class="whitespace-nowrap">
             <ButtonComp color="primary" icon="add">신규 발주</ButtonComp>
           </RouterLink>
-
-          <SearchBarComp
-            v-model="query"
-            placeholder="발주서 검색..."
-            @search="handleSearch"
-          />
+<!--          <SearchBarComp-->
+<!--            v-model="query"-->
+<!--            placeholder="발주서 검색..."-->
+<!--            @search="handleSearch"-->
+<!--          />-->
         </div>
       </div>
     </template>
 
-    <div class="flex flex-wrap items-center gap-3 mb-8">
-      <button
-        v-for="filter in filters"
-        :key="filter"
-        class="flex items-center gap-2 rounded border border-zinc-300 dark:border-zinc-700
-               bg-background-light dark:bg-zinc-900 px-3 py-1.5 text-sm text-zinc-700
-               dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-      >
-        <span>{{ filter }}</span>
-        <span class="material-symbols-outlined text-base">expand_more</span>
-      </button>
-    </div>
+<!--    <div class="flex flex-wrap items-center gap-3 mb-8">-->
+<!--      <button-->
+<!--        v-for="filter in filters"-->
+<!--        :key="filter"-->
+<!--        class="flex items-center gap-2 rounded border border-zinc-300 dark:border-zinc-700-->
+<!--               bg-background-light dark:bg-zinc-900 px-3 py-1.5 text-sm text-zinc-700-->
+<!--               dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"-->
+<!--      >-->
+<!--        <span>{{ filter }}</span>-->
+<!--        <span class="material-symbols-outlined text-base">expand_more</span>-->
+<!--      </button>-->
+<!--    </div>-->
 
     <!-- 발주 목록 확장 테이블 -->
     <ExpandableTable

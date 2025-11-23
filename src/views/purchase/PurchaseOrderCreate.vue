@@ -211,7 +211,7 @@ const loadVendors = async () => {
 
 const loadVendorProducts = async () => {
   const res = await api.getVendorProducts(form.value.vendorId)
-  if (res.isSuccess) vendorProducts.value = res.result
+  vendorProducts.value = res
 }
 
 // 등록

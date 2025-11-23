@@ -59,6 +59,7 @@
             <p class="text-xs text-gray-400 text-right">최근 업데이트: {{ lastUpdated }}</p>
         </template>
     </AppPageLayout>
+
 </template>
 
 <script setup>

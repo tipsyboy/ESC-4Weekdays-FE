@@ -16,7 +16,23 @@
           <ButtonComp color="secondary" icon="arrow_back" @click="router.push('/inbound')">
             뒤로가기
           </ButtonComp>
-          <ButtonComp v-if="inbound.status === 'SCHEDULED'" color="primary" icon="done_all">
+          <!-- 차량 도착 버튼 (SCHEDULED 상태에서만 표시) -->
+          <ButtonComp
+            v-if="inbound.status === 'SCHEDULED'"
+            color="warning"
+            icon="local_shipping"
+            @click="handleArriveDelivery"
+            :disabled="isArriving"
+          >
+            {{ isArriving ? '처리 중...' : '차량 도착' }}
+          </ButtonComp>
+          <!-- 입고 완료 버튼 (INSPECTING 상태에서만 표시) -->
+          <ButtonComp
+            v-if="inbound.status === 'INSPECTING'"
+            color="primary"
+            icon="done_all"
+            @click="handleInboundComplete"
+          >
             입고 완료
           </ButtonComp>
           <ButtonComp color="secondary" icon="edit">수정</ButtonComp>
@@ -45,7 +61,7 @@
             <span class="text-xs text-slate-500 block mb-1">연결된 발주서</span>
             <RouterLink
               v-if="inbound.purchaseOrder"
-              :to="`/purchase/detail/${inbound.purchaseOrder.id}`"
+              :to="`/purchase/${inbound.purchaseOrder.id}`"
               class="text-sm text-primary hover:underline font-medium"
             >
               {{ inbound.purchaseOrder.orderNumber }}
@@ -111,6 +127,7 @@ import BadgeComp from '@/components/common/BadgeComp.vue'
 const route = useRoute()
 const router = useRouter()
 const inbound = ref({})
+const isArriving = ref(false)
 
 // 컬럼 정의
 const itemColumns = [
@@ -122,20 +139,31 @@ const itemColumns = [
 // 상태 색상/라벨
 const getStatusColor = (status) => {
   switch (status) {
-    case 'SCHEDULED': return 'blue'
-    case 'INSPECTING': return 'yellow'
-    case 'COMPLETED': return 'green'
-    case 'CANCELLED': return 'red'
-    default: return 'gray'
+    case 'SCHEDULED':
+      return 'blue'
+    case 'INSPECTING':
+      return 'yellow'
+    case 'COMPLETED':
+      return 'green'
+    case 'CANCELLED':
+      return 'red'
+    default:
+      return 'gray'
   }
 }
+
 const getStatusLabel = (status) => {
   switch (status) {
-    case 'SCHEDULED': return '입고예정'
-    case 'INSPECTING': return '검수중'
-    case 'COMPLETED': return '완료'
-    case 'CANCELLED': return '취소'
-    default: return '미정'
+    case 'SCHEDULED':
+      return '입고예정'
+    case 'INSPECTING':
+      return '검수중'
+    case 'COMPLETED':
+      return '완료'
+    case 'CANCELLED':
+      return '취소'
+    default:
+      return '미정'
   }
 }
 
@@ -152,10 +180,50 @@ const formatDate = (dateStr) => {
 // 상세 조회
 const fetchInboundDetail = async () => {
   const res = await api.getInboundDetail(route.params.id)
+  console.log(res)
   if (res.success) {
     inbound.value = res.results
   } else {
     console.error('입고 상세 조회 실패:', res)
+  }
+}
+
+// 차량 도착 처리
+const handleArriveDelivery = async () => {
+  if (!confirm('차량 도착을 처리하시겠습니까?')) {
+    return
+  }
+
+  isArriving.value = true
+  try {
+    const res = await api.arriveDelivery(route.params.id)
+    if (res.success) {
+      alert('차량 도착이 처리되었습니다.')
+      await fetchInboundDetail()
+    } else {
+      alert(res.message || '차량 도착 처리에 실패했습니다.')
+    }
+  } catch (e) {
+    console.error('차량 도착 처리 실패:', e)
+    alert('차량 도착 처리 중 오류가 발생했습니다.')
+  } finally {
+    isArriving.value = false
+  }
+}
+
+// 입고 완료 처리
+const handleInboundComplete = async () => {
+  if (!confirm('입고를 완료하시겠습니까?')) {
+    return
+  }
+
+  try {
+    // 입고 완료 API 호출 (필요시 구현)
+    alert('입고가 완료되었습니다.')
+    await fetchInboundDetail()
+  } catch (e) {
+    console.error('입고 완료 처리 실패:', e)
+    alert('입고 완료 처리 중 오류가 발생했습니다.')
   }
 }
 

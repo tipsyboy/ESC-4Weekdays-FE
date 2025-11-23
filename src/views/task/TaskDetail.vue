@@ -38,20 +38,16 @@
               <div v-if="inboundDetails.items?.length" class="inline-block">
                 <ul class="list-disc pl-5">
                   <li v-for="item in inboundDetails.items" :key="item.id">
-                    {{ item.productName }} ({{ item.receivedQuantity }}개)
+                    {{ item.productName }} ({{ item.orderedQuantity }}개)
                   </li>
                 </ul>
               </div>
               <span v-else>입고 품목 정보 없음</span>
             </div>
 
-            <!-- ✅ 위치 선택 -->
-            <!-- ✅ 위치 선택 -->
+            <!-- ✅ 위치 선택 (PUTAWAY일 때만) -->
             <div v-if="task.category === 'PUTAWAY'">
-              <strong class="inline-block w-20 text-slate-600 dark:text-slate-400 align-top"
-                >위치:</strong
-              >
-
+              <strong class="inline-block w-20 text-slate-600 dark:text-slate-400 align-top">위치:</strong>
               <!-- 이미 할당된 위치 -->
               <div v-if="task.assignedLocationCode" class="inline-block">
                 <span class="text-slate-800 dark:text-slate-200">{{
@@ -77,7 +73,11 @@
                     {{ location.locationCode }}
                   </option>
                 </select>
+                <span v-if="availableLocations.length === 0" class="text-slate-500 text-xs ml-2"
+                >({{ loadingLocations ? '로딩 중...' : '위치 없음' }})</span
+                >
               </div>
+
 
               <span v-else-if="task.status === 'PENDING'" class="text-slate-500"
                 >추천 위치 없음</span
@@ -138,8 +138,9 @@
     </div>
   </AppPageLayout>
 </template>
+
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
@@ -156,7 +157,8 @@ const workers = ref([])
 const selectedWorker = ref('')
 const inboundDetails = ref(null)
 const availableLocations = ref([])
-const selectedLocationId = ref('') // ✅ 숫자 ID 저장
+const selectedLocationId = ref('')
+const loadingLocations = ref(false)
 
 // 지시문
 const inspectionInstruction = computed(() => {
@@ -166,32 +168,46 @@ const inspectionInstruction = computed(() => {
   return `${products} 을(를) 검수하세요.`
 })
 
-// 상세 조회
+// 작업 상세 조회
 const fetchTaskDetail = async () => {
   const id = route.params.id
   if (!id) return
+
   try {
     const res = await taskApi.taskDetail(id)
     task.value = res.results
-    if (task.value.referenceCode) await fetchInboundDetails(task.value.referenceCode)
+    console.log('Task Detail:', task.value)
+
+    // task 정보 받은 후 입고 정보 조회
+    await fetchInboundDetails(task.value)
   } catch (e) {
     console.error('작업 상세 실패:', e)
   }
 }
 
-// 입고 조회
-const fetchInboundDetails = async (code) => {
-  if (!code?.startsWith('IB-')) return
+// 입고 상세 조회
+const fetchInboundDetails = async (taskData) => {
   try {
-    const res = await inboundApi.getInboundsSearch({ inboundCode: code })
-    if (res?.length > 0) {
-      inboundDetails.value = res[0]
+    // task에서 reference_id를 직접 사용
+    const referenceId = taskData?.referenceId || taskData?.reference_id
+    console.log('Reference ID:', referenceId)
+
+    if (referenceId) {
+      const inboundResult = await inboundApi.getInboundDetail(referenceId)
+      inboundDetails.value = inboundResult.results || inboundResult
+      console.log('Inbound Details:', inboundDetails.value)
+
+      // PUTAWAY 작업이면 위치 정보 조회 (입고 정보 로드 후)
       if (task.value.category === 'PUTAWAY' && task.value.status === 'PENDING') {
         await fetchAvailableLocations()
       }
-    } else inboundDetails.value = {}
+    } else {
+      console.warn('Reference ID 없음')
+      inboundDetails.value = {}
+    }
   } catch (e) {
     console.error('입고 조회 실패:', e)
+    inboundDetails.value = {}
   }
 }
 
@@ -210,6 +226,28 @@ const fetchAvailableLocations = async () => {
     } catch (e) {
       console.error('추천 위치 조회 실패:', e)
     }
+
+    const minCapacity = inboundDetails.value.items.reduce(
+      (sum, i) => sum + (i.orderedQuantity || 0), 0
+    )
+    const vendorId = inboundDetails.value.purchaseOrder?.vendorId
+
+    console.log('Location Query:', { vendorId, minCapacity })
+
+    let res
+    if (vendorId && minCapacity > 0) {
+      res = await locationApi.locationAvailable({ vendorId, minCapacity })
+    } else {
+      res = await locationApi.locationAvailable()
+    }
+
+    availableLocations.value = res.results || res.content || res || []
+    // console.log('Available Locations:', availableLocations.value)
+  } catch (e) {
+    console.error('추천 위치 조회 실패:', e)
+    availableLocations.value = []
+  } finally {
+    loadingLocations.value = false
   }
 }
 
@@ -217,12 +255,13 @@ const fetchAvailableLocations = async () => {
 const fetchWorkers = async () => {
   try {
     const res = await memberApi.memberList()
-    workers.value = res.results?.content || []
+    workers.value = res.results?.content || res.content || res || []
   } catch (e) {
     console.error('작업자 목록 실패:', e)
   }
 }
 
+// 작업자 할당
 const assignWorker = async () => {
   if (!selectedWorker.value) {
     alert('작업자를 선택하세요.')
@@ -244,7 +283,6 @@ const assignWorker = async () => {
         return
       }
 
-      // ✅ 순서 주의: (req객체, taskId숫자)
       await taskApi.putawayStart(
         {
           locationCode: location.locationCode,
@@ -267,7 +305,7 @@ const assignWorker = async () => {
   }
 }
 
-// 상태 라벨/색상
+
 const getStatusLabel = (s) =>
   ({
     PENDING: '대기중',
@@ -276,12 +314,14 @@ const getStatusLabel = (s) =>
     COMPLETED: '완료',
   })[s] || '알 수 없음'
 
+
 const getCategoryLabel = (c) =>
   ({
     INSPECTION: '검수',
     PUTAWAY: '적치',
     PICKING: '피킹',
     PACKING: '포장',
+
   })[c] ||
   c ||
   '-'
@@ -322,9 +362,15 @@ const changeStatus = async (next) => {
 }
 
 // 메모 저장
-const saveMemo = () => {
-  console.log('메모 저장:', task.value.note)
-  alert('작업 메모가 저장되었습니다.')
+const saveMemo = async () => {
+  try {
+    const id = route.params.id
+    console.log('메모 저장:', task.value.note)
+    alert('작업 메모가 저장되었습니다.')
+  } catch (e) {
+    console.error('메모 저장 실패:', e)
+    alert('메모 저장에 실패했습니다.')
+  }
 }
 
 onMounted(() => {

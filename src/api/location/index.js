@@ -1,19 +1,17 @@
 import api from '@/plugin/axiosInterceptor.js'
 
-const locationAvailable = async (params) => {
-  let data = {}
+const locationAvailable = async () => {
   const url = `/api/locations/available`
 
-  await api
-    .get(url, { params })
+  return await api
+    .get(url)
     .then((res) => {
-      data = res.data
+      console.log(res)
+      return res.data
     })
     .catch((error) => {
-      data = error.data
+      return error.data
     })
-
-  return data
 }
 
 const putawayStart = async (req, taskId) => {
