@@ -159,6 +159,55 @@ const taskUpdate = async (req, taskId) => {
   return data
 }
 
+
+const pickingComplete = async (req, taskId) => {
+  let data = {}
+  let url = `/api/outbound-task/picking/${taskId}/complete`
+
+  await api
+    .post(url, req)
+    .then((res) => {
+      data = res.data
+    })
+    .catch((error) => {
+      data = error.data
+    })
+
+  return data
+}
+
+const packingComplete = async (req, taskId) => {
+  let data = {}
+  let url = `/api/outbound-task/packing/${taskId}/complete`
+
+  await api
+    .post(url, req)
+    .then((res) => {
+      data = res.data
+    })
+    .catch((error) => {
+      data = error.data
+    })
+
+  return data
+}
+
+const shipmentAssignShipper = async (req, taskId) => {
+  let data = {}
+  let url = `/api/outbound-task/shipment/${taskId}/assign-shipper`
+
+  await api
+    .post(url, req)
+    .then((res) => {
+      data = res.data
+    })
+    .catch((error) => {
+      data = error.data
+    })
+
+  return data
+}
+
 export default {
   taskList,
   taskAssign,
@@ -170,4 +219,7 @@ export default {
   putawayStart,
   putawayComplete,
   taskUpdate,
+  pickingComplete,      // 추가
+  packingComplete,      // 추가
+  shipmentAssignShipper, // 추가
 }

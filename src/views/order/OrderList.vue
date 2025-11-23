@@ -4,10 +4,8 @@
     <template #header>
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">주문 목록</h1>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            전체 주문 현황을 조회합니다.
-          </p>
+          <h1 class="text-2xl font-semibold">주문 목록</h1>
+          <p class="text-sm text-slate-500 mt-1">전체 주문 현황을 조회합니다.</p>
         </div>
 
         <SearchBarComp
@@ -18,111 +16,134 @@
       </div>
     </template>
 
-    <!-- 주문 목록 테이블 -->
-    <TableComp :columns="columns" :data="pagedOrders">
-      <!-- 주문 코드 -->
-      <template #cell-orderCode="{ row }">
-        <RouterLink
-            :to="`/order/${row.id}`"
-            class="text-primary font-semibold hover:underline"
-        >
-          {{ row.orderCode }}
-        </RouterLink>
+    <!-- 확장형 테이블 -->
+    <ExpandableTable
+        :columns="mainColumns"
+        :rows="orders"
+        :sub-columns="subColumns"
+        :expanded-ids="expandedIds"
+        sub-key="items"
+        link-key="orderCode"
+        link-path="/order"
+        @toggle-expand="toggleExpand"
+    >
+      <template #sub-row="{ subItem }">
+        <td class="px-6 py-3 text-sm">{{ subItem.productName }}</td>
+        <td class="px-6 py-3 text-sm">{{ subItem.orderedQuantity }}</td>
+        <td class="px-6 py-3 text-sm">{{ subItem.unitPrice }}</td>
       </template>
-
-      <!-- 납기일 -->
-      <template #cell-dueDate="{ row }">
-        {{ row.dueDate ? formatDate(row.dueDate) : '-' }}
-      </template>
-
-      <!-- 상태 -->
-      <template #cell-status="{ row }">
-        <BadgeComp :color="getStatusColor(row.status)" :label="getStatusLabel(row.status)" />
-      </template>
-    </TableComp>
+    </ExpandableTable>
 
     <!-- 페이지네이션 -->
-    <div class="flex justify-center items-center gap-2 mt-8">
+    <div class="flex items-center justify-center gap-2 mt-8">
+      <ButtonComp
+          color="secondary"
+          icon="first_page"
+          :disabled="pagination.page === 0"
+          @click="goToFirstPage"
+      />
       <ButtonComp
           color="secondary"
           icon="arrow_back"
-          :disabled="page === 0"
-          @click="changePage(page - 1)"
+          :disabled="pagination.page === 0"
+          @click="goToPreviousPage"
       />
-      <span class="text-sm text-slate-600 whitespace-nowrap">
-        페이지 {{ page + 1 }} / {{ totalPages }}
-      </span>
+
+      <button
+          v-for="pageNum in pageNumbers"
+          :key="pageNum"
+          @click="goToPage(pageNum)"
+          :class="[
+          'min-w-[40px] h-10 px-4 rounded-lg font-medium text-sm transition-colors',
+          pageNum === pagination.page
+            ? 'bg-emerald-600 text-white'
+            : 'bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-700',
+        ]"
+      >
+        {{ pageNum + 1 }}
+      </button>
+
       <ButtonComp
           color="secondary"
           icon="arrow_forward"
-          :disabled="page >= totalPages - 1"
-          @click="changePage(page + 1)"
+          :disabled="pagination.page >= pagination.totalPages - 1"
+          @click="goToNextPage"
+      />
+      <ButtonComp
+          color="secondary"
+          icon="last_page"
+          :disabled="pagination.page >= pagination.totalPages - 1"
+          @click="goToLastPage"
       />
     </div>
   </AppPageLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import {computed, onMounted, reactive, ref} from 'vue'
+
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
-import TableComp from '@/components/common/TableComp.vue'
+import ExpandableTable from '@/components/common/ExpandableTable.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
-import BadgeComp from '@/components/common/BadgeComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
+
 import orderApi from '@/api/order/index.js'
 
-const orders = ref([])
 const query = ref('')
-const page = ref(0)
-const pageSize = 10
-const total = ref(0)
+const expandedIds = ref(new Set())
 
-const columns = [
-  { key: 'orderCode', label: '주문 코드' },
-  { key: 'franchiseName', label: '가맹점명' },
-  { key: 'dueDate', label: '납기일' },
-  { key: 'status', label: '상태' },
-  { key: 'description', label: '비고' },
+const pagination = reactive({
+  page: 0,
+  size: 10,
+  totalPages: 1,
+  totalElements: 0,
+})
+
+const orders = ref([])
+
+const mainColumns = [
+  {key: 'orderCode', label: '주문 코드'},
+  {key: 'franchiseName', label: '가맹점명'},
+  {key: 'dueDate', label: '납기일'},
+  {key: 'statusLabel', label: '상태'},
 ]
 
-const totalPages = computed(() => Math.ceil(total.value / pageSize))
-const pagedOrders = computed(() => orders.value)
+const subColumns = [
+  {key: 'productName', label: '상품명'},
+  {key: 'orderedQuantity', label: '수량'},
+  {key: 'unitPrice', label: '단가'},
+]
 
-const fetchOrderList = async () => {
-  const res = await orderApi.orderRead(page.value, pageSize)
-  const list = res?.results?.content || []
-  total.value = res?.results?.totalElements || 0
+const fetchOrders = async (pageNum = 0) => {
+  const res = await orderApi.orderRead(pageNum, pagination.size)
 
-  orders.value = list.map((item) => ({
-    id: item.id,
-    orderCode: item.orderCode,
-    franchiseName: item.franchiseName,
-    dueDate: item.dueDate,
-    description: item.description || '-',
-    status: item.orderStatus || 'REQUESTED', // 기본값
+  const pageData = res?.results
+
+  const paging = res?.results?.page
+
+  // 페이지 값 안전하게 보정
+  pagination.page = paging?.number ?? 0
+  pagination.totalPages = paging?.totalPages ?? 1
+  pagination.totalElements = paging?.totalElements ?? 0
+
+  const list = pageData?.content || []
+
+  // 확장형 테이블에 맞도록 items 추가
+  orders.value = list.map(o => ({
+    id: o.id,
+    orderCode: o.orderCode,
+    franchiseName: o.franchiseName,
+    dueDate: o.dueDate?.split('T')[0] ?? '-',
+    status: o.orderStatus,
+    statusLabel: getStatusLabel(o.orderStatus),
+    items: o.products || [], // 서브데이터
   }))
 }
 
-// 상태별 색상
-const getStatusColor = (status) => {
-  switch (status) {
-    case 'REQUESTED': // 주문 생성
-      return 'warning'
-    case 'APPROVED': // 승인 완료
-      return 'info'
-    case 'SHIPPED': // 출하 완료
-      return 'primary'
-    case 'DELIVERED': // 배송 완료
-      return 'success'
-    case 'CANCELLED': // 취소
-      return 'danger'
-    default:
-      return 'gray'
-  }
+const handleSearch = () => {
+  fetchOrders(0)
 }
 
-// 상태별 라벨
 const getStatusLabel = (status) => {
   switch (status) {
     case 'REQUESTED':
@@ -140,20 +161,35 @@ const getStatusLabel = (status) => {
   }
 }
 
-const changePage = (newPage) => {
-  if (newPage < 0 || newPage >= totalPages.value) return
-  page.value = newPage
-  fetchOrderList()
+const toggleExpand = (id) => {
+  if (expandedIds.value.has(id)) expandedIds.value.delete(id)
+  else expandedIds.value.add(id)
 }
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
-}
+const pageNumbers = computed(() => {
+  const arr = []
+  const max = 5
 
-onMounted(fetchOrderList)
+  let start = Math.max(0, pagination.page - Math.floor(max / 2))
+  let end = Math.min(pagination.totalPages - 1, start + max - 1)
+
+  if (end - start < max - 1) {
+    start = Math.max(0, end - max + 1)
+  }
+
+  for (let i = start; i <= end; i++) arr.push(i)
+  return arr
+})
+
+const goToPage = (p) => fetchOrders(p)
+const goToFirstPage = () => fetchOrders(0)
+const goToLastPage = () => fetchOrders(pagination.totalPages - 1)
+const goToPreviousPage = () =>
+    pagination.page > 0 && fetchOrders(pagination.page - 1)
+const goToNextPage = () =>
+    pagination.page < pagination.totalPages - 1 && fetchOrders(pagination.page + 1)
+
+onMounted(() => {
+  fetchOrders(0)
+})
 </script>

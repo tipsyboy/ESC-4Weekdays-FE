@@ -1,8 +1,16 @@
 <template>
   <AppPageLayout>
     <template #header>
-      <div>
-        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">작업 상세 정보</h1>
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">작업 상세 정보</h1>
+        </div>
+
+        <div class="flex gap-2">
+          <ButtonComp color="secondary" icon="arrow_back" @click="$router.push('/task/kanban')">
+            뒤로가기
+          </ButtonComp>
+        </div>
       </div>
     </template>
 
@@ -18,14 +26,14 @@
           <div v-if="inboundDetails" class="space-y-3 text-sm text-slate-700 dark:text-slate-300">
             <p>
               <strong class="inline-block w-20 text-slate-600 dark:text-slate-400"
-              >지시 사항:</strong
+                >지시 사항:</strong
               >
               {{ inspectionInstruction }}
             </p>
 
             <div>
               <strong class="inline-block w-20 text-slate-600 dark:text-slate-400 align-top"
-              >품목:</strong
+                >품목:</strong
               >
               <div v-if="inboundDetails.items?.length" class="inline-block">
                 <ul class="list-disc pl-5">
@@ -39,19 +47,19 @@
 
             <!-- ✅ 위치 선택 (PUTAWAY일 때만) -->
             <div v-if="task.category === 'PUTAWAY'">
-              <strong class="inline-block w-20 text-slate-600 dark:text-slate-400 align-top"
-              >위치:</strong
-              >
-
+              <strong class="inline-block w-20 text-slate-600 dark:text-slate-400 align-top">위치:</strong>
               <!-- 이미 할당된 위치 -->
               <div v-if="task.assignedLocationCode" class="inline-block">
                 <span class="text-slate-800 dark:text-slate-200">{{
-                    task.assignedLocationCode
-                  }}</span>
+                  task.assignedLocationCode
+                }}</span>
               </div>
 
-              <!-- 미할당 상태: 위치 선택 드롭다운 -->
-              <div v-else-if="task.status === 'PENDING'" class="inline-block">
+              <!-- 아직 미할당 상태라 선택해야 함 -->
+              <div
+                v-else-if="task.status === 'PENDING' && availableLocations.length > 0"
+                class="inline-block"
+              >
                 <select
                   v-model="selectedLocationId"
                   class="border border-gray-300 dark:border-gray-700 rounded-md p-2 text-sm bg-white dark:bg-zinc-800 text-slate-800 dark:text-slate-200"
@@ -69,6 +77,11 @@
                 >({{ loadingLocations ? '로딩 중...' : '위치 없음' }})</span
                 >
               </div>
+
+
+              <span v-else-if="task.status === 'PENDING'" class="text-slate-500"
+                >추천 위치 없음</span
+              >
             </div>
           </div>
         </div>
@@ -200,12 +213,18 @@ const fetchInboundDetails = async (taskData) => {
 
 // 추천 위치 조회
 const fetchAvailableLocations = async () => {
-  loadingLocations.value = true
-  try {
-    if (!inboundDetails.value?.items?.length) {
-      console.warn('입고 품목이 없음')
-      availableLocations.value = []
-      return
+  if (!inboundDetails.value?.items) return
+  const minCapacity = inboundDetails.value.items.reduce(
+    (sum, i) => sum + (i.receivedQuantity || 0),
+    0,
+  )
+  const vendorId = inboundDetails.value.purchaseOrder?.vendorId
+  if (vendorId && minCapacity > 0) {
+    try {
+      const res = await locationApi.locationAvailable({ vendorId, minCapacity })
+      availableLocations.value = res.results || res.content || []
+    } catch (e) {
+      console.error('추천 위치 조회 실패:', e)
     }
 
     const minCapacity = inboundDetails.value.items.reduce(
@@ -270,7 +289,7 @@ const assignWorker = async () => {
           workerId: selectedWorker.value,
           note: task.value.note || '',
         },
-        id
+        id, // ← taskId는 두 번째 파라미터!
       )
 
       alert('적치 작업이 시작되었습니다.')
@@ -286,7 +305,7 @@ const assignWorker = async () => {
   }
 }
 
-// 상태 라벨
+
 const getStatusLabel = (s) =>
   ({
     PENDING: '대기중',
@@ -295,16 +314,18 @@ const getStatusLabel = (s) =>
     COMPLETED: '완료',
   })[s] || '알 수 없음'
 
-// 카테고리 라벨
+
 const getCategoryLabel = (c) =>
   ({
     INSPECTION: '검수',
     PUTAWAY: '적치',
     PICKING: '피킹',
     PACKING: '포장',
-  })[c] || c || '-'
 
-// 상태 색상
+  })[c] ||
+  c ||
+  '-'
+
 const getStatusColor = (s) =>
   ({
     PENDING: 'default',
@@ -317,16 +338,26 @@ const getStatusColor = (s) =>
 const changeStatus = async (next) => {
   const id = route.params.id
   try {
-    if (next === 'IN_PROGRESS') await taskApi.taskStart({}, id)
-    else if (next === 'COMPLETED') {
-      if (task.value.category === 'INSPECTION') await taskApi.inspectionTaskComplete({}, id)
-      else if (task.value.category === 'PUTAWAY') await taskApi.putawayComplete({}, id)
-      else await taskApi.taskComplete({}, id)
+    if (next === 'IN_PROGRESS') {
+      await taskApi.taskStart({}, id)
+    } else if (next === 'COMPLETED') {
+      if (task.value.category === 'INSPECTION') {
+        await taskApi.inspectionTaskComplete({}, id)
+      } else if (task.value.category === 'PUTAWAY') {
+        await taskApi.putawayComplete({}, id)
+      } else if (task.value.category === 'PICKING') {
+        await taskApi.pickingComplete({}, id)
+      } else if (task.value.category === 'PACKING') {
+        await taskApi.packingComplete({}, id)
+      } else {
+        await taskApi.taskComplete({}, id)
+      }
     }
     alert('상태 변경 완료')
     await fetchTaskDetail()
   } catch (e) {
     console.error('상태 변경 실패:', e)
+    alert('상태 변경에 실패했습니다.')
   }
 }
 
