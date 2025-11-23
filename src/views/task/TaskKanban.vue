@@ -67,23 +67,23 @@ import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
 import SearchBarComp from '@/components/common/SearchBarComp.vue'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
-import api from '@/plugin/axiosInterceptor'           // ✅ axios 인스턴스
-import taskApi from '@/api/task'  // ✅ task API wrapper
+import api from '@/plugin/axiosInterceptor'
+import taskApi from '@/api/task'
 
 // ✅ 한글 매핑
 const categoryMap = {
-    INSPECTION: '입고 검수',
-    PUTAWAY: '입고 적치',
-    PICKING: '출고 피킹',
-    PACKING: '출고 포장',
+  INSPECTION: '입고 검수',
+  PUTAWAY: '입고 적치',
+  PICKING: '출고 피킹',
+  PACKING: '출고 포장',
 }
 
 const statusMap = {
-    PENDING: '할당 대기',
-    ASSIGNED: '할당됨',
-    IN_PROGRESS: '진행 중',
-    COMPLETED: '완료',
-    CANCELLED: '취소됨',
+  PENDING: '할당 대기',
+  ASSIGNED: '할당됨',
+  IN_PROGRESS: '진행 중',
+  COMPLETED: '완료',
+  CANCELLED: '취소됨',
 }
 
 const categoryLabel = (key) => categoryMap[key] || key
@@ -94,79 +94,90 @@ const lastUpdated = ref('2025-10-27 16:00')
 
 // ✅ 상태별 컬럼
 const columns = ref([
-    { label: '할당 대기 (Pending)', status: 'PENDING', color: 'gray', list: [] },
-    { label: '할당됨 (Assigned)', status: 'ASSIGNED', color: 'blue', list: [] },
-    { label: '진행 중 (In Progress)', status: 'IN_PROGRESS', color: 'yellow', list: [] },
-    { label: '완료됨 (Completed)', status: 'COMPLETED', color: 'green', list: [] },
-    { label: '취소됨 (Cancelled)', status: 'CANCELLED', color: 'red', list: [] },
+  { label: '할당 대기 (Pending)', status: 'PENDING', color: 'gray', list: [] },
+  { label: '할당됨 (Assigned)', status: 'ASSIGNED', color: 'blue', list: [] },
+  { label: '진행 중 (In Progress)', status: 'IN_PROGRESS', color: 'yellow', list: [] },
+  { label: '완료됨 (Completed)', status: 'COMPLETED', color: 'green', list: [] },
+  { label: '취소됨 (Cancelled)', status: 'CANCELLED', color: 'red', list: [] },
 ])
 
 // ✅ 전체 작업 불러오기
 const fetchTasks = async () => {
-    try {
-        const res = await taskApi.taskList(0, 100)
-        const data = res.results
-        if (data && data.content) groupTasks(data.content)
-    } catch (error) {
-        console.error('작업 목록 불러오기 실패:', error)
-    }
+  try {
+    const res = await taskApi.taskList(0, 100)
+    const data = res.results
+    if (data && data.content) groupTasks(data.content)
+  } catch (error) {
+    console.error('작업 목록 불러오기 실패:', error)
+  }
 }
 
-// ✅ 상태별 그룹화
 const groupTasks = (tasks) => {
-    columns.value.forEach((col) => {
-        col.list = tasks.filter((t) => t.status === col.status)
-    })
+  console.log('전체 작업 개수:', tasks.length)
+  console.log('PICKING 작업들:', tasks.filter(t => t.category === 'PICKING'))
+
+  columns.value.forEach((col) => {
+    col.list = tasks.filter((t) => t.status === col.status)
+    console.log(`${col.label}: ${col.list.length}개`, col.list)
+  })
 }
 
 // ✅ 검색 (필터링 예정)
 const handleSearch = () => {
-    console.log('검색 실행:', query.value)
+  console.log('검색 실행:', query.value)
 }
 
 // ✅ 드래그앤드롭 상태 변경
 let draggedTask = null
 
 const onDragStart = (task) => {
-    draggedTask = task
+  draggedTask = task
 }
 
 const onDrop = async (newStatus) => {
-    if (!draggedTask || draggedTask.status === newStatus) return
+  if (!draggedTask || draggedTask.status === newStatus) return
 
-    try {
-        let endpoint = ''
+  try {
+    let endpoint = ''
 
-        if (newStatus === 'ASSIGNED') {
-            endpoint = `/api/tasks/${draggedTask.id}/assign`
-        } else if (newStatus === 'IN_PROGRESS') {
-            endpoint = `/api/tasks/${draggedTask.id}/start`
-        } else if (newStatus === 'COMPLETED') {
-            if (draggedTask.category === 'INSPECTION') {
-                endpoint = `/api/inbound-tasks/inspection/${draggedTask.id}/complete`
-            } else {
-                endpoint = `/api/tasks/${draggedTask.id}/complete`
-            }
-        } else if (newStatus === 'CANCELLED') {
-            endpoint = `/api/tasks/${draggedTask.id}/cancel?reason=관리자취소`
-        }
-
-        if (!endpoint) return
-
-        await api.post(endpoint, {})
-
-        // 상태 업데이트
-        draggedTask.status = newStatus
-        groupTasks([
-            ...columns.value.flatMap((c) => c.list).map((t) =>
-                t.id === draggedTask.id ? { ...t, status: newStatus } : t
-            ),
-        ])
-    } catch (err) {
-        console.error('상태 변경 실패:', err)
-    } finally {
-        draggedTask = null
+    if (newStatus === 'ASSIGNED') {
+      endpoint = `/api/tasks/${draggedTask.id}/assign`
+    } else if (newStatus === 'IN_PROGRESS') {
+      endpoint = `/api/tasks/${draggedTask.id}/start`
+    } else if (newStatus === 'COMPLETED') {
+      // ✅ 카테고리별 완료 엔드포인트
+      if (draggedTask.category === 'INSPECTION') {
+        endpoint = `/api/inbound-tasks/inspection/${draggedTask.id}/complete`
+      } else if (draggedTask.category === 'PUTAWAY') {
+        endpoint = `/api/inbound-tasks/putaway/${draggedTask.id}/complete`
+      } else if (draggedTask.category === 'PICKING') {
+        endpoint = `/api/outbound-task/picking/${draggedTask.id}/complete`  // ✅ 수정
+      } else if (draggedTask.category === 'PACKING') {
+        endpoint = `/api/outbound-task/packing/${draggedTask.id}/complete`  // ✅ 수정
+      } else {
+        endpoint = `/api/tasks/${draggedTask.id}/complete`
+      }
+    } else if (newStatus === 'CANCELLED') {
+      endpoint = `/api/tasks/${draggedTask.id}/cancel?reason=관리자취소`
     }
+
+    if (!endpoint) return
+
+    await api.post(endpoint, {})
+
+    // 상태 업데이트
+    draggedTask.status = newStatus
+    groupTasks([
+      ...columns.value.flatMap((c) => c.list).map((t) =>
+        t.id === draggedTask.id ? { ...t, status: newStatus } : t
+      ),
+    ])
+  } catch (err) {
+    console.error('상태 변경 실패:', err)
+    alert('상태 변경에 실패했습니다.')
+  } finally {
+    draggedTask = null
+  }
 }
 
 onMounted(fetchTasks)
