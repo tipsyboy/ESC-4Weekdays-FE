@@ -12,9 +12,10 @@
 
         <div class="flex items-center gap-3">
           <!-- 신규 출고 버튼 -->
-          <RouterLink to="/outbound/create" class="w-40">
+          <RouterLink to="/outbound/create" class="w-40 whitespace-nowrap">
             <ButtonComp color="primary" icon="add">신규 출고</ButtonComp>
           </RouterLink>
+
           <SearchBarComp v-model="filters.search" placeholder="출고 내역 검색..." />
         </div>
       </div>
