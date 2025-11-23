@@ -15,38 +15,35 @@
     <form @submit.prevent="registerOutbound" class="space-y-6 max-w-3xl mx-auto mt-8">
       <div class="grid grid-cols-2 gap-6">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">출고 번호</label>
-          <input v-model="form.outboundCode" type="text" class="w-full border rounded px-3 py-2" placeholder="OB-YYYYMMDD" />
+          <label class="block text-sm font-medium text-gray-700 mb-1">주문 코드</label>
+          <input
+            v-model="form.orderCode"
+            type="text"
+            class="w-full border rounded px-3 py-2"
+            placeholder="주문 코드를 입력하세요"
+            required
+          />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">거래처</label>
-          <input v-model="form.partnerName" type="text" class="w-full border rounded px-3 py-2" placeholder="거래처명을 입력하세요" />
+          <label class="block text-sm font-medium text-gray-700 mb-1">출고 완료 예상 시간</label>
+          <input
+            v-model="form.scheduledDate"
+            type="datetime-local"
+            class="w-full border rounded px-3 py-2"
+            required
+          />
         </div>
+      </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">상품명</label>
-          <input v-model="form.productName" type="text" class="w-full border rounded px-3 py-2" placeholder="상품명을 입력하세요" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">출고 수량</label>
-          <input v-model="form.quantity" type="number" class="w-full border rounded px-3 py-2" placeholder="수량 입력" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">출고 유형</label>
-          <select v-model="form.type" class="w-full border rounded px-3 py-2">
-            <option value="SALE">판매</option>
-            <option value="RETURN">반품</option>
-            <option value="TRANSFER">이동</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">담당자</label>
-          <input v-model="form.handler" type="text" class="w-full border rounded px-3 py-2" placeholder="담당자명 입력" />
-        </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">비고</label>
+        <textarea
+          v-model="form.description"
+          class="w-full border rounded px-3 py-2"
+          rows="4"
+          placeholder="추가 설명을 입력하세요"
+        ></textarea>
       </div>
 
       <div class="flex justify-end mt-6">
@@ -61,18 +58,35 @@
 <script setup>
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import OutboundApi from '@/api/outbound/index.js'
+
+const router = useRouter()
 
 const form = ref({
-  outboundCode: '',
-  partnerName: '',
-  productName: '',
-  quantity: '',
-  type: 'SALE',
-  handler: '',
+  orderCode: '',
+  scheduledDate: '',
+  description: '',
 })
 
-const registerOutbound = () => {
-  console.log('등록 데이터:', form.value)
-  alert('출고 등록 완료!')
+const registerOutbound = async () => {
+  // 서버로 전송할 데이터 준비
+  const requestData = {
+    orderCode: form.value.orderCode,
+    scheduledDate: form.value.scheduledDate,
+    description: form.value.description,
+  }
+
+  const result = await OutboundApi.outboundCreate(requestData)
+
+  if (result.code === 200) {
+    console.log('등록 결과:', result)
+    alert('출고 등록 완료!')
+
+    router.push('/outbound')
+  } else {
+    console.error('출고 등록 실패:', error)
+    alert('출고 등록에 실패했습니다. 다시 시도해주세요.')
+  }
 }
 </script>

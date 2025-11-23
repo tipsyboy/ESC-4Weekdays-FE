@@ -298,16 +298,26 @@ const getStatusColor = (s) =>
 const changeStatus = async (next) => {
   const id = route.params.id
   try {
-    if (next === 'IN_PROGRESS') await taskApi.taskStart({}, id)
-    else if (next === 'COMPLETED') {
-      if (task.value.category === 'INSPECTION') await taskApi.inspectionTaskComplete({}, id)
-      else if (task.value.category === 'PUTAWAY') await taskApi.putawayComplete({}, id)
-      else await taskApi.taskComplete({}, id)
+    if (next === 'IN_PROGRESS') {
+      await taskApi.taskStart({}, id)
+    } else if (next === 'COMPLETED') {
+      if (task.value.category === 'INSPECTION') {
+        await taskApi.inspectionTaskComplete({}, id)
+      } else if (task.value.category === 'PUTAWAY') {
+        await taskApi.putawayComplete({}, id)
+      } else if (task.value.category === 'PICKING') {
+        await taskApi.pickingComplete({}, id)
+      } else if (task.value.category === 'PACKING') {
+        await taskApi.packingComplete({}, id)
+      } else {
+        await taskApi.taskComplete({}, id)
+      }
     }
     alert('상태 변경 완료')
     await fetchTaskDetail()
   } catch (e) {
     console.error('상태 변경 실패:', e)
+    alert('상태 변경에 실패했습니다.')
   }
 }
 
