@@ -211,24 +211,15 @@ const fetchInboundDetails = async (taskData) => {
   }
 }
 
-// 추천 위치 조회
 const fetchAvailableLocations = async () => {
   if (!inboundDetails.value?.items) return
-  const minCapacity = inboundDetails.value.items.reduce(
-    (sum, i) => sum + (i.receivedQuantity || 0),
-    0,
-  )
-  const vendorId = inboundDetails.value.purchaseOrder?.vendorId
-  if (vendorId && minCapacity > 0) {
-    try {
-      const res = await locationApi.locationAvailable({ vendorId, minCapacity })
-      availableLocations.value = res.results || res.content || []
-    } catch (e) {
-      console.error('추천 위치 조회 실패:', e)
-    }
+
+  try {
+    loadingLocations.value = true
 
     const minCapacity = inboundDetails.value.items.reduce(
-      (sum, i) => sum + (i.orderedQuantity || 0), 0
+      (sum, i) => sum + (i.orderedQuantity || 0),
+      0,
     )
     const vendorId = inboundDetails.value.purchaseOrder?.vendorId
 
@@ -242,7 +233,7 @@ const fetchAvailableLocations = async () => {
     }
 
     availableLocations.value = res.results || res.content || res || []
-    // console.log('Available Locations:', availableLocations.value)
+    console.log('Available Locations:', availableLocations.value)
   } catch (e) {
     console.error('추천 위치 조회 실패:', e)
     availableLocations.value = []
