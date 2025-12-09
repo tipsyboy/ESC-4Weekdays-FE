@@ -34,7 +34,7 @@ const searchProducts = async (page, size, searchForm = {}) => {
     const requestUrl = `/api/products/search?page=${page}&size=${size}`;
     const requestUrlWithEs = `/api/products/search/es?page=${page}&size=${size}`;
 
-    return await api.post(requestUrlWithEs, searchForm)
+    return await api.post(requestUrl, searchForm)
         .then((response) => {
           console.log(response)
           return response.data.results
