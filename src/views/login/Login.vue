@@ -9,7 +9,7 @@
                     </div>
                 </div>
                 <h2 class="text-center text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
-                    4Weekdays 로그인
+                    4Weekdays 로그인 V1
                 </h2>
 
 
