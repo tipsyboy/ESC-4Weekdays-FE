@@ -1,10 +1,13 @@
-import Login from '@/views/login/Login.vue'
+import LoginPage from '@/views/auth/LoginPage.vue'
 
 const loginRoutes = [
   {
     path: '/auth/login',
     name: 'login',
-    component: Login,
+    component: LoginPage,
+    meta: {
+      guestOnly: true,
+    },
   },
 ]
 export default loginRoutes

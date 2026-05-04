@@ -7,7 +7,7 @@ import productRoutes from '@/router/productRoutes.js'
 import outboundRoutes from '@/router/outboundRoutes.js'
 import inventoryRoutes from '@/router/inventoryRoutes.js'
 import taskRoutes from '@/router/taskRoutes.js'
-import employeeRoutes from './employeeRoutes'
+import memberRoutes from './memberRoutes'
 import vendorRoutes from '@/router/vendorRoutes.js'
 import franchiseRoutes from '@/router/franchiseRoutes.js'
 import announcementRoutes from './announcementRoutes'
@@ -19,6 +19,7 @@ import { useUIStore } from '@/stores/uiStore.js'
 import asn from '@/api/asn'
 import asnRoutes from './asnRoutes'
 import orderRoutes from "@/router/orderRoutes.js";
+import pinia from '@/stores'
 
 const routes = [
   { path: '/', redirect: '/auth/login' },
@@ -38,7 +39,7 @@ const routes = [
   ...productRoutes,
   ...outboundRoutes,
   ...taskRoutes,
-  ...employeeRoutes,
+  ...memberRoutes,
   ...vendorRoutes,
   ...franchiseRoutes,
   ...announcementRoutes,
@@ -52,50 +53,24 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
-  const auth = useAuthStore()
-  const isAuthenticated = auth.isAuthenticated
-  const userRole = auth.role
-  const requiredRoles = to.meta.roles
+router.beforeEach(async (to) => {
+  const auth = useAuthStore(pinia)
+  await auth.initialize()
 
-  // 🔹 로그인 안 된 경우
-  if (!isAuthenticated) {
-    if (to.path === '/auth/login') {
-      return next()
-    } else {
-      return next('/auth/login')
-    }
+  if (to.meta.guestOnly && auth.isAuthenticated) {
+    return auth.defaultRoute()
   }
 
-  // 🔹 로그인된 상태에서 로그인 페이지 접근 시
-  if (to.path === '/auth/login') {
-    if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-      return next('/dashboard')
-    } else if (userRole === 'WORKER') {
-      return next('/task/Worker/view')
-    } else {
-      return next('/dashboard')
-    }
+  if (!to.meta.guestOnly && !auth.isAuthenticated) {
+    return '/auth/login'
   }
 
-  // 🔹 권한이 필요한 페이지일 경우
-  if (requiredRoles && requiredRoles.length > 0) {
-    // ADMIN은 모든 페이지 접근 가능
-    if (userRole === 'ADMIN') {
-      return next()
-    }
-
-    // 해당 페이지 접근 가능한 역할이면 통과
-    if (requiredRoles.includes(userRole)) {
-      return next()
-    } else {
-      alert('이 페이지에 접근할 권한이 없습니다.')
-      return next(from.path)
-    }
+  const requiredRoles = to.meta.roles || []
+  if (requiredRoles.length && !auth.hasAnyRole(requiredRoles)) {
+    return auth.defaultRoute()
   }
 
-  // 🔹 권한 정보가 없는 페이지는 누구나 접근 가능
-  return next()
+  return true
 })
 
 export default router

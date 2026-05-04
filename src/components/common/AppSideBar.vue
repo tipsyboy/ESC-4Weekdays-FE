@@ -58,18 +58,7 @@ const isCollapsed = ref(false)
 
 const munus = [
   { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
-  { label: '작업 관리', icon: 'task', route: '/task/kanban' },
-  { label: '발주', icon: 'assignment', route: '/purchase' },
-  { label: 'ASN', icon: 'task', route: '/asn/list' },
-  { label: '입고', icon: 'inventory', route: '/inbound' },
-  { label: '재고', icon: 'inventory_2', route: '/inventory' },
-  { label: '주문', icon: 'task', route: '/order' },
-  { label: '출고', icon: 'local_shipping', route: '/outbound' },
-  { label: '상품 관리', icon: 'Shop', route: '/product' },
-  { label: '공급 업체', icon: 'handshake', route: '/vendors' },
-  { label: '가맹 업체', icon: 'handshake', route: '/franchise' },
-  { label: '직원 관리', icon: 'assignment_ind', route: '/employee' },
-  { label: '물류창고', icon: 'warehouse', route: '/warehouse' },
+  { label: '직원 관리', icon: 'assignment_ind', route: '/members' },
 ]
 
 const isActive = (path) => route.path === path

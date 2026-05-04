@@ -146,7 +146,7 @@ import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import taskApi from '@/api/task'
-import memberApi from '@/api/member'
+import memberApi from '@/api/member/memberApi.js'
 import inboundApi from '@/api/inbound'
 import locationApi from '@/api/location'
 
