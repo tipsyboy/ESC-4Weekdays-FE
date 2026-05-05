@@ -244,7 +244,7 @@ const searchParams = reactive({
 const statusMeta = (status) => {
   if (status === 'TRADING') return { label: '거래중', color: 'success' }
   if (status === 'PENDING') return { label: '거래대기', color: 'warning' }
-  return { label: '거래중지', color: 'gray' }
+  return { label: '거래중지', color: 'danger' }
 }
 
 const formatDate = (value) => value?.slice(0, 10) || '-'

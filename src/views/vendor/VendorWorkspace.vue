@@ -225,13 +225,13 @@ const inboundItems = ref([])
 const statusMeta = (status) => {
   if (status === 'TRADING') return { label: '거래중', color: 'success' }
   if (status === 'PENDING') return { label: '거래대기', color: 'warning' }
-  return { label: '거래중지', color: 'gray' }
+  return { label: '거래중지', color: 'danger' }
 }
 
 const statusChipClass = (status) => {
   if (status === 'TRADING') return 'bg-emerald-100 text-emerald-800'
   if (status === 'PENDING') return 'bg-amber-100 text-amber-800'
-  return 'bg-slate-200 text-slate-700'
+  return 'bg-red-100 text-red-800 dark:bg-red-900/70 dark:text-red-100'
 }
 
 const loadVendor = async () => {
