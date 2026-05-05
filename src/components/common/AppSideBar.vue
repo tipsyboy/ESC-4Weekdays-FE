@@ -60,6 +60,7 @@ const isDarkMode = computed(() => themeStore.isDarkMode)
 const menus = [
   { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
   { label: '직원 관리', icon: 'assignment_ind', route: '/members' },
+  { label: '공급업체 관리', icon: 'storefront', route: '/vendors' },
 ]
 
 const isActive = (path) => route.path === path

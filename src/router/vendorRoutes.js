@@ -1,26 +1,40 @@
-import vendorList from "@/views/vendor/VendorList.vue";
-import vendorCreate from "@/views/vendor/VendorCreate.vue";
-import vendorDetail from '@/views/vendor/VendorDetail.vue'
+import vendorDashboard from '@/views/vendor/VendorDashboard.vue'
+import vendorCreate from '@/views/vendor/VendorCreate.vue'
+import vendorEdit from '@/views/vendor/VendorEdit.vue'
+import vendorWorkspace from '@/views/vendor/VendorWorkspace.vue'
+
+const INTERNAL_ROLES = ['ADMIN', 'MANAGER']
 
 const vendorRoutes = [
   {
     path: '/vendors',
-    name: 'vendorList',
-    component: vendorList,
-    meta: { roles: ['MANAGER'] },
+    name: 'vendorDashboard',
+    component: vendorDashboard,
+    meta: { roles: INTERNAL_ROLES },
   },
   {
     path: '/vendors/create',
     name: 'vendorCreate',
     component: vendorCreate,
-    meta: { roles: ['MANAGER'] },
+    meta: { roles: INTERNAL_ROLES },
+  },
+  {
+    path: '/vendors/new',
+    redirect: '/vendors/create',
+  },
+  {
+    path: '/vendors/:id/edit',
+    name: 'vendorEdit',
+    component: vendorEdit,
+    props: true,
+    meta: { roles: INTERNAL_ROLES },
   },
   {
     path: '/vendors/:id',
-    name: 'vendorDetail',
-    component: vendorDetail,
+    name: 'vendorWorkspace',
+    component: vendorWorkspace,
     props: true,
-    meta: { roles: ['MANAGER'] },
+    meta: { roles: INTERNAL_ROLES },
   },
 ]
 

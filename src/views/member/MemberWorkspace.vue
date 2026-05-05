@@ -203,7 +203,7 @@ import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
 import memberApi from '@/api/member/memberApi.js'
-import vendorApi from '@/api/vendor/index.js'
+import vendorApi from '@/api/vendor/vendorApi.js'
 import { memberStatusMeta, roleMeta } from '@/views/member/memberUiMeta.js'
 
 const route = useRoute()

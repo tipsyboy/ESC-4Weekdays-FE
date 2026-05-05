@@ -3,25 +3,25 @@
     <template #header>
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div class="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-600">Vendor Create</div>
-          <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50">공급업체 등록</h1>
+          <div class="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-600">Vendor Edit</div>
+          <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50">공급업체 수정</h1>
           <p class="mt-2 max-w-3xl text-sm text-slate-500 dark:text-slate-400">
-            공급업체 기본 정보를 등록합니다. 등록 후 담당자 승인 전까지 기본 상태는 `거래대기`입니다.
+            공급업체 기본 정보와 주소 정보를 수정합니다.
           </p>
         </div>
 
         <div class="flex flex-wrap gap-3">
-          <ButtonComp color="secondary" icon="arrow_back" @click="handleCancel">목록으로</ButtonComp>
-          <ButtonComp color="primary" icon="save" @click="submitForm">저장</ButtonComp>
+          <ButtonComp color="secondary" icon="arrow_back" @click="handleCancel">상세로</ButtonComp>
+          <ButtonComp color="primary" icon="save" :disabled="isSubmitting" @click="submitForm">저장</ButtonComp>
         </div>
       </div>
     </template>
 
-    <section class="grid grid-cols-1 gap-6 2xl:grid-cols-[1.15fr_0.85fr]">
+    <section v-if="isLoaded" class="grid grid-cols-1 gap-6 2xl:grid-cols-[1.15fr_0.85fr]">
       <article class="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900/40">
         <div class="border-b border-zinc-200 pb-4 dark:border-zinc-700">
           <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">기본 정보</h2>
-          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">공급업체 식별값과 연락 정보를 입력합니다.</p>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">공급업체 식별값과 연락 정보를 수정합니다.</p>
         </div>
 
         <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -32,11 +32,10 @@
           </label>
 
           <div class="flex flex-col gap-1.5">
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">거래 상태</span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">현재 거래 상태</span>
             <div class="input-base cursor-not-allowed bg-zinc-100 text-slate-500 dark:bg-zinc-800/70 dark:text-slate-400">
-              거래대기
+              {{ statusLabel(form.status) }}
             </div>
-            <span class="text-xs text-slate-500 dark:text-slate-400">등록 후 승인하면 거래중으로 변경됩니다.</span>
           </div>
 
           <label class="flex flex-col gap-1.5">
@@ -78,7 +77,7 @@
         <article class="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900/40">
           <div class="border-b border-zinc-200 pb-4 dark:border-zinc-700">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">주소 정보</h2>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">1차에서는 기본 주소만 우선 관리합니다.</p>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">기본 주소 정보를 수정합니다.</p>
           </div>
 
           <div class="mt-6 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950/60">
@@ -108,20 +107,22 @@
             </div>
           </div>
         </article>
-
       </div>
     </section>
   </AppPageLayout>
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import vendorApi from '@/api/vendor/vendorApi.js'
 
+const route = useRoute()
 const router = useRouter()
+const isLoaded = ref(false)
+const isSubmitting = ref(false)
 const submitted = ref(false)
 const touched = reactive({
   name: false,
@@ -175,36 +176,54 @@ const handlePhoneInput = (event) => {
   form.phoneNumber = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
 }
 
-const isDirty = computed(() =>
-  Boolean(
-    form.name.trim() ||
-    form.managerName.trim() ||
-    form.phoneNumber.trim() ||
-    form.email.trim() ||
-    form.description.trim() ||
-    form.address.zipcode.trim() ||
-    form.address.city.trim() ||
-    form.address.street.trim() ||
-    form.address.detail.trim(),
-  ),
-)
+const statusLabel = (status) => {
+  if (status === 'ACTIVE') return '거래중'
+  if (status === 'INACTIVE') return '거래대기'
+  return '거래중지'
+}
 
-const handleCancel = () => {
-  if (isDirty.value && !confirm('입력 중인 내용이 있습니다. 목록으로 이동하시겠습니까?')) {
+const applyVendor = (vendor) => {
+  form.name = vendor.name || ''
+  form.managerName = vendor.managerName || ''
+  form.phoneNumber = vendor.phoneNumber || ''
+  form.email = vendor.email || ''
+  form.status = vendor.status || 'INACTIVE'
+  form.description = vendor.description || ''
+  form.address.zipcode = vendor.address?.zipcode || ''
+  form.address.city = vendor.address?.city || ''
+  form.address.street = vendor.address?.street || ''
+  form.address.detail = vendor.address?.detail || ''
+  form.address.country = vendor.address?.country || 'KR'
+}
+
+const loadVendor = async () => {
+  const res = await vendorApi.getVendorDetail(route.params.id)
+  if (!res.success || !res.results) {
+    alert(res.message || '공급업체 정보를 불러오지 못했습니다.')
+    router.push('/vendors')
     return
   }
 
-  router.push('/vendors')
+  applyVendor(res.results)
+  isLoaded.value = true
+}
+
+onMounted(loadVendor)
+
+const handleCancel = () => {
+  router.push(`/vendors/${route.params.id}`)
 }
 
 const submitForm = async () => {
   submitted.value = true
 
-  if (!isValid.value) {
+  if (!isValid.value || isSubmitting.value) {
     return
   }
 
-  const res = await vendorApi.createVendor({
+  isSubmitting.value = true
+
+  const res = await vendorApi.updateVendor(route.params.id, {
     name: form.name.trim(),
     phoneNumber: form.phoneNumber.trim(),
     email: form.email.trim(),
@@ -217,11 +236,14 @@ const submitForm = async () => {
       country: form.address.country,
     },
   })
+
+  isSubmitting.value = false
+
   if (!res.success) {
-    alert(res.message || '공급업체 등록에 실패했습니다.')
+    alert(res.message || '공급업체 수정에 실패했습니다.')
     return
   }
 
-  router.push('/vendors')
+  router.push(`/vendors/${route.params.id}`)
 }
 </script>
