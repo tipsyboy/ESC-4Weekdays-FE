@@ -1,11 +1,11 @@
 <template>
   <aside
-    class="flex flex-col border-r transition-all duration-300 bg-white dark:bg-[#0f172a] border-gray-100 dark:border-gray-800"
+    class="flex flex-col border-r bg-white dark:bg-[#0f172a] border-gray-100 dark:border-gray-800 transition-[width,background-color,border-color] duration-200 ease-out"
     :class="isCollapsed ? 'w-20' : 'w-64'">
     <!-- 메뉴 -->
     <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-      <RouterLink v-for="menu in munus" :key="menu.label" :to="menu.route"
-        class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group relative" :class="[
+      <RouterLink v-for="menu in menus" :key="menu.label" :to="menu.route"
+        class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-150 ease-out group relative" :class="[
           isActive(menu.route)
             ? 'bg-primary/10 text-primary dark:bg-primary/20'
             : 'text-gray-700 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary',
@@ -27,7 +27,7 @@
       <div class="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700 flex justify-center gap-2">
         <!-- 다크모드 -->
         <button
-          class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary/10 dark:hover:bg-primary/20 transition-all"
+          class="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 transition-colors duration-150 ease-out dark:bg-gray-800 hover:bg-primary/10 dark:hover:bg-primary/20"
           @click="handleToggleDarkMode" title="Toggle dark mode">
           <span class="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-300">
             {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
@@ -36,7 +36,7 @@
 
         <!-- 사이드바 토글 -->
         <button @click="isCollapsed = !isCollapsed"
-          class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary/10 dark:hover:bg-primary/20 transition-all"
+          class="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 transition-colors duration-150 ease-out dark:bg-gray-800 hover:bg-primary/10 dark:hover:bg-primary/20"
           title="Toggle sidebar">
           <span class="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-300">
             {{ isCollapsed ? 'menu' : 'menu_open' }}
@@ -48,15 +48,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useThemeStore } from '@/stores/theme.js'
 
 const route = useRoute()
 const themeStore = useThemeStore()
 const isCollapsed = ref(false)
+const isDarkMode = computed(() => themeStore.isDarkMode)
 
-const munus = [
+const menus = [
   { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
   { label: '직원 관리', icon: 'assignment_ind', route: '/members' },
 ]
