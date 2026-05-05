@@ -73,9 +73,9 @@
                 class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-cyan-600 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
               >
                 <option value="">전체</option>
-                <option value="ACTIVE">거래중</option>
-                <option value="INACTIVE">거래대기</option>
-                <option value="SUSPENDED">거래중지</option>
+                <option value="TRADING">거래중</option>
+                <option value="PENDING">거래대기</option>
+                <option value="STOPPED">거래중지</option>
               </select>
             </div>
           </div>

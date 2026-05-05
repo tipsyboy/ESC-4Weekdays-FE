@@ -155,9 +155,9 @@ const selectedStatus = ref('ALL')
 
 const statusFilters = [
   { value: 'ALL', label: '전체' },
-  { value: 'ACTIVE', label: '거래중' },
-  { value: 'INACTIVE', label: '거래대기' },
-  { value: 'SUSPENDED', label: '거래중지' },
+  { value: 'TRADING', label: '거래중' },
+  { value: 'PENDING', label: '거래대기' },
+  { value: 'STOPPED', label: '거래중지' },
 ]
 
 watch(
@@ -192,14 +192,14 @@ const filteredVendors = computed(() => {
 })
 
 const statusLabel = (status) => {
-  if (status === 'ACTIVE') return '거래중'
-  if (status === 'INACTIVE') return '거래대기'
+  if (status === 'TRADING') return '거래중'
+  if (status === 'PENDING') return '거래대기'
   return '거래중지'
 }
 
 const statusPillClass = (status) => {
-  if (status === 'ACTIVE') return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200'
-  if (status === 'INACTIVE') return 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-200'
+  if (status === 'TRADING') return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200'
+  if (status === 'PENDING') return 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-200'
   return 'bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-100'
 }
 

@@ -36,38 +36,38 @@
 
                 <div class="flex flex-wrap justify-end gap-2">
                   <ButtonComp
-                    v-if="vendor.status === 'INACTIVE'"
+                    v-if="vendor.status === 'PENDING'"
                     color="primary"
                     icon="check_circle"
                     size="sm"
-                    @click="changeStatus('ACTIVE')"
+                    @click="changeStatus('TRADING')"
                   >
                     거래 승인
                   </ButtonComp>
                   <ButtonComp
-                    v-if="vendor.status === 'ACTIVE'"
+                    v-if="vendor.status === 'TRADING'"
                     color="secondary"
                     icon="pause_circle"
                     size="sm"
-                    @click="changeStatus('SUSPENDED')"
+                    @click="changeStatus('STOPPED')"
                   >
                     거래중지
                   </ButtonComp>
                   <ButtonComp
-                    v-if="vendor.status === 'SUSPENDED'"
+                    v-if="vendor.status === 'STOPPED'"
                     color="primary"
                     icon="play_circle"
                     size="sm"
-                    @click="changeStatus('ACTIVE')"
+                    @click="changeStatus('TRADING')"
                   >
                     거래 재개
                   </ButtonComp>
                   <ButtonComp
-                    v-if="vendor.status !== 'INACTIVE'"
+                    v-if="vendor.status !== 'PENDING'"
                     color="secondary"
                     icon="schedule"
                     size="sm"
-                    @click="changeStatus('INACTIVE')"
+                    @click="changeStatus('PENDING')"
                   >
                     거래대기
                   </ButtonComp>
@@ -223,14 +223,14 @@ const asnItems = ref([])
 const inboundItems = ref([])
 
 const statusMeta = (status) => {
-  if (status === 'ACTIVE') return { label: '거래중', color: 'success' }
-  if (status === 'INACTIVE') return { label: '거래대기', color: 'warning' }
+  if (status === 'TRADING') return { label: '거래중', color: 'success' }
+  if (status === 'PENDING') return { label: '거래대기', color: 'warning' }
   return { label: '거래중지', color: 'gray' }
 }
 
 const statusChipClass = (status) => {
-  if (status === 'ACTIVE') return 'bg-emerald-100 text-emerald-800'
-  if (status === 'INACTIVE') return 'bg-amber-100 text-amber-800'
+  if (status === 'TRADING') return 'bg-emerald-100 text-emerald-800'
+  if (status === 'PENDING') return 'bg-amber-100 text-amber-800'
   return 'bg-slate-200 text-slate-700'
 }
 

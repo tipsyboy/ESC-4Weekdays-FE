@@ -242,8 +242,8 @@ const searchParams = reactive({
 })
 
 const statusMeta = (status) => {
-  if (status === 'ACTIVE') return { label: '거래중', color: 'success' }
-  if (status === 'INACTIVE') return { label: '거래대기', color: 'warning' }
+  if (status === 'TRADING') return { label: '거래중', color: 'success' }
+  if (status === 'PENDING') return { label: '거래대기', color: 'warning' }
   return { label: '거래중지', color: 'gray' }
 }
 
@@ -305,9 +305,9 @@ onMounted(loadVendors)
 
 const summaryCards = computed(() => [
   { title: '전체 공급업체', value: `${summaryVendors.value.length}`, description: '현재 등록된 공급업체 수', icon: 'storefront' },
-  { title: '거래중 업체', value: `${summaryVendors.value.filter((vendor) => vendor.status === 'ACTIVE').length}`, description: '현재 거래 가능한 공급업체', icon: 'check_circle' },
-  { title: '거래대기 업체', value: `${summaryVendors.value.filter((vendor) => vendor.status === 'INACTIVE').length}`, description: '검토 또는 초기 등록 단계', icon: 'hourglass_top' },
-  { title: '거래중지 업체', value: `${summaryVendors.value.filter((vendor) => vendor.status === 'SUSPENDED').length}`, description: '현재 신규 거래 중지 상태', icon: 'pause_circle' },
+  { title: '거래중 업체', value: `${summaryVendors.value.filter((vendor) => vendor.status === 'TRADING').length}`, description: '현재 거래 가능한 공급업체', icon: 'check_circle' },
+  { title: '거래대기 업체', value: `${summaryVendors.value.filter((vendor) => vendor.status === 'PENDING').length}`, description: '검토 또는 초기 등록 단계', icon: 'hourglass_top' },
+  { title: '거래중지 업체', value: `${summaryVendors.value.filter((vendor) => vendor.status === 'STOPPED').length}`, description: '현재 신규 거래 중지 상태', icon: 'pause_circle' },
 ])
 
 const hasActiveSearch = computed(() =>
@@ -327,7 +327,7 @@ const activeSearchChips = computed(() => {
   return chips
 })
 
-const pendingVendors = computed(() => summaryVendors.value.filter((vendor) => vendor.status === 'INACTIVE'))
+const pendingVendors = computed(() => summaryVendors.value.filter((vendor) => vendor.status === 'PENDING'))
 
 const recentChanges = computed(() =>
   [...summaryVendors.value]

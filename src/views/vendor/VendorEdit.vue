@@ -40,8 +40,8 @@
 
           <label class="flex flex-col gap-1.5">
             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">담당자명</span>
-            <input v-model="form.managerName" class="input-base" placeholder="담당자명을 입력하세요" />
-            <span class="text-xs text-slate-500 dark:text-slate-400">현재 BE 저장 필드는 아니며 후속 vendor 담당자 작업에서 연결합니다.</span>
+            <input v-model="form.managerName" class="input-base" placeholder="담당자명을 입력하세요" @blur="touchField('managerName')" />
+            <span v-if="showError('managerName')" class="text-sm text-rose-500">{{ errors.managerName }}</span>
           </label>
 
           <label class="flex flex-col gap-1.5">
@@ -126,6 +126,7 @@ const isSubmitting = ref(false)
 const submitted = ref(false)
 const touched = reactive({
   name: false,
+  managerName: false,
   phoneNumber: false,
   street: false,
 })
@@ -135,7 +136,7 @@ const form = reactive({
   managerName: '',
   phoneNumber: '',
   email: '',
-  status: 'INACTIVE',
+  status: 'PENDING',
   description: '',
   address: {
     zipcode: '',
@@ -148,11 +149,12 @@ const form = reactive({
 
 const errors = computed(() => ({
   name: form.name.trim() ? '' : '공급업체명을 입력해주세요.',
+  managerName: form.managerName.trim() ? '' : '담당자명을 입력해주세요.',
   phoneNumber: form.phoneNumber.trim() ? '' : '연락처를 입력해주세요.',
   street: form.address.street.trim() ? '' : '기본 주소를 입력해주세요.',
 }))
 
-const isValid = computed(() => !errors.value.name && !errors.value.phoneNumber && !errors.value.street)
+const isValid = computed(() => !errors.value.name && !errors.value.managerName && !errors.value.phoneNumber && !errors.value.street)
 
 const touchField = (field) => {
   touched[field] = true
@@ -177,8 +179,8 @@ const handlePhoneInput = (event) => {
 }
 
 const statusLabel = (status) => {
-  if (status === 'ACTIVE') return '거래중'
-  if (status === 'INACTIVE') return '거래대기'
+  if (status === 'TRADING') return '거래중'
+  if (status === 'PENDING') return '거래대기'
   return '거래중지'
 }
 
@@ -187,7 +189,7 @@ const applyVendor = (vendor) => {
   form.managerName = vendor.managerName || ''
   form.phoneNumber = vendor.phoneNumber || ''
   form.email = vendor.email || ''
-  form.status = vendor.status || 'INACTIVE'
+  form.status = vendor.status || 'PENDING'
   form.description = vendor.description || ''
   form.address.zipcode = vendor.address?.zipcode || ''
   form.address.city = vendor.address?.city || ''
@@ -225,6 +227,7 @@ const submitForm = async () => {
 
   const res = await vendorApi.updateVendor(route.params.id, {
     name: form.name.trim(),
+    managerName: form.managerName.trim(),
     phoneNumber: form.phoneNumber.trim(),
     email: form.email.trim(),
     description: form.description.trim(),
