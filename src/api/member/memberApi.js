@@ -1,5 +1,19 @@
 import api from '@/plugin/axiosInterceptor.js'
-import { fail, ok, unwrap, unwrapMessage } from '@/api/common/response.js'
+import { unwrap, unwrapMessage } from '@/api/common/response.js'
+
+const ok = (response, fallbackResults = null) => ({
+  success: response?.data?.success ?? true,
+  code: response?.data?.code ?? 200,
+  message: response?.data?.message ?? '',
+  results: unwrap(response) ?? fallbackResults,
+})
+
+const fail = (error, fallbackMessage) => ({
+  success: false,
+  code: error.response?.data?.code || error.response?.status || 500,
+  message: unwrapMessage(error, fallbackMessage),
+  results: null,
+})
 
 const memberList = async (page = 0, size = 20) => {
   try {
