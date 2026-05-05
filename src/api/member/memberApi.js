@@ -67,7 +67,14 @@ const memberEdit = async (id, payload) => {
 
 const updateMember = async (id, payload) => memberEdit(id, payload)
 
-const updateMemberStatus = async (id, status) => memberEdit(id, { status })
+const updateMemberStatus = async (id, status) => {
+  try {
+    const { data } = await api.patch(`/api/members/${id}/status`, { status })
+    return ok(data?.results ?? null, data)
+  } catch (error) {
+    return normalizeError(error, '직원 상태 변경에 실패했습니다.')
+  }
+}
 
 const memberEmailCheck = async (payload) => {
   try {
