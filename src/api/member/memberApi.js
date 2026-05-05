@@ -19,7 +19,7 @@ const ok = (results, data) => ({
 
 const memberList = async (page = 0, size = 20) => {
   try {
-    const { data } = await api.get('/api/member/list', { params: { page, size } })
+    const { data } = await api.get('/api/members', { params: { page, size } })
     return ok(data?.results ?? { content: [], totalPages: 0, totalElements: 0, size, number: page }, data)
   } catch (error) {
     return normalizeError(error, '직원 목록 조회에 실패했습니다.')
@@ -30,7 +30,7 @@ const getMembers = async () => memberList(0, 200)
 
 const memberDetail = async (id) => {
   try {
-    const { data } = await api.get(`/api/member/${id}`)
+    const { data } = await api.get(`/api/members/${id}`)
     return ok(data?.results ?? null, data)
   } catch (error) {
     return normalizeError(error, '직원 상세 조회에 실패했습니다.')
@@ -41,7 +41,7 @@ const getMemberDetail = async (id) => memberDetail(id)
 
 const memberCreate = async (payload) => {
   try {
-    const { data } = await api.post('/api/member/signup', payload)
+    const { data } = await api.post('/api/members', payload)
     return ok(data?.results ?? null, data)
   } catch (error) {
     return normalizeError(error, '직원 등록에 실패했습니다.')
@@ -58,7 +58,7 @@ const createMember = async (payload) => {
 
 const memberEdit = async (id, payload) => {
   try {
-    const { data } = await api.patch(`/api/member/${id}`, payload)
+    const { data } = await api.patch(`/api/members/${id}`, payload)
     return ok(data?.results ?? null, data)
   } catch (error) {
     return normalizeError(error, '직원 수정에 실패했습니다.')
@@ -71,7 +71,7 @@ const updateMemberStatus = async (id, status) => memberEdit(id, { status })
 
 const memberEmailCheck = async (payload) => {
   try {
-    const { data } = await api.post('/api/member/check-email', payload)
+    const { data } = await api.post('/api/members/check-email', payload)
     return ok(data?.results ?? data?.message ?? null, data)
   } catch (error) {
     return normalizeError(error, '이메일 중복 확인에 실패했습니다.')
@@ -80,7 +80,7 @@ const memberEmailCheck = async (payload) => {
 
 const MemberSearch = async (page = 0, size = 20, searchParams = {}) => {
   try {
-    const { data } = await api.get('/api/member/search', {
+    const { data } = await api.get('/api/members/search', {
       params: {
         page,
         size,
