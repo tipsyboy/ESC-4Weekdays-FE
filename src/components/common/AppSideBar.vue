@@ -62,9 +62,16 @@ const menus = [
   { label: '직원 관리', icon: 'assignment_ind', route: '/members' },
   { label: '공급업체 관리', icon: 'storefront', route: '/vendors' },
   { label: '상품 관리', icon: 'inventory_2', route: '/products' },
+  { label: '발주', icon: 'receipt_long', route: '/purchase-orders' },
 ]
 
-const isActive = (path) => route.path === path
+const isActive = (path) => {
+  if (path === '/purchase-orders') {
+    return route.path.startsWith('/purchase-orders')
+  }
+
+  return route.path === path
+}
 
 const handleToggleDarkMode = () => {
   themeStore.toggleDarkMode()
