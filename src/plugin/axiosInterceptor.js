@@ -2,6 +2,20 @@ import axios from 'axios'
 
 axios.defaults.withCredentials = true
 
+let isRefreshing = false
+let refreshQueue = []
+
+const resolveRefreshQueue = (error = null) => {
+  refreshQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error)
+      return
+    }
+    resolve()
+  })
+  refreshQueue = []
+}
+
 const api = axios.create({
   // baseURL: 'http://localhost:8080',
   baseURL: '',
@@ -26,7 +40,7 @@ api.interceptors.response.use(
     // console.log('응답을 받기 전 실행')
     return response
   },
-  (error) => {
+  async (error) => {
     // console.log('응답 받을 때 에러 처리')
 
     // const userStore = useUserStore()
@@ -35,6 +49,36 @@ api.interceptors.response.use(
     //   alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.')
     //   userStore.logout()
     // }
+
+    const originalRequest = error.config
+    const status = error.response?.status
+    const requestUrl = originalRequest?.url || ''
+    const isAuthRequest = requestUrl.includes('/api/login')
+      || requestUrl.includes('/api/auth/reissue')
+      || requestUrl.includes('/api/auth/logout')
+
+    if (status === 401 && originalRequest && !originalRequest._retry && !isAuthRequest) {
+      originalRequest._retry = true
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          refreshQueue.push({ resolve, reject })
+        }).then(() => api(originalRequest))
+      }
+
+      isRefreshing = true
+
+      try {
+        await axios.post('/api/auth/reissue', null, { withCredentials: true })
+        resolveRefreshQueue()
+        return api(originalRequest)
+      } catch (refreshError) {
+        resolveRefreshQueue(refreshError)
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
+    }
 
     return Promise.reject(error)
   },
