@@ -1,24 +1,53 @@
-import ProductList from '@/views/product/ProductList.vue'
-import ProductRegister from '@/views/product/ProductRegister.vue'
-import ProductDetail from '@/views/product/ProductDetail.vue'
+import productDashboard from '@/views/product/ProductDashboard.vue'
+import productCreate from '@/views/product/ProductCreate.vue'
+import productEdit from '@/views/product/ProductEdit.vue'
+import productWorkspace from '@/views/product/ProductWorkspace.vue'
 
-export default [
+const INTERNAL_ROLES = ['ADMIN', 'MANAGER']
+
+const productRoutes = [
+  {
+    path: '/products',
+    name: 'productDashboard',
+    component: productDashboard,
+    meta: { roles: INTERNAL_ROLES },
+  },
+  {
+    path: '/products/create',
+    name: 'productCreate',
+    component: productCreate,
+    meta: { roles: INTERNAL_ROLES },
+  },
+  {
+    path: '/products/new',
+    redirect: '/products/create',
+  },
+  {
+    path: '/products/:id/edit',
+    name: 'productEdit',
+    component: productEdit,
+    props: true,
+    meta: { roles: INTERNAL_ROLES },
+  },
+  {
+    path: '/products/:id',
+    name: 'productWorkspace',
+    component: productWorkspace,
+    props: true,
+    meta: { roles: INTERNAL_ROLES },
+  },
   {
     path: '/product',
-    name: 'ProductList',
-    component: ProductList,
-    meta: { roles: ['MANAGER'] },
+    redirect: '/products',
   },
   {
     path: '/product/register',
-    name: 'ProductRegister',
-    component: ProductRegister,
-    meta: { roles: ['MANAGER'] },
+    redirect: '/products/create',
   },
   {
     path: '/product/:id',
-    name: 'ProductDetail',
-    component: ProductDetail,
-    meta: { roles: ['MANAGER'] },
+    redirect: (to) => `/products/${to.params.id}`,
   },
 ]
+
+export default productRoutes
