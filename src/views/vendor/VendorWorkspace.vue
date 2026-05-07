@@ -262,7 +262,7 @@ const loadTradeData = async () => {
     : []
 
   purchaseOrders.value = purchaseOrdersRes.success
-    ? (purchaseOrdersRes.results || []).map((item) => ({
+    ? (purchaseOrdersRes.results?.content || []).map((item) => ({
         id: item.id,
         title: item.purchaseOrderNumber,
         meta: `${formatDate(item.requestedAt)} · 수량 ${formatNumber(item.totalQuantity)} / ${formatAmount(item.totalAmount)}`,
