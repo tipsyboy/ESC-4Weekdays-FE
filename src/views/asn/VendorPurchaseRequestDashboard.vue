@@ -6,11 +6,25 @@
           <div class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-600">Vendor Purchase Request</div>
           <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50">발주 요청 목록</h1>
           <p class="mt-2 max-w-3xl text-sm text-slate-500 dark:text-slate-400">
-            로그인한 공급업체 계정 기준으로 전달된 발주 요청과 ASN 회신 여부를 확인합니다.
+            공급업체 기준으로 전달된 발주 요청과 ASN 회신 여부를 확인합니다.
           </p>
         </div>
 
-        <div class="flex flex-wrap gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+          <label v-if="authStore.isAdmin" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+            <span class="font-medium">공급업체</span>
+            <select
+              v-model="selectedVendorId"
+              class="h-10 min-w-[220px] rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 dark:focus:ring-emerald-950"
+              :disabled="isVendorLoading"
+              @change="handleVendorChange"
+            >
+              <option value="">업체 선택</option>
+              <option v-for="vendor in vendorOptions" :key="vendor.id" :value="String(vendor.id)">
+                {{ vendor.name }}
+              </option>
+            </select>
+          </label>
           <ButtonComp color="secondary" icon="refresh" @click="loadPage">목록 새로고침</ButtonComp>
         </div>
       </div>
@@ -149,14 +163,24 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const purchaseOrders = ref([])
+const vendorOptions = ref([])
+const selectedVendorId = ref('')
 const selectedStatus = ref('ALL')
 const isLoading = ref(false)
+const isVendorLoading = ref(false)
 const errorMessage = ref('')
 const currentPage = ref(0)
 const pageSize = 10
 const totalElements = ref(0)
 const totalPages = ref(0)
 const summary = ref({
+  totalCount: 0,
+  noneCount: 0,
+  doneCount: 0,
+  rejectedCount: 0,
+})
+
+const emptySummary = () => ({
   totalCount: 0,
   noneCount: 0,
   doneCount: 0,
@@ -170,6 +194,9 @@ const statusTabs = [
   { value: 'REJECTED', label: '회신불가' },
 ]
 
+const activeVendorId = computed(() =>
+  authStore.isAdmin ? selectedVendorId.value : authStore.vendorId,
+)
 const hydratedPurchaseOrders = computed(() => purchaseOrders.value)
 const pageEndIndex = computed(() =>
   totalElements.value === 0 ? 0 : Math.min((currentPage.value + 1) * pageSize, totalElements.value),
@@ -246,7 +273,7 @@ const loadPurchaseOrders = async (vendorId) => {
     purchaseOrders.value = []
     totalElements.value = 0
     totalPages.value = 0
-    summary.value = { totalCount: 0, noneCount: 0, doneCount: 0 }
+    summary.value = emptySummary()
     errorMessage.value = purchaseOrderRes.message || '발주 요청 목록 조회에 실패했습니다.'
     isLoading.value = false
     return
@@ -255,21 +282,39 @@ const loadPurchaseOrders = async (vendorId) => {
   purchaseOrders.value = (purchaseOrderRes.results?.content || []).filter((item) => item.status === 'ORDERED')
   totalElements.value = purchaseOrderRes.results?.totalElements || 0
   totalPages.value = purchaseOrderRes.results?.totalPages || 0
-  summary.value = purchaseOrderRes.results?.summary || { totalCount: 0, noneCount: 0, doneCount: 0 }
+  summary.value = purchaseOrderRes.results?.summary || emptySummary()
   isLoading.value = false
 }
 
-const loadPage = async () => {
-  if (!authStore.vendorId) {
-    purchaseOrders.value = []
-    totalElements.value = 0
-    totalPages.value = 0
-    summary.value = { totalCount: 0, noneCount: 0, doneCount: 0, rejectedCount: 0 }
-    errorMessage.value = '연결된 공급업체 계정 정보가 없습니다.'
+const loadVendorOptions = async () => {
+  if (!authStore.isAdmin) {
     return
   }
 
-  await loadPurchaseOrders(authStore.vendorId)
+  isVendorLoading.value = true
+  const res = await vendorApi.getVendors({
+    page: 0,
+    size: 200,
+    sortBy: 'name',
+    sortDirection: 'asc',
+  })
+  vendorOptions.value = res.success ? (res.results?.content || []) : []
+  selectedVendorId.value = selectedVendorId.value || String(vendorOptions.value[0]?.id || '')
+  isVendorLoading.value = false
+}
+
+const loadPage = async () => {
+  const vendorId = activeVendorId.value
+  if (!vendorId) {
+    purchaseOrders.value = []
+    totalElements.value = 0
+    totalPages.value = 0
+    summary.value = emptySummary()
+    errorMessage.value = authStore.isAdmin ? '조회할 공급업체를 선택하세요.' : '연결된 공급업체 계정 정보가 없습니다.'
+    return
+  }
+
+  await loadPurchaseOrders(vendorId)
 }
 
 const goDetail = (purchaseOrderId) => {
@@ -280,13 +325,22 @@ const goDetail = (purchaseOrderId) => {
 }
 
 const movePage = async (page) => {
-  if (page < 0 || page >= totalPages.value || !authStore.vendorId) {
+  const vendorId = activeVendorId.value
+  if (page < 0 || page >= totalPages.value || !vendorId) {
     return
   }
 
   currentPage.value = page
-  await loadPurchaseOrders(authStore.vendorId)
+  await loadPurchaseOrders(vendorId)
 }
 
-onMounted(loadPage)
+const handleVendorChange = async () => {
+  currentPage.value = 0
+  await loadPage()
+}
+
+onMounted(async () => {
+  await loadVendorOptions()
+  await loadPage()
+})
 </script>
