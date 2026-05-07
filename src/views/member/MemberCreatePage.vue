@@ -75,7 +75,15 @@
 
             <label class="space-y-2">
               <span class="text-sm font-medium text-slate-700 dark:text-slate-200">연락처</span>
-              <input v-model="form.phoneNumber" type="text" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 dark:focus:ring-sky-950" placeholder="연락처 입력" />
+              <input
+                v-model="form.phoneNumber"
+                type="tel"
+                inputmode="numeric"
+                maxlength="13"
+                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 dark:focus:ring-sky-950"
+                placeholder="010-0000-0000"
+                @input="handlePhoneInput"
+              />
             </label>
 
             <label class="space-y-2">
@@ -197,6 +205,22 @@ watch(
 const loadVendors = async () => {
   const res = await vendorApi.getVendors({ page: 0, size: 200, sortBy: 'name', sortDirection: 'asc' })
   vendors.value = res.success ? (res.results?.content || []) : (res.results?.content || res.result?.content || [])
+}
+
+const handlePhoneInput = (event) => {
+  const digits = event.target.value.replace(/\D/g, '').slice(0, 11)
+
+  if (digits.length <= 3) {
+    form.phoneNumber = digits
+    return
+  }
+
+  if (digits.length <= 7) {
+    form.phoneNumber = `${digits.slice(0, 3)}-${digits.slice(3)}`
+    return
+  }
+
+  form.phoneNumber = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
 }
 
 const resetForm = () => {

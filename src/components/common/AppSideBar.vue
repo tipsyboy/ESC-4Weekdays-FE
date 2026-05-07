@@ -4,7 +4,7 @@
     :class="isCollapsed ? 'w-20' : 'w-64'">
     <!-- 메뉴 -->
     <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-      <RouterLink v-for="menu in menus" :key="menu.label" :to="menu.route"
+      <RouterLink v-for="menu in visibleMenus" :key="menu.label" :to="menu.route"
         class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-150 ease-out group relative" :class="[
           isActive(menu.route)
             ? 'bg-primary/10 text-primary dark:bg-primary/20'
@@ -51,23 +51,37 @@
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useThemeStore } from '@/stores/theme.js'
+import { useAuthStore } from '@/stores/authStore.js'
 
 const route = useRoute()
 const themeStore = useThemeStore()
+const authStore = useAuthStore()
 const isCollapsed = ref(false)
 const isDarkMode = computed(() => themeStore.isDarkMode)
 
 const menus = [
-  { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
-  { label: '직원 관리', icon: 'assignment_ind', route: '/members' },
-  { label: '공급업체 관리', icon: 'storefront', route: '/vendors' },
-  { label: '상품 관리', icon: 'inventory_2', route: '/products' },
-  { label: '발주', icon: 'receipt_long', route: '/purchase-orders' },
+  { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: ['ADMIN', 'MANAGER'] },
+  { label: '직원 관리', icon: 'assignment_ind', route: '/members', roles: ['ADMIN'] },
+  { label: '공급업체 관리', icon: 'storefront', route: '/vendors', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
+  { label: '상품 관리', icon: 'inventory_2', route: '/products', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
+  { label: '발주', icon: 'receipt_long', route: '/purchase-orders', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
+  { label: 'ASN', icon: 'local_shipping', route: '/asns', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
+  { label: '공급업체 ASN', icon: 'assignment_returned', route: '/vendor-portal/asns', roles: ['ADMIN', 'VENDOR_MANAGER'] },
 ]
+
+const visibleMenus = computed(() => menus.filter((menu) => authStore.hasAnyRole(menu.roles)))
 
 const isActive = (path) => {
   if (path === '/purchase-orders') {
     return route.path.startsWith('/purchase-orders')
+  }
+
+  if (path === '/asns') {
+    return route.path.startsWith('/asns')
+  }
+
+  if (path === '/vendor-portal/asns') {
+    return route.path.startsWith('/vendor-portal/asns')
   }
 
   return route.path === path
