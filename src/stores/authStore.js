@@ -5,6 +5,7 @@ const INTERNAL_ROLES = ['ADMIN', 'MANAGER', 'WORKER']
 
 const homeByRole = (role) => {
   if (role === 'WORKER') return '/task/Worker/view'
+  if (role === 'VENDOR_MANAGER') return '/vendor-portal/asns'
   if (INTERNAL_ROLES.includes(role)) return '/dashboard'
   return '/auth/login'
 }
@@ -18,6 +19,7 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     role: (state) => state.user?.role ?? null,
+    vendorId: (state) => state.user?.vendorId ?? null,
     isAuthenticated: (state) => Boolean(state.user),
     isAdmin: (state) => state.role === 'ADMIN',
     hasInitialized: (state) => state.initialized,

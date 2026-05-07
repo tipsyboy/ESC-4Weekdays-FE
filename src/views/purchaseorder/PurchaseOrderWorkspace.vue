@@ -294,6 +294,7 @@ import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
 import purchaseOrderApi from '@/api/purchaseorder/purchaseOrderApi.js'
+import asnApi from '@/api/asn/asnApi.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -474,8 +475,8 @@ const loadPurchaseOrder = async () => {
 
   purchaseOrder.value = res.results
 
-  // ASN/입고 API는 후속 도메인 이식 때 연결한다.
-  relatedAsns.value = []
+  const asnRes = await asnApi.getAsnByPurchaseOrderId(route.params.id)
+  relatedAsns.value = asnRes.success && asnRes.results ? [asnRes.results] : []
   relatedInbounds.value = []
 
   isLoading.value = false

@@ -63,11 +63,21 @@ const menus = [
   { label: '공급업체 관리', icon: 'storefront', route: '/vendors' },
   { label: '상품 관리', icon: 'inventory_2', route: '/products' },
   { label: '발주', icon: 'receipt_long', route: '/purchase-orders' },
+  { label: 'ASN', icon: 'local_shipping', route: '/asns' },
+  { label: '공급업체 ASN', icon: 'assignment_returned', route: '/vendor-portal/asns' },
 ]
 
 const isActive = (path) => {
   if (path === '/purchase-orders') {
     return route.path.startsWith('/purchase-orders')
+  }
+
+  if (path === '/asns') {
+    return route.path.startsWith('/asns')
+  }
+
+  if (path === '/vendor-portal/asns') {
+    return route.path.startsWith('/vendor-portal/asns')
   }
 
   return route.path === path
