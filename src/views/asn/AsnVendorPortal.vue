@@ -170,8 +170,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
-import purchaseOrderApi from '@/api/purchaseorder/purchaseOrderApi.js'
-import asnApi from '@/api/asn/asnApi.js'
+import vendorPortalApi from '@/api/vendorPortal/vendorPortalApi.js'
 import vendorApi from '@/api/vendor/vendorApi.js'
 
 const route = useRoute()
@@ -218,7 +217,7 @@ const loadPage = async () => {
   isLoading.value = true
   errorMessage.value = ''
 
-  const res = await purchaseOrderApi.getPurchaseOrderDetail(purchaseOrderId)
+  const res = await vendorPortalApi.getPurchaseOrderDetail(purchaseOrderId)
 
   if (!res.success) {
     purchaseOrder.value = null
@@ -278,7 +277,7 @@ const submitAsn = async () => {
 
   isSubmitting.value = true
 
-  const res = await asnApi.createAsn({
+  const res = await vendorPortalApi.createAsn({
     purchaseOrderId: purchaseOrder.value.id,
     expectedArrivalAt: form.status === 'RECEIVED' ? `${form.expectedArrivalAt}:00` : null,
     status: form.status,

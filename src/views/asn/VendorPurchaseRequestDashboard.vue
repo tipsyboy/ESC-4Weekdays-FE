@@ -157,6 +157,7 @@ import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
 import vendorApi from '@/api/vendor/vendorApi.js'
+import vendorPortalApi from '@/api/vendorPortal/vendorPortalApi.js'
 import { useAuthStore } from '@/stores/authStore.js'
 
 const router = useRouter()
@@ -265,7 +266,8 @@ const loadPurchaseOrders = async (vendorId) => {
   isLoading.value = true
   errorMessage.value = ''
 
-  const purchaseOrderRes = await vendorApi.getVendorPurchaseOrders(vendorId, {
+  const purchaseOrderRes = await vendorPortalApi.getPurchaseOrders({
+    vendorId: authStore.isAdmin ? vendorId : undefined,
     page: currentPage.value,
     size: pageSize,
   })

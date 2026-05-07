@@ -174,8 +174,7 @@ import { useRoute, useRouter } from 'vue-router'
 import AppPageLayout from '@/layouts/AppPageLayout.vue'
 import ButtonComp from '@/components/common/ButtonComp.vue'
 import BadgeComp from '@/components/common/BadgeComp.vue'
-import purchaseOrderApi from '@/api/purchaseorder/purchaseOrderApi.js'
-import asnApi from '@/api/asn/asnApi.js'
+import vendorPortalApi from '@/api/vendorPortal/vendorPortalApi.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -259,8 +258,8 @@ const loadPage = async () => {
   errorMessage.value = ''
 
   const [purchaseOrderRes, asnRes] = await Promise.all([
-    purchaseOrderApi.getPurchaseOrderDetail(route.params.id),
-    asnApi.getAsnByPurchaseOrderId(route.params.id),
+    vendorPortalApi.getPurchaseOrderDetail(route.params.id),
+    vendorPortalApi.getAsnByPurchaseOrderId(route.params.id),
   ])
 
   if (!purchaseOrderRes.success) {
