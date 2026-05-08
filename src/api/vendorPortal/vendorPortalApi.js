@@ -66,6 +66,20 @@ const getAsnByPurchaseOrderId = async (purchaseOrderId) => {
   }
 }
 
+const getAsns = async (params = {}) => {
+  try {
+    const { data } = await api.get('/api/vendor-portal/asns', { params })
+    const page = unwrap({ data })
+
+    return ok({ data }, {
+      ...page,
+      content: (page?.content || []).map(normalizeAsn),
+    })
+  } catch (error) {
+    return fail(error, '공급업체 ASN 목록 조회에 실패했습니다.')
+  }
+}
+
 const createAsn = async (req) => {
   try {
     const payload = {
@@ -93,5 +107,6 @@ export default {
   getPurchaseOrders,
   getPurchaseOrderDetail,
   getAsnByPurchaseOrderId,
+  getAsns,
   createAsn,
 }

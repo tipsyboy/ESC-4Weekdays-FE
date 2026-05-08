@@ -13,7 +13,7 @@
         </div>
 
         <div class="flex flex-wrap gap-3">
-          <ButtonComp color="secondary" icon="arrow_back" @click="router.push('/vendor-portal/asns')">목록으로</ButtonComp>
+          <ButtonComp color="secondary" icon="arrow_back" @click="router.push('/vendor-portal/purchase-orders')">목록으로</ButtonComp>
           <ButtonComp
             v-if="purchaseOrder && !relatedAsn"
             color="primary"

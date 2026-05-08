@@ -3,6 +3,7 @@ import asnWorkspace from '@/views/asn/AsnWorkspace.vue'
 import asnVendorPortal from '@/views/asn/AsnVendorPortal.vue'
 import vendorPurchaseRequestDashboard from '@/views/asn/VendorPurchaseRequestDashboard.vue'
 import vendorPurchaseRequestWorkspace from '@/views/asn/VendorPurchaseRequestWorkspace.vue'
+import vendorAsnDashboard from '@/views/asn/VendorAsnDashboard.vue'
 import vendorAsnWorkspace from '@/views/asn/VendorAsnWorkspace.vue'
 import { INTERNAL_ROLES, VENDOR_ONLY } from '@/router/accessRoles.js'
 
@@ -35,9 +36,15 @@ const asnRoutes = [
     meta: { roles: VENDOR_ONLY },
   },
   {
-    path: '/vendor-portal/asns',
+    path: '/vendor-portal/purchase-orders',
     name: 'vendorPurchaseRequestDashboard',
     component: vendorPurchaseRequestDashboard,
+    meta: { roles: VENDOR_ONLY },
+  },
+  {
+    path: '/vendor-portal/asns',
+    name: 'vendorAsnDashboard',
+    component: vendorAsnDashboard,
     meta: { roles: VENDOR_ONLY },
   },
   {
@@ -49,7 +56,7 @@ const asnRoutes = [
   },
   {
     path: '/vendor-purchase-requests',
-    redirect: '/vendor-portal/asns',
+    redirect: '/vendor-portal/purchase-orders',
   },
   {
     path: '/vendor-purchase-requests/:id/asn-reply',
@@ -69,7 +76,7 @@ const asnRoutes = [
   },
   {
     path: '/asn/vendor',
-    redirect: '/vendor-portal/asns',
+    redirect: '/vendor-portal/purchase-orders',
   },
   {
     path: '/asn/:id',
