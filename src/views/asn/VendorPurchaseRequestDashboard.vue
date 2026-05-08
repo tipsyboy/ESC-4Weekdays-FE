@@ -3,10 +3,10 @@
     <template #header>
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-600">Vendor Purchase Request</div>
-          <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50">발주 요청 목록</h1>
+          <div class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-600">Vendor Portal</div>
+          <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50">받은 발주서</h1>
           <p class="mt-2 max-w-3xl text-sm text-slate-500 dark:text-slate-400">
-            공급업체 기준으로 전달된 발주 요청과 ASN 회신 여부를 확인합니다.
+            공급업체가 받은 발주서와 연결된 ASN 회신 상태를 확인합니다.
           </p>
         </div>
 
@@ -49,8 +49,8 @@
       <div class="border-b border-slate-200 px-6 py-5 dark:border-slate-800">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">전달된 발주 요청</h2>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">발주 완료된 건만 노출하고, ASN 회신 여부를 함께 보여줍니다.</p>
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">받은 발주서 목록</h2>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">발주 완료된 문서를 기준으로 ASN 생성 여부와 회신 상태를 함께 보여줍니다.</p>
           </div>
 
           <div class="flex flex-wrap gap-2">
@@ -78,17 +78,18 @@
               <th class="px-6 py-4 text-left font-medium">요청자</th>
               <th class="px-6 py-4 text-left font-medium">요청 납기일</th>
               <th class="px-6 py-4 text-left font-medium">품목 / 수량</th>
-              <th class="px-6 py-4 text-left font-medium">회신 상태</th>
+              <th class="px-6 py-4 text-left font-medium">ASN</th>
+              <th class="px-6 py-4 text-left font-medium">ASN 회신 상태</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="isLoading">
-              <td colspan="5" class="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+              <td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
                 목록을 불러오는 중입니다.
               </td>
             </tr>
             <tr v-else-if="errorMessage">
-              <td colspan="5" class="px-6 py-10 text-center text-sm text-rose-500">
+              <td colspan="6" class="px-6 py-10 text-center text-sm text-rose-500">
                 {{ errorMessage }}
               </td>
             </tr>
@@ -108,11 +109,17 @@
                 {{ purchaseOrder.itemCount ?? purchaseOrder.items?.length ?? 0 }}종 / {{ purchaseOrder.totalQuantity || 0 }}개
               </td>
               <td class="px-6 py-5">
+                <div class="font-medium text-slate-700 dark:text-slate-200">{{ purchaseOrder.asnNumber || 'ASN 미생성' }}</div>
+                <div v-if="purchaseOrder.asnExpectedArrivalAt" class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {{ formatDateTime(purchaseOrder.asnExpectedArrivalAt) }}
+                </div>
+              </td>
+              <td class="px-6 py-5">
                 <BadgeComp :color="replyStatusMeta(purchaseOrder).color" :label="replyStatusMeta(purchaseOrder).label" />
               </td>
             </tr>
             <tr v-if="!isLoading && !errorMessage && !filteredPurchaseOrders.length">
-              <td colspan="5" class="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+              <td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
                 조건에 맞는 발주 요청이 없습니다.
               </td>
             </tr>
@@ -213,7 +220,7 @@ const filteredPurchaseOrders = computed(() => {
 
 const summaryCards = computed(() => [
   {
-    title: '전달된 발주',
+    title: '받은 발주서',
     value: `${summary.value.totalCount}`,
     description: '현재 업체에 전달된 발주 완료 건',
     icon: 'receipt_long',
