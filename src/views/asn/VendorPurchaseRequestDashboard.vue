@@ -4,7 +4,7 @@
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-600">Vendor Portal</div>
-          <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50">받은 발주서</h1>
+          <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50">발주서</h1>
           <p class="mt-2 max-w-3xl text-sm text-slate-500 dark:text-slate-400">
             공급업체가 받은 발주서와 연결된 ASN 회신 상태를 확인합니다.
           </p>

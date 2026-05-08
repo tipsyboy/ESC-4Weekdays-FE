@@ -29,7 +29,7 @@ const asnRoutes = [
     meta: { roles: VENDOR_ONLY },
   },
   {
-    path: '/vendor-portal/purchase-requests/:id/asn',
+    path: '/vendor-portal/asns/purchase-orders/:id',
     name: 'vendorAsnWorkspace',
     component: vendorAsnWorkspace,
     props: true,
@@ -64,7 +64,11 @@ const asnRoutes = [
   },
   {
     path: '/vendor-purchase-requests/:id/asn',
-    redirect: (to) => `/vendor-portal/purchase-requests/${to.params.id}/asn`,
+    redirect: (to) => `/vendor-portal/asns/purchase-orders/${to.params.id}`,
+  },
+  {
+    path: '/vendor-portal/purchase-requests/:id/asn',
+    redirect: (to) => `/vendor-portal/asns/purchase-orders/${to.params.id}`,
   },
   {
     path: '/vendor-purchase-requests/:id',
