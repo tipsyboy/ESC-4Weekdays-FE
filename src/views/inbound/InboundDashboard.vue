@@ -12,7 +12,6 @@
 
         <div class="flex flex-wrap gap-3">
           <ButtonComp color="secondary" icon="refresh" @click="loadInbounds">목록 새로고침</ButtonComp>
-          <ButtonComp color="primary" icon="checklist" :disabled="!inboundRows.length" @click="openFirstInbound">입고 처리 보기</ButtonComp>
         </div>
       </div>
     </template>
@@ -270,11 +269,6 @@ const summaryCards = computed(() => [
   { title: '부분입고', value: `${summary.value.partialCount}`, description: '추가 입고 확인이 필요한 건', icon: 'difference' },
   { title: '입고완료', value: `${summary.value.completedCount}`, description: '검수와 수량 반영이 끝난 건', icon: 'inventory' },
 ])
-
-const openFirstInbound = () => {
-  if (!inboundRows.value.length) return
-  router.push(`/inbounds/${inboundRows.value[0].id}`)
-}
 
 const movePage = async (page) => {
   if (page < 0 || page >= totalPages.value) {
