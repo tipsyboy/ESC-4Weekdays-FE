@@ -1,26 +1,39 @@
-import InboundList from '@/views/inbound/InboundList.vue'
-import InboundCreate from '@/views/inbound/InboundCreate.vue'
-import InboundDetail from '@/views/inbound/InboundDetail.vue'
+import inboundDashboard from '@/views/inbound/InboundDashboard.vue'
+import inboundCreateWorkspace from '@/views/inbound/InboundCreateWorkspace.vue'
+import inboundWorkspace from '@/views/inbound/InboundWorkspace.vue'
+import { INTERNAL_ROLES } from '@/router/accessRoles.js'
 
 const inboundRoutes = [
   {
+    path: '/inbounds',
+    name: 'inboundDashboard',
+    component: inboundDashboard,
+    meta: { roles: INTERNAL_ROLES },
+  },
+  {
+    path: '/inbounds/create',
+    name: 'inboundCreateWorkspace',
+    component: inboundCreateWorkspace,
+    meta: { roles: INTERNAL_ROLES },
+  },
+  {
+    path: '/inbounds/:id',
+    name: 'inboundWorkspace',
+    component: inboundWorkspace,
+    props: true,
+    meta: { roles: INTERNAL_ROLES },
+  },
+  {
     path: '/inbound',
-    name: 'inboundList',
-    component: InboundList,
-    meta: { roles: ['MANAGER'] },
+    redirect: '/inbounds',
   },
   {
     path: '/inbound/create',
-    name: 'inboundCreate',
-    component: InboundCreate,
-    meta: { roles: ['MANAGER'] },
+    redirect: '/inbounds/create',
   },
   {
     path: '/inbound/:id',
-    name: 'inboundDetail',
-    component: InboundDetail,
-    props: true,
-    meta: { roles: ['MANAGER'] },
+    redirect: (to) => `/inbounds/${to.params.id}`,
   },
 ]
 

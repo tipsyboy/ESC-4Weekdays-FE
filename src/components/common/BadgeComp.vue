@@ -37,6 +37,7 @@ const colorClasses = computed(() => {
     warning: 'bg-amber-100 text-amber-800 dark:bg-amber-800 dark:text-amber-100',
     danger: 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100',
     info: 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100',
+    secondary: 'bg-violet-100 text-violet-800 dark:bg-violet-800 dark:text-violet-100',
     gray: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-100',
   }
 
@@ -46,6 +47,7 @@ const colorClasses = computed(() => {
     warning: 'text-amber-700 border border-amber-700 bg-transparent',
     danger: 'text-red-700 border border-red-700 bg-transparent',
     info: 'text-blue-700 border border-blue-700 bg-transparent',
+    secondary: 'text-violet-700 border border-violet-700 bg-transparent',
     gray: 'text-zinc-700 border border-zinc-500 bg-transparent',
   }
 
