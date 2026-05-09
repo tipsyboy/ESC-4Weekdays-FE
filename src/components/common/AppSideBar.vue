@@ -4,7 +4,7 @@
     :class="isCollapsed ? 'w-20' : 'w-64'">
     <!-- 메뉴 -->
     <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-      <RouterLink v-for="menu in visibleMenus" :key="menu.label" :to="menu.route"
+      <RouterLink v-for="menu in visibleMenus" :key="menu.route" :to="menu.route"
         class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-150 ease-out group relative" :class="[
           isActive(menu.route)
             ? 'bg-primary/10 text-primary dark:bg-primary/20'
@@ -67,6 +67,7 @@ const menus = [
   { label: '발주', icon: 'receipt_long', route: '/purchase-orders', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
   { label: 'ASN', icon: 'local_shipping', route: '/asns', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
   { label: '입고', icon: 'warehouse', route: '/inbounds', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
+  { label: '발주서', icon: 'receipt_long', route: '/vendor-portal/purchase-orders', roles: ['ADMIN', 'VENDOR_MANAGER'] },
   { label: '공급업체 ASN', icon: 'assignment_returned', route: '/vendor-portal/asns', roles: ['ADMIN', 'VENDOR_MANAGER'] },
 ]
 
@@ -83,6 +84,11 @@ const isActive = (path) => {
 
   if (path === '/inbounds') {
     return route.path.startsWith('/inbounds')
+  }
+
+  if (path === '/vendor-portal/purchase-orders') {
+    return route.path.startsWith('/vendor-portal/purchase-orders')
+      || route.path.startsWith('/vendor-portal/purchase-requests')
   }
 
   if (path === '/vendor-portal/asns') {

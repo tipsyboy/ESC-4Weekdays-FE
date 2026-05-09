@@ -13,23 +13,7 @@
         </div>
 
         <div class="flex flex-wrap gap-3">
-          <ButtonComp color="secondary" icon="arrow_back" @click="router.push('/vendor-portal/asns')">목록으로</ButtonComp>
-          <ButtonComp
-            v-if="purchaseOrder && !relatedAsn"
-            color="primary"
-            icon="arrow_forward"
-            @click="goReply"
-          >
-            ASN 회신 작성
-          </ButtonComp>
-          <ButtonComp
-            v-if="relatedAsn"
-            color="secondary"
-            icon="visibility"
-            @click="goAsnDetail"
-          >
-            ASN 상세
-          </ButtonComp>
+          <ButtonComp color="secondary" icon="arrow_back" @click="router.push('/vendor-portal/purchase-orders')">목록으로</ButtonComp>
         </div>
       </div>
     </template>
@@ -106,7 +90,30 @@
 
             <div class="detail-card">
               <div class="detail-label">연결 ASN</div>
-              <div class="detail-value">{{ relatedAsn?.asnNumber || '-' }}</div>
+              <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div class="detail-value mt-0">{{ relatedAsn?.asnNumber || 'ASN 미생성' }}</div>
+                  <div class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    {{ relatedAsn ? '이 발주서에 연결된 ASN 문서' : '아직 공급업체 ASN 회신이 없습니다.' }}
+                  </div>
+                </div>
+                <ButtonComp
+                  v-if="relatedAsn"
+                  color="secondary"
+                  icon="visibility"
+                  @click="goAsnDetail"
+                >
+                  보기
+                </ButtonComp>
+                <ButtonComp
+                  v-else
+                  color="primary"
+                  icon="edit"
+                  @click="goReply"
+                >
+                  회신 작성
+                </ButtonComp>
+              </div>
             </div>
 
             <div class="detail-card">

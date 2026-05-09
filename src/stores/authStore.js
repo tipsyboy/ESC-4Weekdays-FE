@@ -5,7 +5,7 @@ const INTERNAL_ROLES = ['ADMIN', 'MANAGER', 'WORKER']
 
 const homeByRole = (role) => {
   if (role === 'WORKER') return '/task/Worker/view'
-  if (role === 'VENDOR_MANAGER') return '/vendor-portal/asns'
+  if (role === 'VENDOR_MANAGER') return '/vendor-portal/purchase-orders'
   if (INTERNAL_ROLES.includes(role)) return '/dashboard'
   return '/auth/login'
 }

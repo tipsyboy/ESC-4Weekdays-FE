@@ -11,7 +11,7 @@
         </div>
 
         <div class="flex flex-wrap gap-3">
-          <ButtonComp color="secondary" icon="arrow_back" @click="router.push(`/vendor-portal/purchase-requests/${route.params.id}`)">발주 요청 상세로</ButtonComp>
+          <ButtonComp color="secondary" icon="arrow_back" @click="router.push('/vendor-portal/asns')">목록으로</ButtonComp>
         </div>
       </div>
     </template>
@@ -93,6 +93,16 @@
           </div>
 
           <div class="grid grid-cols-1 gap-4 p-6">
+            <div class="info-card">
+              <div class="info-label">연결된 발주서</div>
+              <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div class="info-value mt-0">{{ asn.purchaseOrderNumber }}</div>
+                  <div class="mt-1 text-sm text-slate-500 dark:text-slate-400">이 ASN이 회신한 발주서 원본</div>
+                </div>
+                <ButtonComp color="secondary" icon="visibility" @click="goPurchaseOrderDetail">보기</ButtonComp>
+              </div>
+            </div>
             <div class="info-card">
               <div class="info-label">회신 총수량 / 요청 총수량</div>
               <div class="info-value">{{ asn.status === 'REJECTED' ? '회신불가' : `${totalAnnouncedQuantity}개 / ${totalRequestedQuantity}개` }}</div>
@@ -251,6 +261,13 @@ const loadPage = async () => {
   }
 
   isLoading.value = false
+}
+
+const goPurchaseOrderDetail = () => {
+  router.push({
+    name: 'vendorPurchaseRequestWorkspace',
+    params: { id: String(asn.value.purchaseOrderId) },
+  })
 }
 
 onMounted(loadPage)

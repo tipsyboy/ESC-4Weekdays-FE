@@ -4,9 +4,9 @@
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-600">Vendor Portal</div>
-          <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50">발주서</h1>
+          <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50">ASN</h1>
           <p class="mt-2 max-w-3xl text-sm text-slate-500 dark:text-slate-400">
-            공급업체가 받은 발주서와 연결된 ASN 회신 상태를 확인합니다.
+            발주서 회신으로 생성된 ASN 문서와 입고 연결 상태를 확인합니다.
           </p>
         </div>
 
@@ -49,8 +49,8 @@
       <div class="border-b border-slate-200 px-6 py-5 dark:border-slate-800">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">받은 발주서 목록</h2>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">발주 완료된 문서를 기준으로 ASN 생성 여부와 회신 상태를 함께 보여줍니다.</p>
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">ASN 목록</h2>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">생성된 ASN 문서를 기준으로 회신 결과를 확인합니다.</p>
           </div>
 
           <div class="flex flex-wrap gap-2">
@@ -74,53 +74,44 @@
         <table class="w-full text-sm">
           <thead class="bg-slate-50 text-slate-500 dark:bg-slate-950 dark:text-slate-400">
             <tr>
-              <th class="px-6 py-4 text-left font-medium">발주서</th>
-              <th class="px-6 py-4 text-left font-medium">요청자</th>
-              <th class="px-6 py-4 text-left font-medium">요청 납기일</th>
-              <th class="px-6 py-4 text-left font-medium">품목 / 수량</th>
               <th class="px-6 py-4 text-left font-medium">ASN</th>
-              <th class="px-6 py-4 text-left font-medium">ASN 회신 상태</th>
+              <th class="px-6 py-4 text-left font-medium">발주서</th>
+              <th class="px-6 py-4 text-left font-medium">예정 도착</th>
+              <th class="px-6 py-4 text-left font-medium">출하 담당</th>
+              <th class="px-6 py-4 text-left font-medium">상태</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="isLoading">
-              <td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+              <td colspan="5" class="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
                 목록을 불러오는 중입니다.
               </td>
             </tr>
             <tr v-else-if="errorMessage">
-              <td colspan="6" class="px-6 py-10 text-center text-sm text-rose-500">
+              <td colspan="5" class="px-6 py-10 text-center text-sm text-rose-500">
                 {{ errorMessage }}
               </td>
             </tr>
             <tr
-              v-for="purchaseOrder in filteredPurchaseOrders"
-              :key="purchaseOrder.id"
+              v-for="asn in filteredAsns"
+              :key="asn.id"
               class="cursor-pointer border-t border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-950"
-              @click="goDetail(purchaseOrder.id)"
+              @click="goDetail(asn)"
             >
               <td class="px-6 py-5">
-                <div class="font-semibold text-slate-900 dark:text-slate-50">{{ purchaseOrder.purchaseOrderNumber }}</div>
-                <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ formatDateTime(purchaseOrder.orderedAt || purchaseOrder.updatedAt) }}</div>
+                <div class="font-semibold text-slate-900 dark:text-slate-50">{{ asn.asnNumber }}</div>
+                <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ asn.vehicleInfo || '-' }}</div>
               </td>
-              <td class="px-6 py-5 text-slate-600 dark:text-slate-300">{{ purchaseOrder.requesterName || '-' }}</td>
-              <td class="px-6 py-5 text-slate-600 dark:text-slate-300">{{ purchaseOrder.expectedInboundDate || '-' }}</td>
-              <td class="px-6 py-5 text-slate-600 dark:text-slate-300">
-                {{ purchaseOrder.itemCount ?? purchaseOrder.items?.length ?? 0 }}종 / {{ purchaseOrder.totalQuantity || 0 }}개
-              </td>
+              <td class="px-6 py-5 text-slate-600 dark:text-slate-300">{{ asn.purchaseOrderNumber }}</td>
+              <td class="px-6 py-5 text-slate-600 dark:text-slate-300">{{ asn.status === 'REJECTED' ? '-' : formatDateTime(asn.expectedArrivalAt) }}</td>
+              <td class="px-6 py-5 text-slate-600 dark:text-slate-300">{{ asn.contactName || '-' }}</td>
               <td class="px-6 py-5">
-                <div class="font-medium text-slate-700 dark:text-slate-200">{{ purchaseOrder.asnNumber || 'ASN 미생성' }}</div>
-                <div v-if="purchaseOrder.asnExpectedArrivalAt" class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  {{ formatDateTime(purchaseOrder.asnExpectedArrivalAt) }}
-                </div>
-              </td>
-              <td class="px-6 py-5">
-                <BadgeComp :color="replyStatusMeta(purchaseOrder).color" :label="replyStatusMeta(purchaseOrder).label" />
+                <BadgeComp :color="statusMeta(asn.status).color" :label="statusMeta(asn.status).label" />
               </td>
             </tr>
-            <tr v-if="!isLoading && !errorMessage && !filteredPurchaseOrders.length">
-              <td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
-                조건에 맞는 발주 요청이 없습니다.
+            <tr v-if="!isLoading && !errorMessage && !filteredAsns.length">
+              <td colspan="5" class="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+                조건에 맞는 ASN이 없습니다.
               </td>
             </tr>
           </tbody>
@@ -170,7 +161,7 @@ import { useAuthStore } from '@/stores/authStore.js'
 const router = useRouter()
 const authStore = useAuthStore()
 
-const purchaseOrders = ref([])
+const asns = ref([])
 const vendorOptions = ref([])
 const selectedVendorId = ref('')
 const selectedStatus = ref('ALL')
@@ -181,78 +172,43 @@ const currentPage = ref(0)
 const pageSize = 10
 const totalElements = ref(0)
 const totalPages = ref(0)
-const summary = ref({
-  totalCount: 0,
-  noneCount: 0,
-  doneCount: 0,
-  rejectedCount: 0,
-})
-
-const emptySummary = () => ({
-  totalCount: 0,
-  noneCount: 0,
-  doneCount: 0,
-  rejectedCount: 0,
-})
-
-const statusTabs = [
-  { value: 'ALL', label: '전체' },
-  { value: 'NONE', label: '미회신' },
-  { value: 'DONE', label: '회신완료' },
-  { value: 'REJECTED', label: '회신불가' },
-]
 
 const activeVendorId = computed(() =>
   authStore.isAdmin ? selectedVendorId.value : authStore.vendorId,
 )
-const hydratedPurchaseOrders = computed(() => purchaseOrders.value)
+const filteredAsns = computed(() => {
+  if (selectedStatus.value === 'ALL') {
+    return asns.value
+  }
+
+  return asns.value.filter((item) => item.status === selectedStatus.value)
+})
 const pageEndIndex = computed(() =>
   totalElements.value === 0 ? 0 : Math.min((currentPage.value + 1) * pageSize, totalElements.value),
 )
-
-const filteredPurchaseOrders = computed(() => {
-  if (selectedStatus.value === 'ALL') {
-    return hydratedPurchaseOrders.value
-  }
-
-  return hydratedPurchaseOrders.value.filter((item) => item.replyStatus === selectedStatus.value)
-})
-
 const summaryCards = computed(() => [
-  {
-    title: '받은 발주서',
-    value: `${summary.value.totalCount}`,
-    description: '현재 업체에 전달된 발주 완료 건',
-    icon: 'receipt_long',
-  },
-  {
-    title: '미회신',
-    value: `${summary.value.noneCount}`,
-    description: '아직 ASN 회신이 없는 건',
-    icon: 'hourglass_empty',
-  },
-  {
-    title: '회신완료',
-    value: `${summary.value.doneCount}`,
-    description: 'ASN 회신이 완료된 건',
-    icon: 'task_alt',
-  },
-  {
-    title: '회신불가',
-    value: `${summary.value.rejectedCount}`,
-    description: '수량 부족 등으로 수주가 어려운 건',
-    icon: 'block',
-  },
+  { title: '전체 ASN', value: `${totalElements.value}`, description: '생성된 ASN 문서', icon: 'local_shipping' },
+  { title: '입고예정', value: `${asns.value.filter((item) => item.status === 'SCHEDULED').length}`, description: '입고 연결이 완료된 건', icon: 'event_available' },
+  { title: '회신불가', value: `${asns.value.filter((item) => item.status === 'REJECTED').length}`, description: '수주 불가로 회신된 건', icon: 'block' },
+  { title: '확인대상', value: `${asns.value.filter((item) => item.status === 'RECEIVED').length}`, description: '내부 확인이 필요한 건', icon: 'task_alt' },
 ])
 
-const replyStatusMeta = (purchaseOrder) => {
+const statusTabs = [
+  { value: 'ALL', label: '전체' },
+  { value: 'RECEIVED', label: '확인' },
+  { value: 'SCHEDULED', label: '입고예정' },
+  { value: 'REJECTED', label: '회신불가' },
+]
+
+const statusMeta = (status) => {
   const map = {
-    NONE: { label: '미회신', color: 'warning' },
-    DONE: { label: '회신완료', color: 'success' },
+    WAITING: { label: '대기', color: 'info' },
+    RECEIVED: { label: '확인', color: 'warning' },
     REJECTED: { label: '회신불가', color: 'danger' },
+    SCHEDULED: { label: '입고예정', color: 'success' },
   }
 
-  return map[purchaseOrder.replyStatus] || map.NONE
+  return map[status] || map.WAITING
 }
 
 const formatDateTime = (value) => {
@@ -269,29 +225,28 @@ const formatDateTime = (value) => {
   })
 }
 
-const loadPurchaseOrders = async (vendorId) => {
+const loadAsns = async (vendorId) => {
   isLoading.value = true
   errorMessage.value = ''
 
-  const purchaseOrderRes = await vendorPortalApi.getPurchaseOrders({
+  const res = await vendorPortalApi.getAsns({
     vendorId: authStore.isAdmin ? vendorId : undefined,
     page: currentPage.value,
     size: pageSize,
   })
-  if (!purchaseOrderRes.success) {
-    purchaseOrders.value = []
+
+  if (!res.success) {
+    asns.value = []
     totalElements.value = 0
     totalPages.value = 0
-    summary.value = emptySummary()
-    errorMessage.value = purchaseOrderRes.message || '발주 요청 목록 조회에 실패했습니다.'
+    errorMessage.value = res.message || 'ASN 목록 조회에 실패했습니다.'
     isLoading.value = false
     return
   }
 
-  purchaseOrders.value = (purchaseOrderRes.results?.content || []).filter((item) => item.status === 'ORDERED')
-  totalElements.value = purchaseOrderRes.results?.totalElements || 0
-  totalPages.value = purchaseOrderRes.results?.totalPages || 0
-  summary.value = purchaseOrderRes.results?.summary || emptySummary()
+  asns.value = res.results?.content || []
+  totalElements.value = res.results?.totalElements || 0
+  totalPages.value = res.results?.totalPages || 0
   isLoading.value = false
 }
 
@@ -315,37 +270,35 @@ const loadVendorOptions = async () => {
 const loadPage = async () => {
   const vendorId = activeVendorId.value
   if (!vendorId) {
-    purchaseOrders.value = []
+    asns.value = []
     totalElements.value = 0
     totalPages.value = 0
-    summary.value = emptySummary()
     errorMessage.value = authStore.isAdmin ? '조회할 공급업체를 선택하세요.' : '연결된 공급업체 계정 정보가 없습니다.'
     return
   }
 
-  await loadPurchaseOrders(vendorId)
-}
-
-const goDetail = (purchaseOrderId) => {
-  router.push({
-    name: 'vendorPurchaseRequestWorkspace',
-    params: { id: String(purchaseOrderId) },
-  })
-}
-
-const movePage = async (page) => {
-  const vendorId = activeVendorId.value
-  if (page < 0 || page >= totalPages.value || !vendorId) {
-    return
-  }
-
-  currentPage.value = page
-  await loadPurchaseOrders(vendorId)
+  await loadAsns(vendorId)
 }
 
 const handleVendorChange = async () => {
   currentPage.value = 0
   await loadPage()
+}
+
+const movePage = async (page) => {
+  if (page < 0 || page >= totalPages.value) {
+    return
+  }
+
+  currentPage.value = page
+  await loadPage()
+}
+
+const goDetail = (asn) => {
+  router.push({
+    name: 'vendorAsnWorkspace',
+    params: { id: String(asn.purchaseOrderId) },
+  })
 }
 
 onMounted(async () => {
