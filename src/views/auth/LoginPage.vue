@@ -115,7 +115,6 @@
     </div>
     <TestAccountModal
       :is-open="isTestAccountModalOpen"
-      :accounts="testAccounts"
       @close="isTestAccountModalOpen = false"
     />
   </div>
@@ -136,11 +135,6 @@ const password = ref('')
 const isPasswordVisible = ref(false)
 const isSubmitting = ref(false)
 const isTestAccountModalOpen = ref(false)
-const testAccounts = [
-  { role: 'ADMIN', loginId: '20260001' },
-  { role: 'MANAGER', loginId: '20260012' },
-  { role: 'WORKER', loginId: '20260108' },
-]
 
 const submitLogin = async () => {
   if (!loginId.value.trim()) {

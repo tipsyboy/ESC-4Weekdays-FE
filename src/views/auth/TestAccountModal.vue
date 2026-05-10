@@ -19,7 +19,7 @@
               <div>
                 <div class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-600">Test Accounts</div>
                 <h2 class="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-50">테스트 계정 안내</h2>
-                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">공통 비밀번호는 `qwer1234` 입니다.</p>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">공통 비밀번호는 `1234` 입니다.</p>
               </div>
               <button
                 type="button"
@@ -81,13 +81,13 @@ defineProps({
     type: Boolean,
     default: false,
   },
-  accounts: {
-    type: Array,
-    default: () => [],
-  },
 })
 
 const emit = defineEmits(['close'])
+
+const accounts = [
+  { role: 'ADMIN', loginId: 'admin' },
+]
 
 const closeModal = () => emit('close')
 
