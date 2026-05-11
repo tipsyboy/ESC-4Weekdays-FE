@@ -1,19 +1,29 @@
-import InventoryList from "@/views/inventory/InventoryList.vue";
-import InventoryDetail from "@/views/inventory/InventoryDetail.vue";
+import inventoryDashboard from '@/views/inventory/InventoryDashboard.vue'
+import inventoryWorkspace from '@/views/inventory/InventoryWorkspace.vue'
+import { INTERNAL_ROLES } from '@/router/accessRoles.js'
 
 const inventoryRoutes = [
-    {
-        path: '/inventory',
-        name: 'inventoryList',
-        component: InventoryList,
-        meta: { roles: ['MANAGER'] },
-    },
-    {
-        path: '/inventory/detail/:productCode',
-        name: 'inventoryDetail',
-        component: InventoryDetail,
-        meta: { roles: ['MANAGER'] },
-    },
+  {
+    path: '/inventories',
+    name: 'inventoryDashboard',
+    component: inventoryDashboard,
+    meta: { roles: INTERNAL_ROLES },
+  },
+  {
+    path: '/inventories/:id',
+    name: 'inventoryWorkspace',
+    component: inventoryWorkspace,
+    props: true,
+    meta: { roles: INTERNAL_ROLES },
+  },
+  {
+    path: '/inventory',
+    redirect: '/inventories',
+  },
+  {
+    path: '/inventory/detail/:productCode',
+    redirect: '/inventories',
+  },
 ]
 
 export default inventoryRoutes

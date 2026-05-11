@@ -67,6 +67,7 @@ const menus = [
   { label: '발주', icon: 'receipt_long', route: '/purchase-orders', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
   { label: 'ASN', icon: 'local_shipping', route: '/asns', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
   { label: '입고', icon: 'warehouse', route: '/inbounds', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
+  { label: '재고', icon: 'inventory', route: '/inventories', roles: ['ADMIN', 'MANAGER', 'WORKER'] },
   { label: '발주서', icon: 'receipt_long', route: '/vendor-portal/purchase-orders', roles: ['ADMIN', 'VENDOR_MANAGER'] },
   { label: '공급업체 ASN', icon: 'assignment_returned', route: '/vendor-portal/asns', roles: ['ADMIN', 'VENDOR_MANAGER'] },
 ]
@@ -84,6 +85,10 @@ const isActive = (path) => {
 
   if (path === '/inbounds') {
     return route.path.startsWith('/inbounds')
+  }
+
+  if (path === '/inventories') {
+    return route.path.startsWith('/inventories')
   }
 
   if (path === '/vendor-portal/purchase-orders') {
