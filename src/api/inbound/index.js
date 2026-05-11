@@ -38,16 +38,4 @@ const getInboundsSearch = async (taskId) => {
     })
 }
 
-const arriveDelivery = async (inboundId) => {
-  return await api
-    .patch(`/api/inbounds/${inboundId}/arrive`)
-    .then((response) => {
-      return response.data
-    })
-    .catch((error) => {
-      return error.response?.data || { success: false, message: '차량 도착 처리 실패' }
-    })
-}
-
-
-export default { getInboundList, getInboundDetail, getInboundsSearch, arriveDelivery }
+export default { getInboundList, getInboundDetail, getInboundsSearch }

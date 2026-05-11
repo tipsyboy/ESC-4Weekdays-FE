@@ -218,10 +218,9 @@ const formatDate = (dateStr) => {
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'SCHEDULED': return 'info'
-    case 'PUTAWAY' : return 'info'
-    case 'ARRIVED' : return 'warning'
-    case 'INSPECTING': return 'warning'
+    case 'PLANNED': return 'info'
+    case 'RECEIVING': return 'warning'
+    case 'PARTIAL': return 'secondary'
     case 'COMPLETED': return 'success'
     case 'CANCELLED': return 'danger'
     default: return 'gray'
@@ -230,11 +229,10 @@ const getStatusColor = (status) => {
 
 const getStatusLabel = (status) => {
   switch (status) {
-    case 'SCHEDULED': return '입고예정'
-    case 'ARRIVED' : return '검수 대기중'
-    case 'INSPECTING': return '검수중'
-    case 'PUTAWAY' : return '적치중'
-    case 'COMPLETED': return '완료'
+    case 'PLANNED': return '입고예정'
+    case 'RECEIVING': return '입고중'
+    case 'PARTIAL': return '부분입고'
+    case 'COMPLETED': return '입고완료'
     case 'CANCELLED': return '취소'
     default: return '미정'
   }
