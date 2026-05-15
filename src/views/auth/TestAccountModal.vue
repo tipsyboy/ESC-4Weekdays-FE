@@ -70,12 +70,32 @@
             </div>
           </div>
         </div>
+        <Transition
+          enter-active-class="transition duration-200 ease-out"
+          enter-from-class="translate-y-2 opacity-0"
+          enter-to-class="translate-y-0 opacity-100"
+          leave-active-class="transition duration-150 ease-in"
+          leave-from-class="translate-y-0 opacity-100"
+          leave-to-class="translate-y-2 opacity-0"
+        >
+          <div
+            v-if="toastMessage"
+            class="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-xl dark:bg-white dark:text-slate-950"
+            role="status"
+            aria-live="polite"
+          >
+            <span class="material-symbols-outlined text-[18px]">check_circle</span>
+            {{ toastMessage }}
+          </div>
+        </Transition>
       </div>
     </Transition>
   </Teleport>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
 defineProps({
   isOpen: {
     type: Boolean,
@@ -89,13 +109,29 @@ const accounts = [
   { role: 'ADMIN', loginId: 'admin' },
 ]
 
+const toastMessage = ref('')
+let toastTimer = null
+
 const closeModal = () => emit('close')
+
+const showToast = (message) => {
+  toastMessage.value = message
+  if (toastTimer) {
+    clearTimeout(toastTimer)
+  }
+  toastTimer = window.setTimeout(() => {
+    toastMessage.value = ''
+    toastTimer = null
+  }, 1800)
+}
 
 const copyToClipboard = async (text) => {
   try {
     await navigator.clipboard.writeText(text)
+    showToast('로그인 ID가 복사되었습니다.')
   } catch {
     window.prompt('로그인 ID를 복사하세요.', text)
+    showToast('복사할 로그인 ID를 표시했습니다.')
   }
 }
 </script>
