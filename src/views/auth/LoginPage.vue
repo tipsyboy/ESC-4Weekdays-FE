@@ -1,27 +1,29 @@
 <template>
-  <div class="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6 py-12">
-    <div class="grid w-full max-w-6xl grid-cols-1 overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.12)] dark:border-slate-800 dark:bg-slate-900 lg:grid-cols-[1.05fr_0.95fr]">
-      <section class="bg-[linear-gradient(145deg,#082f49_0%,#0f172a_55%,#0284c7_100%)] px-8 py-10 text-white sm:px-10 lg:px-12">
-        <div class="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
+  <div class="login-shell flex min-h-[calc(100vh-4rem)] items-center justify-center px-6 py-12">
+    <div class="login-panel grid w-full max-w-6xl grid-cols-1 overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.12)] dark:border-slate-800 dark:bg-slate-900 lg:grid-cols-[1.05fr_0.95fr]">
+      <section class="login-hero relative overflow-hidden bg-[linear-gradient(145deg,#082f49_0%,#0f172a_55%,#0284c7_100%)] px-8 py-10 text-white sm:px-10 lg:px-12">
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="flow-field" aria-hidden="true"></div>
+        <div class="hero-badge relative inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
           4Weekdays WMS
         </div>
-        <h1 class="mt-6 text-4xl font-bold leading-tight">창고 운영 흐름을 추적/관리합니다.</h1>
-        <p class="mt-4 max-w-xl text-sm leading-7 text-white/75">
+        <h1 class="hero-copy relative mt-6 text-4xl font-bold leading-tight">창고 운영 흐름을 추적/관리합니다.</h1>
+        <p class="hero-copy relative mt-4 max-w-xl text-sm leading-7 text-white/75">
           발주, ASN, 입고, 재고를 연결하고 실제 작업 흐름에 맞춰 운영할 수 있습니다.
         </p>
 
-        <div class="mt-10 grid grid-cols-1 gap-4">
-          <div class="rounded-2xl bg-white/10 p-5">
+        <div class="relative mt-10 grid grid-cols-1 gap-4">
+          <div class="hero-card rounded-2xl bg-white/10 p-5">
             <div class="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Purchase To Inbound</div>
             <div class="mt-2 text-xl font-semibold">발주에서 입고까지 연결</div>
             <div class="mt-2 text-sm text-white/75">발주 승인 이후 공급업체 응답과 입고 흐름을 끊기지 않게 이어갑니다.</div>
           </div>
-          <div class="rounded-2xl bg-white/10 p-5">
+          <div class="hero-card rounded-2xl bg-white/10 p-5">
             <div class="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Vendor Collaboration</div>
             <div class="mt-2 text-xl font-semibold">공급업체 회신 추적</div>
             <div class="mt-2 text-sm text-white/75">ASN 회신과 납품 커뮤니케이션을 내부 운영 흐름과 같이 확인할 수 있습니다.</div>
           </div>
-          <div class="rounded-2xl bg-white/10 p-5">
+          <div class="hero-card rounded-2xl bg-white/10 p-5">
             <div class="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Location-Based Inventory</div>
             <div class="mt-2 text-xl font-semibold">위치 기반 재고 관리</div>
             <div class="mt-2 text-sm text-white/75">입고 완료 시 실제 적치 위치를 기준으로 재고를 반영하고 위치 단위로 추적합니다.</div>
@@ -30,7 +32,7 @@
       </section>
 
       <section class="px-8 py-10 sm:px-10 lg:px-12">
-        <div class="mx-auto flex h-full max-w-xl flex-col justify-center">
+        <div class="login-form mx-auto flex h-full max-w-xl flex-col justify-center">
           <div>
             <div class="text-xs font-semibold uppercase tracking-[0.18em] text-sky-600">Login</div>
             <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
@@ -162,3 +164,187 @@ const submitLogin = async () => {
   router.push(authStore.defaultRoute())
 }
 </script>
+
+<style scoped>
+.login-shell {
+  animation: shellFade 480ms ease-out both;
+}
+
+.login-panel {
+  animation: panelLift 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.login-hero::before {
+  position: absolute;
+  inset: -20%;
+  content: '';
+  background:
+    radial-gradient(circle at 18% 18%, rgba(56, 189, 248, 0.24), transparent 26%),
+    radial-gradient(circle at 78% 72%, rgba(14, 165, 233, 0.22), transparent 30%);
+  animation: heroGlow 7s ease-in-out infinite alternate;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(135deg, rgba(0, 0, 0, 0.75), transparent 72%);
+  opacity: 0.4;
+  animation: gridDrift 3.5s linear infinite;
+}
+
+.flow-field {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      118deg,
+      transparent 0 72px,
+      rgba(125, 211, 252, 0.11) 72px 74px,
+      transparent 74px 148px
+    ),
+    repeating-linear-gradient(
+      28deg,
+      transparent 0 92px,
+      rgba(255, 255, 255, 0.07) 92px 94px,
+      transparent 94px 186px
+    );
+  background-size: 220px 220px, 260px 260px;
+  mask-image: linear-gradient(125deg, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.24) 72%, transparent);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.68;
+  animation: flowField 18s linear infinite;
+}
+
+.hero-badge,
+.hero-copy,
+.login-form {
+  animation: contentIn 560ms ease-out both;
+}
+
+.hero-copy {
+  animation-delay: 70ms;
+}
+
+.login-form {
+  animation-delay: 120ms;
+}
+
+.hero-card {
+  backdrop-filter: blur(12px);
+  animation: cardIn 560ms ease-out both;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.hero-card:nth-child(1) {
+  animation-delay: 120ms;
+}
+
+.hero-card:nth-child(2) {
+  animation-delay: 200ms;
+}
+
+.hero-card:nth-child(3) {
+  animation-delay: 280ms;
+}
+
+.hero-card:hover {
+  transform: translateY(-3px);
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+@keyframes shellFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes panelLift {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes contentIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes heroGlow {
+  from {
+    transform: translate3d(-1%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1%, 1%, 0) scale(1.04);
+  }
+}
+
+@keyframes gridDrift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 68px 34px, 68px 34px;
+  }
+}
+
+@keyframes flowField {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 220px 220px, -260px 260px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-shell,
+  .login-panel,
+  .login-hero::before,
+  .flow-field,
+  .hero-grid,
+  .hero-badge,
+  .hero-copy,
+  .login-form,
+  .hero-card {
+    animation: none;
+  }
+
+  .hero-card,
+  .hero-card:hover {
+    transform: none;
+  }
+}
+</style>
